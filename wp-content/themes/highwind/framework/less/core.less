@@ -85,6 +85,21 @@ form {
 		float: right;
 		margin-right:0;
 	}
+	::-webkit-input-placeholder {
+	   color: rgba(0,0,0,0.35);
+	}
+
+	:-moz-placeholder { /* Firefox 18- */
+	   color: rgba(0,0,0,0.35);
+	}
+
+	::-moz-placeholder {  /* Firefox 19+ */
+	   color: rgba(0,0,0,0.35);
+	}
+
+	:-ms-input-placeholder {
+	   color: rgba(0,0,0,0.35);
+	}
 	[placeholder]:focus::-webkit-input-placeholder {
 		-webkit-transition: opacity 0.5s 0.5s ease;
 		-moz-transition: opacity 0.5s 0.5s ease;
@@ -398,10 +413,7 @@ p.nocomments {
 		}
 		.comment-meta {
 			a {
-				.opacity(0.3);
-				.transition(opacity,ease,.4s);
 				&:hover {
-					.opacity(1);
 					text-decoration: none;
 				}
 			}
@@ -661,12 +673,6 @@ form.searchform {
 			float: none;
 		}
 	}
-	.page-template-templatestemplate-fullwidth-no-comments-php, body.fullwidth-no-comments {
-		.content {
-			.column(12);
-			float: none;
-		}
-	}
 
 
 	/**
@@ -696,7 +702,7 @@ form.searchform {
 		}
 		.highwind-navigation {
 			max-width: 74.55em;
-			padding:0 1.777em;
+			padding:0 3.157em;
 			margin:0 auto;
 			.clearfix;
 			.borderbox;
