@@ -8,6 +8,49 @@ Changelog Legend:
 [x] = Deleted
 [!] = Bugs
 
+(10/04/13) - Improvements - Version 1.9.3.8
+
+[*] Spaces for indentation have been swapped out for tabs in the code
+[!] Fixed javascript bug that was preventing other javascripts from working correctly
+
+(09/26/13) - Improvements - Version 1.9.3.7
+
+http://cyberchimps.com/guide/update-1-9-3-7/
+
+[*] Set up icon links with new responsive_child_uri() function.
+[+] Added function responsive_free_get_option() to get value of individual free option.
+[+] Added title to blog post page.
+[x] Removed trailing blank spaces.
+[+] Added editor option type for Content area and Featured content options.
+
+
+(08/21/13) - Improvements - Version 1.9.3.6
+
+http://cyberchimps.com/guide/update-1-9-3-6/
+
+[+] Themes page to appearance menu
+[!] Fixed support and forum links.
+[^] Moved plugin from theme to wordpress plugin repo.
+[+] Added ability to add classes to options.
+[*] Allowed call to action update without home content.
+
+----
+
+(08/06/13) - Improvements - Version 1.9.3.5
+
+http://cyberchimps.com/guide/update-1-9-3-5/
+
+[+] Added rtl css support.
+[+] Added cyberchimps logo to footer.
+[+] Added option class to define theme options.
+[+] Added support for companion plugin.
+[*] Changed post title tag of blog post from h1 to h2.
+[x] Removed google-site-verification etc as per WP rules.
+[!] Fixed css loading sequence.
+[!] Fixed customizer redirection issue.
+
+----
+
 (07/22/13) - Improvements - Version 1.9.3.4
 
 http://cyberchimps.com/guide/update-1-9-3-4/

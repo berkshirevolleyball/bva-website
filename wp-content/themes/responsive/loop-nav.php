@@ -1,14 +1,16 @@
 <?php
 
 // Exit if accessed directly
-if ( !defined('ABSPATH')) exit;
+if( !defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Loop Navigation Template-Part File
  *
  * @file           loop-nav.php
- * @package        Responsive 
- * @author         Emil Uzelac 
+ * @package        Responsive
+ * @author         Emil Uzelac
  * @copyright      2003 - 2013 ThemeID
  * @license        license.txt
  * @version        Release: 1.1.0
@@ -20,7 +22,7 @@ if ( !defined('ABSPATH')) exit;
 /**
  * Output Prev/Next Posts Links
  */
-if (  $wp_query->max_num_pages > 1 ) : 
+if( $wp_query->max_num_pages > 1 ) :
 	?>
 
 	<div class="navigation">
@@ -28,5 +30,5 @@ if (  $wp_query->max_num_pages > 1 ) :
 		<div class="next"><?php previous_posts_link( __( 'Newer posts &#8250;', 'responsive' ) ); ?></div>
 	</div><!-- end of .navigation -->
 
-	<?php 
+<?php
 endif;
