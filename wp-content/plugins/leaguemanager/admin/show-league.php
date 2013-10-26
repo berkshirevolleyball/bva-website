@@ -108,7 +108,7 @@ if ( $league->mode != 'championship' ) {
 	<form action="admin.php" method="get" style="display: inline;">
 		<input type="hidden" name="page" value="leaguemanager" />
 		<input type="hidden" name="subpage" value="show-league" />
-		<input type="hidden" name="league_id" value="<?php echo $league->id ?>" />
+		<input id="league_id" type="hidden" name="league_id" value="<?php echo $league->id ?>" />
 		<label for="season" style="vertical-align: middle;"><?php _e( 'Season', 'leaguemanager' ) ?></label>
 		<select size="1" name="season" id="season">
 		<?php foreach ( $league->seasons AS $s ) : ?>

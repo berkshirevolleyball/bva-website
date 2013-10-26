@@ -51,8 +51,6 @@ p.table_rows {
 	
 p.info { margin: 0; padding: 0; float: right; }
 
-table#standings tr { cursor: move; }
-
 span.loading { margin-left: 5px; }
 span.loading img { vertical-align: middle; }
 
@@ -237,4 +235,10 @@ div.teampage .prev_match .score {
 .leaguemanager_widget table.leaguemanager tr, .leaguemanager_widget table.leaguemanager tr.alternate {
 	background-color: #ffffff;
 	}
-*/	
+*/
+
+/*--- Custom ---*/
+.form-table td input[type="text"] {
+	text-align:center;
+}
+

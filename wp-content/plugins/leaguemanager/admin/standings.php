@@ -21,12 +21,13 @@
 		<th class="logo">&#160;</th>
 		<th><?php _e( 'Club', 'leaguemanager' ) ?></th>
 		<?php if ( !empty($league->groups) && $league->mode != 'championship' ) : ?><th class="num"><?php _e( 'Group', 'leaguemanager' ) ?></th><?php endif; ?>
-		<th class="num"><?php if ( 1 == $league->standings['pld'] ) : ?><?php _e( 'Pld', 'leaguemanager' ) ?><?php endif; ?></th>
+		<th class="num"><?php if ( 1 == $league->standings['pld'] ) : ?><?php _e( 'Played', 'leaguemanager' ) ?><?php endif; ?></th>
 		<th class="num"><?php if ( 1 == $league->standings['won'] ) : ?><?php echo _c( 'W|Won','leaguemanager' ) ?><?php endif; ?></th>
 		<th class="num"><?php if ( 1 == $league->standings['tie'] ) : ?><?php echo _c( 'T|Tie','leaguemanager' ) ?><?php endif; ?></th>
 		<th class="num"><?php if ( 1 == $league->standings['lost'] ) : ?><?php echo _c( 'L|Lost','leaguemanager' ) ?><?php endif; ?></th>
 		<?php do_action( 'leaguemanager_standings_header_'.$league->sport ) ?>
-		<th class="num"><?php _e( 'Pts', 'leaguemanager' ) ?></th>
+		<th class="num"><?php _e( 'Points Against', 'leaguemanager' ) ?></th>
+		<th class="num"><?php _e( 'Points', 'leaguemanager' ) ?></th>
 		<th class="num"><?php _e( '+/- Points', 'leaguemanager' ) ?></th>
 	</tr>
 	</thead>
@@ -83,11 +84,16 @@
 		<?php endif; ?>
 		<?php do_action( 'leaguemanager_standings_columns_'.$league->sport, $team, $league->point_rule ) ?>
 		<td class="num">
-		<?php if ( $league->point_rule != 'manual' ) : ?>
-			<?php printf($league->point_format, $team->points_plus+$team->add_points, $team->points_minus) ?>
-		<?php else : ?>
-			<input type="text" size="2" name="points_plus[<?php echo $team->id ?>]" value="<?php echo $team->points_plus + $team->add_points ?>" /> : <input type="text" size="2" name="points_minus[<?php echo $team->id ?>]" value="<?php echo $team->points_minus ?>" />
-		<?php endif; ?>
+			<?php if ( $league->point_rule != 'manual' ) : ?>
+				<?php echo $team->points_minus; ?>
+			<?php endif; ?>
+		</td>
+		<td class="num">
+			<?php if ( $league->point_rule != 'manual' ) : ?>
+				<?php echo $team->points_plus+$team->add_points; ?>
+			<?php else : ?>
+				<input type="text" size="2" name="points_plus[<?php echo $team->id ?>]" value="<?php echo $team->points_plus + $team->add_points ?>" /> : <input type="text" size="2" name="points_minus[<?php echo $team->id ?>]" value="<?php echo $team->points_minus ?>" />
+			<?php endif; ?>
 		</td>
 		<td class="num">
 			<input type="text" size="2" name="add_points[<?php echo $team->id ?>]" value="<?php echo $team->add_points ?>" id="add_points_<?php echo $team->id ?>" onblur="Leaguemanager.saveAddPoints(<?php echo $team->id ?>)" /><span class="loading" id="loading_<?php echo $team->id ?>"></span>

@@ -112,17 +112,22 @@ Leaguemanager.saveStandings = function(ranking) {
 }
 
 Leaguemanager.saveAddPoints = function(team_id) {
-	Leaguemanager.isLoading('loading_' + team_id);
+	var league_id = document.getElementById('league_id').value;
 	var points = document.getElementById('add_points_' + team_id).value;
-	
 	var ajax = new sack(LeagueManagerAjaxL10n.requestUrl);
+	
+	Leaguemanager.isLoading('loading_' + team_id);
+
 	ajax.execute = 1;
 	ajax.method = 'POST';
 	ajax.setVar( "action", "leaguemanager_save_add_points" );
 	ajax.setVar( "team_id", team_id );
 	ajax.setVar( "points", points );
+	ajax.setVar( "league_id", league_id );
 	ajax.onError = function() { alert('Ajax error on saving standings'); };
-	ajax.onCompletion = function() { return true; };
+	ajax.onCompletion = function() {
+		location.reload();
+	};
 	ajax.runAJAX();
 }
 
