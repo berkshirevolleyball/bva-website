@@ -52,7 +52,7 @@ class TablePress_Render {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @var object
+	 * @var EvalMath
 	 */
 	protected $evalmath;
 
@@ -123,7 +123,7 @@ class TablePress_Render {
 	 * @param array $table Table to be rendered
 	 * @param array $render_options Options for rendering, from both "Edit" screen and Shortcode
 	 */
-	public function set_input( $table, $render_options ) {
+	public function set_input( array $table, array $render_options ) {
 		$this->table = $table;
 		$this->render_options = $render_options;
 		$this->table = apply_filters( 'tablepress_table_raw_render_data', $this->table, $this->render_options );
@@ -259,8 +259,8 @@ class TablePress_Render {
 	 * @param array $parents List of cells that depend on this cell (to prevent circle references)
 	 * @return string Result of the parsing/evaluation
 	 */
-	protected function _evaluate_cell( $content, $parents = array() ) {
-		if ( '' == $content || '=' != $content[0] )
+	protected function _evaluate_cell( $content, array $parents = array() ) {
+		if ( '' == $content || '=' == $content || '=' != $content[0] )
 			return $content;
 
 		$content = substr( $content, 1 );
@@ -481,7 +481,7 @@ class TablePress_Render {
 		// <colgroup> tag
 		$colgroup = '';
 		if ( apply_filters( 'tablepress_print_colgroup_tag', false, $this->table['id'] ) ) {
-			for ( $col_idx = 0; $col_idx < $columns; $col_idx++ ) {
+			for ( $col_idx = 0; $col_idx < $num_columns; $col_idx++ ) {
 				$attributes = ' class="colgroup-column-' . ( $col_idx + 1 ) . ' "';
 				$attributes = apply_filters( 'tablepress_colgroup_tag_attributes', $attributes, $this->table['id'], $col_idx + 1 );
 				$colgroup .= "\t<col{$attributes}/>\n";
@@ -544,7 +544,7 @@ class TablePress_Render {
 			$cell_content = $this->table['data'][ $row_idx ][ $col_idx ];
 
 			// print formulas that are escaped with '= (like in Excel) as text:
-			if ( strlen( $cell_content ) > 2 && "'=" == substr( $cell_content, 0, 2 ) )
+			if ( "'=" == substr( $cell_content, 0, 2 ) )
 				$cell_content = substr( $cell_content, 1 );
 			$cell_content = $this->safe_output( $cell_content );
 			if ( false !== strpos( $cell_content, '[' ) )
@@ -680,7 +680,8 @@ class TablePress_Render {
 			'hide_columns' => '',
 			'cellspacing' => false,
 			'cellpadding' => false,
-			'border' => false
+			'border' => false,
+			'shortcode_debug' => false
 		);
 	}
 

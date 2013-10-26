@@ -27,7 +27,7 @@ abstract class TablePress {
 	 *
 	 * @const string
 	 */
-	const version = '1.1.1';
+	const version = '1.2';
 
 	/**
 	 * TablePress internal plugin version ("options scheme" version)
@@ -38,7 +38,7 @@ abstract class TablePress {
 	 *
 	 * @const int
 	 */
-	const db_version = 21;
+	const db_version = 22;
 
 	/**
 	 * TablePress "table scheme" (data format structure) version
@@ -53,7 +53,7 @@ abstract class TablePress {
 	const table_scheme_version = 3;
 
 	/**
-	 * Instance of the controller object
+	 * Instance of the controller
 	 *
 	 * @since 1.0.0
 	 *
@@ -97,8 +97,8 @@ abstract class TablePress {
 			return;
 		}
 
-		// check if minimum requirements are fulfilled, currently WordPress 3.5
-		if ( version_compare( $GLOBALS['wp_version'], '3.5', '<' ) ) {
+		// check if minimum requirements are fulfilled, currently WordPress 3.6
+		if ( version_compare( $GLOBALS['wp_version'], '3.6', '<' ) ) {
 			// show error notice to admins, if WP is not installed in the minimum required version, in which case TablePress will not work
 			if ( current_user_can( 'update_plugins' ) )
 				add_action( 'admin_notices', array( 'TablePress', 'show_minimum_requirements_error_notice' ) );
@@ -181,7 +181,7 @@ abstract class TablePress {
 	 * @param array $data (optional) Parameters/PHP variables that shall be available to the view
 	 * @return object Instance of the initialized view, already set up, just needs to be render()ed
 	 */
-	public static function load_view( $view, $data = array() ) {
+	public static function load_view( $view, array $data = array() ) {
 		self::load_file( 'class-view.php', 'classes' ); // View Base Class
 		$ucview = ucfirst( $view ); // make first letter uppercase for a better looking naming pattern
 		$the_view = self::load_class( "TablePress_{$ucview}_View", "view-{$view}.php", 'views' );
@@ -315,7 +315,7 @@ abstract class TablePress {
 	 * @param string $target (optional) Target File, e.g. "admin-post.php" for POST requests
 	 * @return string The URL for the given parameters (already run through esc_url() with $add_nonce == true!)
 	 */
-	public static function url( $params = array(), $add_nonce = false, $target = '' ) {
+	public static function url( array $params = array(), $add_nonce = false, $target = '' ) {
 
 		// default action is "list", if no action given
 		if ( ! isset( $params['action'] ) )
@@ -361,7 +361,7 @@ abstract class TablePress {
 	 * @param array $params (optional) Parameters from which the target URL is constructed
 	 * @param bool $add_nonce (optional) Whether the URL shall be nonced by WordPress
 	 */
-	public static function redirect( $params = array(), $add_nonce = false ) {
+	public static function redirect( array $params = array(), $add_nonce = false ) {
 		$redirect = self::url( $params );
 		if ( $add_nonce ) {
 			if ( ! isset( $params['item'] ) )

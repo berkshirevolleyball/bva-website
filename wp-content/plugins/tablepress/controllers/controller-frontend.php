@@ -296,7 +296,7 @@ JS;
 	 * @param array $shortcode_atts List of attributes that where included in the Shortcode
 	 * @return string Resulting HTML code for the table with the ID <ID>
 	 */
-	public function shortcode_table( $shortcode_atts ) {
+	public function shortcode_table( array $shortcode_atts ) {
 		$_render = TablePress::load_class( 'TablePress_Render', 'class-render.php', 'classes' );
 
 		$default_shortcode_atts = $_render->get_default_render_options();
@@ -355,7 +355,7 @@ JS;
 
 		// generate "Edit Table" link
 		$render_options['edit_table_url'] = '';
-		if ( is_user_logged_in() && apply_filters( 'tablepress_edit_link_below_table', true ) && current_user_can( 'tablepress_edit_table', $table['id'] ) )
+		if ( is_user_logged_in() && apply_filters( 'tablepress_edit_link_below_table', true, $table['id'] ) && current_user_can( 'tablepress_edit_table', $table['id'] ) )
 			$render_options['edit_table_url'] = TablePress::url( array( 'action' => 'edit', 'table_id' => $table['id'] ) );
 
 		$render_options = apply_filters( 'tablepress_table_render_options', $render_options, $table );
@@ -405,6 +405,10 @@ JS;
 			$output = $_render->get_output();
 		}
 
+		// Maybe print a list of used render options
+		if ( $render_options['shortcode_debug'] && is_user_logged_in() )
+			$output .= '<pre>' . var_export( $render_options, true ) . '</pre>';
+
 		return $output;
 	}
 
@@ -416,7 +420,7 @@ JS;
 	 * @param array $atts list of attributes that where included in the Shortcode
 	 * @return string Text that replaces the Shortcode (error message or asked-for information)
 	 */
-	public function shortcode_table_info( $shortcode_atts ) {
+	public function shortcode_table_info( array $shortcode_atts ) {
 		// parse Shortcode attributes, only allow those that are specified
 		$default_shortcode_atts = array(
 				'id' => 0,
@@ -591,7 +595,6 @@ JS;
 		// for all search terms loop through all tables's cells (those cells are all visible, because we filtered before!)
 		$query_result = array(); // array of all search words that were found, and the table IDs where they were found
 		foreach ( $search_terms as $search_term ) {
-			$search_term = addslashes_gpc( $search_term ); // escapes with esc_sql
 			foreach ( $search_tables as $table_id => $table ) {
 				if ( false !== stripos( $table['name'], $search_term ) || false !== stripos( $table['description'], $search_term ) ) {
 					// we found the $search_term in the name or description (and they are shown)
@@ -614,9 +617,10 @@ JS;
 		$exact = get_query_var( 'exact' ); // if $_GET['exact'] is set, WordPress doesn't use % in SQL LIKE clauses
 		$n = ( empty( $exact ) ) ? '%' : '';
 		foreach ( $query_result as $search_term => $tables ) {
+			$search_term = addslashes_gpc( $search_term );
 			$old_or = "OR ({$wpdb->posts}.post_content LIKE '{$n}{$search_term}{$n}')";
 			$table_ids = implode( '|', $tables );
-			$regexp = '\\\\[' . TablePress::$shortcode . ' id=(["\\\']?)(' . $table_ids . ')(["\\\' /])'; // ' needs to be single escaped, [ double escaped (with \\) in mySQL
+			$regexp = '\\\\[' . TablePress::$shortcode . ' id=(["\\\']?)(' . $table_ids . ')([\]"\\\' /])'; // ' needs to be single escaped, [ double escaped (with \\) in mySQL
 			$new_or = $old_or . " OR ({$wpdb->posts}.post_content REGEXP '{$regexp}')";
 			$search_sql = str_replace( $old_or, $new_or, $search_sql );
 		}

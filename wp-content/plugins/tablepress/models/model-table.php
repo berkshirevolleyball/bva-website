@@ -25,7 +25,7 @@ class TablePress_Table_Model extends TablePress_Model {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @var object
+	 * @var TablePress_Post_Model
 	 */
 	protected $model_post;
 
@@ -68,7 +68,7 @@ class TablePress_Table_Model extends TablePress_Model {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @var object
+	 * @var TablePress_WP_Option
 	 */
 	protected $tables;
 
@@ -106,7 +106,7 @@ class TablePress_Table_Model extends TablePress_Model {
 	 *
 	 * @param array $tables New set of tables
 	 */
-	public function _debug_update_tables( $tables ) {
+	public function _debug_update_tables( array $tables ) {
 		$this->tables->update( $tables );
 	}
 
@@ -119,7 +119,7 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @param int $post_id Post ID
 	 * @return array Post
 	 */
-	protected function _table_to_post( $table, $post_id ) {
+	protected function _table_to_post( array $table, $post_id ) {
 		// Sanitize each cell, if the user is not allowed to work with unfiltered HTML
 		// table name and description are sanitized by WordPress directly, but the JSON would break if we don't do it ourselves
 		if ( ! current_user_can( 'unfiltered_html' ) ) {
@@ -264,9 +264,9 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @since 1.0.0
 	 *
 	 * @param array $table Table (needs to have $table['id']!)
-	 * @return mixed False on error, string table ID on success
+	 * @return string|bool False on error, string table ID on success
 	 */
-	public function save( $table ) {
+	public function save( array $table ) {
 		if ( empty( $table['id'] ) )
 			return false;
 
@@ -305,9 +305,9 @@ class TablePress_Table_Model extends TablePress_Model {
 	 *
 	 * @param array $table Table ($table['id'] is not necessary)
 	 * @param string|bool $copied_table_id ID of the copied table, if table is a copy, false otherwise
-	 * @return mixed False on error, string table ID of the new table on success
+	 * @return string|bool False on error, string table ID of the new table on success
 	 */
-	public function add( $table, $copied_table_id = false ) {
+	public function add( array $table, $copied_table_id = false ) {
 		$post_id = false; // to insert table
 		$post = $this->_table_to_post( $table, $post_id );
 		$new_post_id = $this->model_post->insert( $post );
@@ -341,7 +341,7 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @since 1.0.0
 	 *
 	 * @param string $table_id ID of the table to be copied
-	 * @return mixed False on error, string table ID of the new table on success
+	 * @return string|bool False on error, string table ID of the new table on success
 	 */
 	public function copy( $table_id ) {
 		$table = $this->load( $table_id );
@@ -638,7 +638,7 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @param bool $extended_visibility_check (optional) Whether to check the counts of hidden rows and columns (only possible for Admin_AJAX controller as of now)
 	 * @return array|bool Merged table on success, false on error
 	 */
-	public function prepare_table( $table, $new_table, $table_size_check = true, $extended_visibility_check = false ) {
+	public function prepare_table( array $table, array $new_table, $table_size_check = true, $extended_visibility_check = false ) {
 		// Table ID must be the same (if there was an ID already)
 		if ( false !== $table['id'] ) {
 			if ( $table['id'] !== $new_table['id'] )
@@ -748,10 +748,9 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @param array $options Table options
 	 * @return bool True on success, false on error
 	 */
-	protected function _add_table_options( $post_id, $options ) {
+	protected function _add_table_options( $post_id, array $options ) {
 		$options = json_encode( $options );
-		$success = $this->model_post->add_meta_field( $post_id, $this->table_options_field_name, $options );
-		return $success;
+		return $this->model_post->add_meta_field( $post_id, $this->table_options_field_name, $options );
 	}
 
 	/**
@@ -763,12 +762,9 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @param array $options Table options
 	 * @return bool True on success, false on error
 	 */
-	protected function _update_table_options( $post_id, $options ) {
+	protected function _update_table_options( $post_id, array $options ) {
 		$options = json_encode( $options );
-		// we need to pass the previous value to make sure that an update takes place, to really get a successful (true) return result from the WP API
-		$prev_options = json_encode( $this->_get_table_options( $post_id ) );
-		$success = $this->model_post->update_meta_field( $post_id, $this->table_options_field_name, $options, $prev_options );
-		return $success;
+		return $this->model_post->update_meta_field( $post_id, $this->table_options_field_name, $options );
 	}
 
 	/**
@@ -783,8 +779,7 @@ class TablePress_Table_Model extends TablePress_Model {
 		$options = $this->model_post->get_meta_field( $post_id, $this->table_options_field_name );
 		if ( empty( $options ) )
 			return array();
-		$options = json_decode( $options, true );
-		return $options;
+		return json_decode( $options, true );
 	}
 
 	/**
@@ -796,10 +791,9 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @param array $visibility Table visibility
 	 * @return bool True on success, false on error
 	 */
-	protected function _add_table_visibility( $post_id, $visibility ) {
+	protected function _add_table_visibility( $post_id, array $visibility ) {
 		$visibility = json_encode( $visibility );
-		$success = $this->model_post->add_meta_field( $post_id, $this->table_visibility_field_name, $visibility );
-		return $success;
+		return $this->model_post->add_meta_field( $post_id, $this->table_visibility_field_name, $visibility );
 	}
 
 	/**
@@ -811,12 +805,9 @@ class TablePress_Table_Model extends TablePress_Model {
 	 * @param array $visibility Table visibility
 	 * @return bool True on success, false on error
 	 */
-	protected function _update_table_visibility( $post_id, $visibility ) {
+	protected function _update_table_visibility( $post_id, array $visibility ) {
 		$visibility = json_encode( $visibility );
-		// we need to pass the previous value to make sure that an update takes place, to really get a successful (true) return result from the WP API
-		$prev_visibility = json_encode( $this->_get_table_visibility( $post_id ) );
-		$success = $this->model_post->update_meta_field( $post_id, $this->table_visibility_field_name, $visibility, $prev_visibility );
-		return $success;
+		return $this->model_post->update_meta_field( $post_id, $this->table_visibility_field_name, $visibility );
 	}
 
 	/**
@@ -831,8 +822,7 @@ class TablePress_Table_Model extends TablePress_Model {
 		$visibility = $this->model_post->get_meta_field( $post_id, $this->table_visibility_field_name );
 		if ( empty( $visibility ) )
 			return array();
-		$visibility = json_decode( $visibility, true );
-		return $visibility;
+		return json_decode( $visibility, true );
 	}
 
 	/**
