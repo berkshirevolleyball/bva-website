@@ -319,7 +319,7 @@ class LeagueManagerAdminPanel extends LeagueManager
 			// Two point rule
 			$point_rules['two'] = array( 'forwin' => 2, 'fordraw' => 1, 'forloss' => 0 );
 			// Three-point rule
-			$point_rules['three'] = array( 'forwin' => 3, 'fordraw' => 0, 'forloss' => 0 );
+			$point_rules['three'] = array( 'forwin' => 3, 'fordraw' => 1, 'forloss' => 0 );
 			// Score. One point for each scored goal
 			$point_rules['score'] = 'score';
 
@@ -435,16 +435,9 @@ class LeagueManagerAdminPanel extends LeagueManager
 			$points2 = array( 'plus' => 0, 'minus' => 0 );
 			$points2 = apply_filters( 'team_points2_'.$league->sport, $team_id );
 
-			if (isset($points2['plus']) && isset($points2['minus'])) {
-				$diff = $points2['plus'] - $points2['minus'];
-			} else {
-				$diff = 0;
-			}
-
-			$points2plus = isset($points2['plus']) ? $points2['plus'] : 0;
-			$points2minus = isset($points2['minus']) ? $points2['minus'] : 0;
+			$diff = $points2['plus'] - $points2['minus'];
 			
-			$wpdb->query ( $wpdb->prepare( "UPDATE {$wpdb->leaguemanager_teams} SET `points_plus` = '%s', `points_minus` = '%s', `points2_plus` = '%d', `points2_minus` = '%d', `done_matches` = '%d', `won_matches` = '%d', `draw_matches` = '%d', `lost_matches` = '%d', `diff` = '%d' WHERE `id` = '%d'", $points['plus'], $points['minus'], $points2plus, $points2minus, $this->num_done, $this->num_won, $this->num_draw, $this->num_lost, $diff, $team_id ) );
+			$wpdb->query ( $wpdb->prepare( "UPDATE {$wpdb->leaguemanager_teams} SET `points_plus` = '%s', `points_minus` = '%s', `points2_plus` = '%d', `points2_minus` = '%d', `done_matches` = '%d', `won_matches` = '%d', `draw_matches` = '%d', `lost_matches` = '%d', `diff` = '%d' WHERE `id` = '%d'", $points['plus'], $points['minus'], $points2['plus'], $points2['minus'], $this->num_done, $this->num_won, $this->num_draw, $this->num_lost, $diff, $team_id ) );
 
 			do_action( 'leaguemanager_save_standings_'.$league->sport, $team_id );
 		}
@@ -468,7 +461,6 @@ class LeagueManagerAdminPanel extends LeagueManager
 		$points = array( 'plus' => 0, 'minus' => 0 );
 		
 		if ( 'score' == $rule ) {
-
 			$home = $this->getMatches( "`home_team` = '".$team_id."'" );
 			foreach ( $home AS $match ) {
 				$points['plus'] += $match->home_points;
@@ -481,39 +473,10 @@ class LeagueManagerAdminPanel extends LeagueManager
 				$points['minus'] += $match->home_points;
 			}
 		} else {
-			$home = $this->getMatches( "`home_team` = '".$team_id."'" );
-			foreach ( $home AS $match ) {
-				// Points for
-				if ($match->home_points == 2) {
-					$points['plus'] += 3;
-				} elseif ($match->home_points == 1) {
-					$points['plus'] += 1;
-				}
+			extract( $rule );
 
-				// Points against
-				if ($match->away_points == 2) {
-					$points['minus'] += 3;
-				} elseif ($match->away_points == 1) {
-					$points['minus'] += 1;
-				}
-			}
-
-			$away = $this->getMatches("`away_team` = '".$team_id."'" );
-			foreach ( $away AS $match ) {
-				// Points for
-				if ($match->home_points == 2) {
-					$points['minus'] += 3;
-				} elseif ($match->home_points == 1) {
-					$points['minus'] += 1;
-				}
-
-				// Points against
-				if ($match->away_points == 2) {
-					$points['plus'] += 3;
-				} elseif ($match->away_points == 1) {
-					$points['plus'] += 1;
-				}
-			}
+			$points['plus'] = $this->num_won * $forwin + $this->num_draw * $fordraw + $this->num_lost * $forloss;
+			$points['minus'] = $this->num_draw * $fordraw + $this->num_lost * $forwin + $this->num_won * $forloss;
 		}
 		
 		$points = apply_filters( 'team_points_'.$league->sport, $points, $team_id, $rule );

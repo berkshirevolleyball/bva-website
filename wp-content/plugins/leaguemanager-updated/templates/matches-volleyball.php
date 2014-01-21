@@ -36,16 +36,15 @@ The following variables are usable:
 							<option value="<?php echo $team_id ?>"<?php echo $selected ?>><?php echo $team['title'] ?></option>
 						<?php endforeach; ?>
 					</select>
-					<input class="button" type='submit' value='<?php _e('Show') ?>' />
+					<input type='submit' value='<?php _e('Show') ?>' />
 				</div>
 			</form>
 		</div>
+		<br />
 	<?php endif; ?>
 			
 	<?php if ($matches) { ?>
-		<?php $prevLocation = ""; ?>
-		<?php $prevDate = ""; ?>
-		<?php $prevStart_time = ""; ?>
+		<?php $location = ""; ?>
 
 		<table class='leaguemanager matchtable' summary='' title='<?php echo __( 'Match Plan', 'leaguemanager' )." ".$league->title ?>'>
 			<tr>
@@ -54,27 +53,12 @@ The following variables are usable:
 				<th class='sets'><?php _e('Sets', 'leaguemanager') ?></th>
 			</tr>
 			<?php foreach ($matches AS $match) { ?>
-				<?php if (($prevLocation != $match->location) || ($prevDate != $match->date) || ($prevStart_time != $match->start_time)) { ?>
+				<?php if ($location == "" || $location != $match->location) { ?>
 					<tr class='info <?php echo $match->class ?>'>
 						<td colspan="3">
-							<span class="triangle-id">
-								<?php 
-									/*
-									if (!empty($match->custom)) {
-										foreach ($match->custom AS $field) {
-											foreach ($field AS $custom) {
-												if ($custom['triangle_number'] != '') {
-													echo $custom['triangle_number'] . " - ";
-												}
-											}
-										}
-									}
-									*/
-								?>
-							</span>
-							<span class="date"><?php echo $match->date; ?> - </span>
-							<span class="location"><?php echo $match->location; ?>, </span>
-							<span class="start_time"><?php echo $match->start_time; ?></span>
+							<?php echo $match->location; ?>
+							<?php echo $match->date; ?>
+							<?php echo $match->start_time; ?>
 						</td>
 					</tr>
 				<?php } ?>
@@ -96,9 +80,7 @@ The following variables are usable:
 					<td><?php echo implode(", ", $sets); ?></td>
 				</tr>
 
-				<?php $prevLocation = $match->location; ?>
-				<?php $prevDate = $match->date; ?>
-				<?php $prevStart_time = $match->start_time; ?>
+				<?php $location = $match->location; ?>
 
 			<?php } ?>
 		</table>

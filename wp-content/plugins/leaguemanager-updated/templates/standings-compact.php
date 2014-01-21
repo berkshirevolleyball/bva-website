@@ -15,7 +15,7 @@ The following variables are usable:
 <?php else : ?>
 
 <?php if ( $teams ) : ?>
-<h1>eddy</h1>
+
 <table class="leaguemanager standingstable" summary="" title="<?php _e( 'Standings', 'leaguemanager' ) .' '.$league->title ?>">
 <tr>
 	<th class="num"><?php echo _c( 'Pos|Position', 'leaguemanager' ) ?></th>
@@ -28,8 +28,7 @@ The following variables are usable:
 	<?php if ( 1 == $league->standings['pld'] ) : ?>
 	<th class="num"><?php _e( 'Pld', 'leaguemanager' ) ?></th>
 	<?php endif; ?>
-	<th class="num"><?php _e( 'Points Against', 'leaguemanager' ) ?></th>
-	<th class="num"><?php _e( 'Points', 'leaguemanager' ) ?></th>
+	<th class="num"><?php _e( 'Pts', 'leaguemanager' ) ?></th>
 </tr>
 <?php if ( $teams ) : ?>
 <?php foreach( $teams AS $team ) : ?>
