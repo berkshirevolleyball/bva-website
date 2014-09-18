@@ -3,7 +3,7 @@
 Plugin Name: Ultimate Maintenance Mode
 Plugin URI: http://seedprod.com
 Description: Displays a screenshot of website with an overlayed window with the reason your site is down. 
-Version: 1.5.2
+Version: 1.5.3
 Author: SeedProd
 Author URI: http://seedprod.com
 License: GPLv2
