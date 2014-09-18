@@ -18,7 +18,7 @@
  * @package Tab_Override
  */
 class Tab_Override {
-	const VERSION = '3.3.0'; // the current version of the plugin
+	const VERSION = '3.3.1'; // the current version of the plugin
 
 	protected static $_instance; // an instance of the class
 	protected $_plugin_file; // the full path of the main plugin file
@@ -673,7 +673,7 @@ class Tab_Override {
 		// add the script for the plugin options page
 		if ( $this->_options_page_hook_suffix == $hook_suffix ) {
 			wp_enqueue_script( 'taboverride-settings-page', plugins_url( 'js/taboverride-settings-page.min.js', $this->_plugin_file ),
-				array( 'jquery' ), '0.1.0', true );
+				array( 'jquery' ), '0.1.0-1', true );
 		}
 
 		// these are the admin pages that include a textarea for editing content
@@ -747,10 +747,10 @@ class Tab_Override {
 
 				// include the Tab Override and jQuery plugin scripts in the footer
 				wp_enqueue_script( 'taboverride', plugins_url( 'js/taboverride.min.js', $this->_plugin_file ),
-					array(), '4.0.0', true );
+					array(), '4.0.0-1', true );
 
 				wp_enqueue_script( 'jquery-taboverride', plugins_url( 'js/jquery.taboverride.min.js', $this->_plugin_file ),
-					array( 'jquery', 'taboverride' ), '4.0.0', true );
+					array( 'jquery', 'taboverride' ), '4.0.2-1', true );
 
 				$dependencies = array( 'jquery', 'taboverride', 'jquery-taboverride' );
 				if ( 'post' == $page_type ) {

@@ -2,8 +2,8 @@
 Contributors: wjbryant, mtinsley
 Tags: tab, tabs, tab key, html editor, post editor, override, insert, allow, indent, code, admin
 Requires at least: 3.3
-Tested up to: 3.6
-Stable tag: 3.3.0
+Tested up to: 4.0
+Stable tag: 3.3.1
 
 Tab Override allows you to enter tabs into the HTML editor (not Visual) as you would in a desktop text editor.
 
@@ -44,7 +44,7 @@ No, PHP 4 support was dropped in version 3.0.
 
 = Where can I ask additional questions? =
 
-[tinsology.net](http://tinsology.net/plugins/tab-override/ "Tab Override Documentation on Mathew Tinsley's Website") or [wjbryant.com](http://wjbryant.com/projects/tab-override/ "Tab Override Documentation on Bill Bryant's Website")
+[wjbryant.com](http://wjbryant.com/projects/tab-override/ "Tab Override Documentation on Bill Bryant's Website") or [tinsology.net](http://tinsology.net/plugins/tab-override/ "Tab Override Documentation on Mathew Tinsley's Website")
 
 == Screenshots ==
 
@@ -52,6 +52,9 @@ No, PHP 4 support was dropped in version 3.0.
 2. The Tab Override settings page
 
 == Changelog ==
+
+= 3.3.1 =
+* Updated the JavaScript library to version 4.0.2
 
 = 3.3.0 =
 * Added options for custom key combinations

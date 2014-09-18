@@ -3,14 +3,14 @@
 Plugin Name: Tab Override
 Plugin URI: http://tinsology.net/plugins/tab-override/
 Description: Causes tabs to function as they would in a text editor rather than a browser.
-Version: 3.3.0
+Version: 3.3.1
 Author: Bill Bryant, Mathew Tinsley
 Author URI: http://wjbryant.com/
 License: GPLv2 or later
 */
 
 /*
-Copyright 2013  Bill Bryant     (email : bill@wjbryant.com),
+Copyright 2014  Bill Bryant     (email : bill@wjbryant.com),
                 Mathew Tinsley  (email : tinsley@tinsology.net)
 
 This program is free software; you can redistribute it and/or modify

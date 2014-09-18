@@ -1,5 +1,5 @@
 /*! jquery.taboverride v4.0.0 | https://github.com/wjbryant/jquery.taboverride
-Copyright (c) 2013 Bill Bryant | http://opensource.org/licenses/mit */
+(c) 2014 Bill Bryant | http://opensource.org/licenses/mit */
 
 /**
  * @fileOverview Tab Override jQuery plugin
@@ -7,7 +7,8 @@ Copyright (c) 2013 Bill Bryant | http://opensource.org/licenses/mit */
  * @version      4.0.0
  */
 
-/*global exports, require, define, jQuery, tabOverride */
+/*global jQuery, tabOverride */
+/*jslint white: true */
 
 /**
  * The jQuery plugin namespace
@@ -15,22 +16,8 @@ Copyright (c) 2013 Bill Bryant | http://opensource.org/licenses/mit */
  * @external "jQuery.fn"
  */
 
-// Use CommonJS or AMD if available
-(function ( factory ) {
-	"use strict";
-
-	if ( typeof exports === "object" && typeof require === "function" ) {
-		// Node.js/CommonJS
-		factory( require( "jquery" ), require( "taboverride" ) );
-	} else if ( typeof define === "function" && define.amd ) {
-		// AMD - Register as an anonymous module
-		// Files must be concatenated using an AMD-aware tool such as r.js
-		define( [ "jquery", "taboverride" ], factory );
-	} else {
-		// No module format - Use global variables instead
-		factory( jQuery, tabOverride );
-	}
-}(function ( $, tabOverride ) {
+// Wrap everything in a closure
+(function ( $, tabOverride ) {
 	"use strict";
 
 	var $fnTabOverride;
@@ -192,4 +179,4 @@ Copyright (c) 2013 Bill Bryant | http://opensource.org/licenses/mit */
 	 * @method external:"jQuery.fn".tabOverride.untabKey
 	 */
 	$fnTabOverride.untabKey = tabOverride.untabKey;
-}));
+}(jQuery, tabOverride));

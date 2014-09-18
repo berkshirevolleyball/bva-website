@@ -1,34 +1,18 @@
-/*! taboverride v4.0.0 | https://github.com/wjbryant/taboverride
-Copyright (c) 2013 Bill Bryant | http://opensource.org/licenses/mit */
+/*! taboverride v4.0.2 | https://github.com/wjbryant/taboverride
+(c) 2014 Bill Bryant | http://opensource.org/licenses/mit */
 
 /**
  * @fileOverview taboverride
  * @author       Bill Bryant
- * @version      4.0.0
+ * @version      4.0.2
  */
 
 /*jslint browser: true */
-/*global exports, define */
 
-// use CommonJS or AMD if available
-(function (factory) {
-    'use strict';
+// create global variable for namespace
+var tabOverride = {};
 
-    var mod;
-
-    if (typeof exports === 'object') {
-        // Node.js/CommonJS
-        factory(exports);
-    } else if (typeof define === 'function' && define.amd) {
-        // AMD - register as an anonymous module
-        // files must be concatenated using an AMD-aware tool such as r.js
-        define(['exports'], factory);
-    } else {
-        // no module format - create global variable
-        mod = window.tabOverride = {};
-        factory(mod);
-    }
-}(function (tabOverride) {
+(function (tabOverride) {
     'use strict';
 
     /**
@@ -732,13 +716,14 @@ Copyright (c) 2013 Bill Bryant | http://opensource.org/licenses/mit */
         var i;
 
         if (arguments.length) {
-            if (!size) { // size is 0 (or falsy)
-                aTab = '\t';
-            } else if (typeof size === 'number' && size > 0) {
+            if (size && typeof size === 'number' && size > 0) {
                 aTab = '';
                 for (i = 0; i < size; i += 1) {
                     aTab += ' ';
                 }
+            } else {
+                // size is falsy (0), not a number, or a negative number
+                aTab = '\t';
             }
             return this;
         }
@@ -798,4 +783,4 @@ Copyright (c) 2013 Bill Bryant | http://opensource.org/licenses/mit */
         }
         untabKey = keyCode;
     }, untabModifierKeys);
-}));
+}(tabOverride));
