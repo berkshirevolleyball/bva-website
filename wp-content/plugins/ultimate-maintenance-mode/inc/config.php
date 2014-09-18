@@ -149,7 +149,7 @@ $seedprod_umm->options[] = array( "type" => "checkbox",
 $seedprod_umm->options[] = array( "type" => "image",
                 "id" => "comingsoon_bg_image",
                 "label" => __("Custom Background Image", 'ultimate-maintenance-mode'),
-                "desc" => __("This will override the captured screenshot. If left empty a screenshot of your website will be shown.", 'ultimate-maintenance-mode'),
+                "desc" => __("This will override the captured screenshot. If left empty a screenshot of your website will be shown. <a href='http://demo.seedprod.com/coming-soon-pro/?utm_source=ultimate-maintenance-mode-plugin&utm_medium=link&utm_campaign=Free%20Backgrounds' target='_blank'>Looking for FREE backgrounds?</a>", 'ultimate-maintenance-mode'),
                 "section_id" => "seedprod_section_maintenance_mode",
                 "setting_id" => "seedprod_maintenancemode_options",
                 );

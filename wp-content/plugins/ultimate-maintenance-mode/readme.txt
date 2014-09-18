@@ -3,8 +3,8 @@ Contributors: johnnytee
 Donate link: http://seedprod.com/donate/
 Tags: maintenance,admin, administration, construction, under construction, maintenance mode, offline, unavailable, launch, landing page
 Requires at least: 3.3
-Tested up to: 3.8.0
-Stable tag: 1.5.3
+Tested up to: 4.0.0
+Stable tag: 1.5.4
 
 Work on your website behinds the scenes while you display a Maintenance Mode page to your visitors.
 
@@ -62,6 +62,9 @@ The first time you view the maintenance mode page, the screenshot may not displa
 
 
 == Changelog ==
+= 1.5.4 =
+* Added: Link to free backgrounds
+
 = 1.5.3 =
 * Added: German translation
 
@@ -112,6 +115,9 @@ The first time you view the maintenance mode page, the screenshot may not displa
 * Initial Launch
 
 == Upgrade Notice ==
+= 1.5.4 =
+* Added: Link to free backgrounds
+
 = 1.5.2 =
 * Added: Block mshots if using a custom background.
 * Added: Mshots password
