@@ -1,5 +1,6 @@
 .htaccess
 wp-config.php
+wp-config
 wp-content/uploads/
 wp-content/blogs.dir/
 wp-content/upgrade/
