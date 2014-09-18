@@ -19,7 +19,6 @@
 
 html {
 	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
 	-webkit-text-size-adjust: none;
 }
 
@@ -70,9 +69,6 @@ form {
 		display: block;
 	}
 	.comment-form-author, .comment-form-email, .comment-form-url {
-		width:30.75%;
-		float: left;
-		margin-right:3.8%;
 		label {
 			display: inline-block;
 			float: left;
@@ -80,10 +76,6 @@ form {
 		input {
 			clear: left;
 		}
-	}
-	.comment-form-url {
-		float: right;
-		margin-right:0;
 	}
 	::-webkit-input-placeholder {
 	   color: rgba(0,0,0,0.35);
@@ -510,7 +502,12 @@ form.searchform {
 	}
 	li {
 		display: inline;
-		margin-right:1.5em;
+		margin-right: 1em;
+		padding-right: 1em;
+		border-right: 1px solid rgba(0,0,0,0.1);
+		&:last-child {
+			border-right: 0;
+		}
 	}
 	li.comment {
 		.icon_comment;
@@ -520,6 +517,9 @@ form.searchform {
 	}
 	li.tags {
 		.icon_tag;
+	}
+	li.author {
+		.icon_user;
 	}
 }
 
@@ -626,7 +626,7 @@ form.searchform {
 	    -ms-transform: none !important;
 	    -o-transform: none !important;
 	    transform: none !important;
-	    max-width: 74.55em;
+	    max-width: 69.75em;
 		margin: 1.777em auto;
 		.clearfix;
 	}
@@ -701,7 +701,7 @@ form.searchform {
 			display: none;
 		}
 		.highwind-navigation {
-			max-width: 74.55em;
+			max-width: 69.75em;
 			padding:0 3.157em;
 			margin:0 auto;
 			.clearfix;
@@ -777,6 +777,18 @@ form.searchform {
 	.post, article.attachment {
 		.attachment-post-thumbnail {
 			height: auto;
+		}
+	}
+
+	form {
+		.comment-form-author, .comment-form-email, .comment-form-url {
+			width:30.75%;
+			float: left;
+			margin-right:3.8%;
+		}
+		.comment-form-url {
+			float: right;
+			margin-right:0;
 		}
 	}
 
