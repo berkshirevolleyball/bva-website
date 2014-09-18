@@ -37,6 +37,8 @@ $responsive_options = responsive_get_options();
 
 	<div id="footer-wrapper">
 
+		<?php get_sidebar( 'footer' ); ?>
+
 		<div class="grid col-940">
 
 			<div class="grid col-540">

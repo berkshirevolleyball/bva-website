@@ -187,86 +187,34 @@ if( !function_exists( 'responsive_setup' ) ):
 							)
 		);
 
-		if( function_exists( 'get_custom_header' ) ) {
+		add_theme_support( 'custom-background' );
 
-			add_theme_support( 'custom-background' );
+		add_theme_support( 'custom-header', array(
+			// Header image default
+			'default-image'       => get_template_directory_uri() . '/core/images/default-logo.png',
+			// Header text display default
+			'header-text'         => false,
+			// Header image flex width
+			'flex-width'          => true,
+			// Header image width (in pixels)
+			'width'               => 300,
+			// Header image flex height
+			'flex-height'         => true,
+			// Header image height (in pixels)
+			'height'              => 100,
+			// Admin header style callback
+			'admin-head-callback' => 'responsive_admin_header_style'
+		) );
 
-		}
-		else {
-
-			// < 3.4 Backward Compatibility
-
-			/**
-			 * This feature allows users to use custom background for a theme.
-			 * @see http://codex.wordpress.org/Function_Reference/add_custom_background
-			 */
-
-			add_custom_background();
-
-		}
-
-		// WordPress 3.4 >
-		if( function_exists( 'get_custom_header' ) ) {
-
-			add_theme_support( 'custom-header', array(
-				// Header image default
-				'default-image'       => get_template_directory_uri() . '/core/images/default-logo.png',
-				// Header text display default
-				'header-text'         => false,
-				// Header image flex width
-				'flex-width'          => true,
-				// Header image width (in pixels)
-				'width'               => 300,
-				// Header image flex height
-				'flex-height'         => true,
-				// Header image height (in pixels)
-				'height'              => 100,
-				// Admin header style callback
-				'admin-head-callback' => 'responsive_admin_header_style'
-			) );
-
-			// gets included in the admin header
-			function responsive_admin_header_style() {
-				?>
-				<style type="text/css">
-					.appearance_page_custom-header #headimg {
-						background-repeat: no-repeat;
-						border: none;
-					}
-				</style><?php
-			}
-
-		}
-		else {
-
-			// Backward Compatibility
-
-			/**
-			 * This feature adds a callbacks for image header display.
-			 * In our case we are using this to display logo.
-			 * @see http://codex.wordpress.org/Function_Reference/add_custom_image_header
-			 */
-			define( 'HEADER_TEXTCOLOR', '' );
-			define( 'HEADER_IMAGE', '%s/core/images/default-logo.png' ); // %s is the template dir uri
-			define( 'HEADER_IMAGE_WIDTH', 300 ); // use width and height appropriate for your theme
-			define( 'HEADER_IMAGE_HEIGHT', 100 );
-			define( 'NO_HEADER_TEXT', true );
-
-			// gets included in the admin header
-			function responsive_admin_header_style() {
-				?>
-				<style type="text/css">
-				#headimg {
+		// gets included in the admin header
+		function responsive_admin_header_style() {
+			?>
+			<style type="text/css">
+				.appearance_page_custom-header #headimg {
 					background-repeat: no-repeat;
-					border: none !important;
-					width: <?php echo HEADER_IMAGE_WIDTH; ?>px;
-					height: <?php echo HEADER_IMAGE_HEIGHT; ?>px;
+					border: none;
 				}
-				</style><?php
-			}
-
-			add_custom_image_header( '', 'responsive_admin_header_style' );
-
+			</style><?php
 		}
 
 		// While upgrading set theme option front page toggle not to affect old setup.
@@ -341,14 +289,13 @@ class responsive_widget_menu_class {
 		remove_filter( 'wp_nav_menu_args', array( $this, 'wp_nav_menu_args' ) );
 
 		if( 'menu' == $args['menu_class'] ) {
-			$args['menu_class'] = 'menu-widget';
+			$args['menu_class'] = apply_filters( 'responsive_menu_widget_class', 'menu_widget');
 		}
 
 		return $args;
 	}
 }
-
-new responsive_widget_menu_class();
+$GLOBALS['nav_menu_widget_classname'] = new responsive_widget_menu_class();
 
 /**
  * Removes div from wp_page_menu() and replace with ul.
@@ -549,179 +496,183 @@ add_filter( 'the_category', 'responsive_category_rel_removal' );
 if( !function_exists( 'responsive_breadcrumb_lists' ) ) :
 
 	function responsive_breadcrumb_lists() {
+		$responsive_options = get_option( 'responsive_theme_options' );
 
-		/* === OPTIONS === */
-		$text['home']     = __( 'Home', 'responsive' ); // text for the 'Home' link
-		$text['category'] = __( 'Archive for %s', 'responsive' ); // text for a category page
-		$text['search']   = __( 'Search results for: %s', 'responsive' ); // text for a search results page
-		$text['tag']      = __( 'Posts tagged %s', 'responsive' ); // text for a tag page
-		$text['author']   = __( 'View all posts by %s', 'responsive' ); // text for an author page
-		$text['404']      = __( 'Error 404', 'responsive' ); // text for the 404 page
+		if ( 0 == $responsive_options['breadcrumb'] && !is_search() ) {
 
-		$showCurrent = 1; // 1 - show current post/page title in breadcrumbs, 0 - don't show
-		$showOnHome  = 0; // 1 - show breadcrumbs on the homepage, 0 - don't show
-		$delimiter   = ' <span class="chevron">&#8250;</span> '; // delimiter between crumbs
-		$before      = '<span class="breadcrumb-current">'; // tag before the current crumb
-		$after       = '</span>'; // tag after the current crumb
-		/* === END OF OPTIONS === */
+			/* === OPTIONS === */
+			$text['home']     = __( 'Home', 'responsive' ); // text for the 'Home' link
+			$text['category'] = __( 'Archive for %s', 'responsive' ); // text for a category page
+			$text['search']   = __( 'Search results for: %s', 'responsive' ); // text for a search results page
+			$text['tag']      = __( 'Posts tagged %s', 'responsive' ); // text for a tag page
+			$text['author']   = __( 'View all posts by %s', 'responsive' ); // text for an author page
+			$text['404']      = __( 'Error 404', 'responsive' ); // text for the 404 page
 
-		global $post, $paged, $page;
-		$homeLink   = home_url( '/' );
-		$linkBefore = '<span class="breadcrumb" typeof="v:Breadcrumb">';
-		$linkAfter  = '</span>';
-		$linkAttr   = ' rel="v:url" property="v:title"';
-		$link       = $linkBefore . '<a' . $linkAttr . ' href="%1$s">%2$s</a>' . $linkAfter;
+			$showCurrent = 1; // 1 - show current post/page title in breadcrumbs, 0 - don't show
+			$showOnHome  = 0; // 1 - show breadcrumbs on the homepage, 0 - don't show
+			$delimiter   = ' <span class="chevron">&#8250;</span> '; // delimiter between crumbs
+			$before      = '<span class="breadcrumb-current">'; // tag before the current crumb
+			$after       = '</span>'; // tag after the current crumb
+			/* === END OF OPTIONS === */
 
-		if( is_front_page() ) {
+			global $post, $paged, $page;
+			$homeLink   = home_url( '/' );
+			$linkBefore = '<span class="breadcrumb" typeof="v:Breadcrumb">';
+			$linkAfter  = '</span>';
+			$linkAttr   = ' rel="v:url" property="v:title"';
+			$link       = $linkBefore . '<a' . $linkAttr . ' href="%1$s">%2$s</a>' . $linkAfter;
 
-			if( $showOnHome == 1 ) {
-				echo '<div class="breadcrumb-list"><a href="' . $homeLink . '">' . $text['home'] . '</a></div>';
-			}
+			if( is_front_page() ) {
 
-		}
-		else {
-
-			echo '<div class="breadcrumb-list" xmlns:v="http://rdf.data-vocabulary.org/#">' . sprintf( $link, $homeLink, $text['home'] ) . $delimiter;
-
-			if( is_home() ) {
-				if( $showCurrent == 1 ) {
-					echo $before . get_the_title( get_option( 'page_for_posts', true ) ) . $after;
+				if( $showOnHome == 1 ) {
+					echo '<div class="breadcrumb-list"><a href="' . $homeLink . '">' . $text['home'] . '</a></div>';
 				}
 
 			}
-			elseif( is_category() ) {
-				$thisCat = get_category( get_query_var( 'cat' ), false );
-				if( $thisCat->parent != 0 ) {
-					$cats = get_category_parents( $thisCat->parent, true, $delimiter );
-					$cats = str_replace( '<a', $linkBefore . '<a' . $linkAttr, $cats );
-					$cats = str_replace( '</a>', '</a>' . $linkAfter, $cats );
-					echo $cats;
+			else {
+
+				echo '<div class="breadcrumb-list" xmlns:v="http://rdf.data-vocabulary.org/#">' . sprintf( $link, $homeLink, $text['home'] ) . $delimiter;
+
+				if( is_home() ) {
+					if( $showCurrent == 1 ) {
+						echo $before . get_the_title( get_option( 'page_for_posts', true ) ) . $after;
+					}
+
 				}
-				echo $before . sprintf( $text['category'], single_cat_title( '', false ) ) . $after;
+				elseif( is_category() ) {
+					$thisCat = get_category( get_query_var( 'cat' ), false );
+					if( $thisCat->parent != 0 ) {
+						$cats = get_category_parents( $thisCat->parent, true, $delimiter );
+						$cats = str_replace( '<a', $linkBefore . '<a' . $linkAttr, $cats );
+						$cats = str_replace( '</a>', '</a>' . $linkAfter, $cats );
+						echo $cats;
+					}
+					echo $before . sprintf( $text['category'], single_cat_title( '', false ) ) . $after;
 
-			}
-			elseif( is_search() ) {
-				echo $before . sprintf( $text['search'], get_search_query() ) . $after;
+				}
+				elseif( is_search() ) {
+					echo $before . sprintf( $text['search'], get_search_query() ) . $after;
 
-			}
-			elseif( is_day() ) {
-				echo sprintf( $link, get_year_link( get_the_time( 'Y' ) ), get_the_time( 'Y' ) ) . $delimiter;
-				echo sprintf( $link, get_month_link( get_the_time( 'Y' ), get_the_time( 'm' ) ), get_the_time( 'F' ) ) . $delimiter;
-				echo $before . get_the_time( 'd' ) . $after;
+				}
+				elseif( is_day() ) {
+					echo sprintf( $link, get_year_link( get_the_time( 'Y' ) ), get_the_time( 'Y' ) ) . $delimiter;
+					echo sprintf( $link, get_month_link( get_the_time( 'Y' ), get_the_time( 'm' ) ), get_the_time( 'F' ) ) . $delimiter;
+					echo $before . get_the_time( 'd' ) . $after;
 
-			}
-			elseif( is_month() ) {
-				echo sprintf( $link, get_year_link( get_the_time( 'Y' ) ), get_the_time( 'Y' ) ) . $delimiter;
-				echo $before . get_the_time( 'F' ) . $after;
+				}
+				elseif( is_month() ) {
+					echo sprintf( $link, get_year_link( get_the_time( 'Y' ) ), get_the_time( 'Y' ) ) . $delimiter;
+					echo $before . get_the_time( 'F' ) . $after;
 
-			}
-			elseif( is_year() ) {
-				echo $before . get_the_time( 'Y' ) . $after;
+				}
+				elseif( is_year() ) {
+					echo $before . get_the_time( 'Y' ) . $after;
 
-			}
-			elseif( is_single() && !is_attachment() ) {
-				if( get_post_type() != 'post' ) {
+				}
+				elseif( is_single() && !is_attachment() ) {
+					if( get_post_type() != 'post' ) {
+						$post_type = get_post_type_object( get_post_type() );
+						$slug      = $post_type->rewrite;
+						printf( $link, $homeLink . '/' . $slug['slug'] . '/', $post_type->labels->singular_name );
+						if( $showCurrent == 1 ) {
+							echo $delimiter . $before . get_the_title() . $after;
+						}
+					}
+					else {
+						$cat  = get_the_category();
+						$cat  = $cat[0];
+						$cats = get_category_parents( $cat, true, $delimiter );
+						if( $showCurrent == 0 ) {
+							$cats = preg_replace( "#^(.+)$delimiter$#", "$1", $cats );
+						}
+						$cats = str_replace( '<a', $linkBefore . '<a' . $linkAttr, $cats );
+						$cats = str_replace( '</a>', '</a>' . $linkAfter, $cats );
+						echo $cats;
+						if( $showCurrent == 1 ) {
+							echo $before . get_the_title() . $after;
+						}
+					}
+
+				}
+				elseif( !is_single() && !is_page() && get_post_type() != 'post' && !is_404() ) {
 					$post_type = get_post_type_object( get_post_type() );
-					$slug      = $post_type->rewrite;
-					printf( $link, $homeLink . '/' . $slug['slug'] . '/', $post_type->labels->singular_name );
+					echo $before . $post_type->labels->singular_name . $after;
+
+				}
+				elseif( is_attachment() ) {
+					$parent = get_post( $post->post_parent );
+					$cat    = get_the_category( $parent->ID );
+
+					if( isset( $cat[0] ) ) {
+						$cat = $cat[0];
+					}
+
+					if( $cat ) {
+						$cats = get_category_parents( $cat, true, $delimiter );
+						$cats = str_replace( '<a', $linkBefore . '<a' . $linkAttr, $cats );
+						$cats = str_replace( '</a>', '</a>' . $linkAfter, $cats );
+						echo $cats;
+					}
+
+					printf( $link, get_permalink( $parent ), $parent->post_title );
 					if( $showCurrent == 1 ) {
 						echo $delimiter . $before . get_the_title() . $after;
 					}
+
 				}
-				else {
-					$cat  = get_the_category();
-					$cat  = $cat[0];
-					$cats = get_category_parents( $cat, true, $delimiter );
-					if( $showCurrent == 0 ) {
-						$cats = preg_replace( "#^(.+)$delimiter$#", "$1", $cats );
-					}
-					$cats = str_replace( '<a', $linkBefore . '<a' . $linkAttr, $cats );
-					$cats = str_replace( '</a>', '</a>' . $linkAfter, $cats );
-					echo $cats;
+				elseif( is_page() && !$post->post_parent ) {
 					if( $showCurrent == 1 ) {
 						echo $before . get_the_title() . $after;
 					}
+
 				}
+				elseif( is_page() && $post->post_parent ) {
+					$parent_id   = $post->post_parent;
+					$breadcrumbs = array();
+					while( $parent_id ) {
+						$page_child    = get_page( $parent_id );
+						$breadcrumbs[] = sprintf( $link, get_permalink( $page_child->ID ), get_the_title( $page_child->ID ) );
+						$parent_id     = $page_child->post_parent;
+					}
+					$breadcrumbs = array_reverse( $breadcrumbs );
+					for( $i = 0; $i < count( $breadcrumbs ); $i++ ) {
+						echo $breadcrumbs[$i];
+						if( $i != count( $breadcrumbs ) - 1 ) {
+							echo $delimiter;
+						}
+					}
+					if( $showCurrent == 1 ) {
+						echo $delimiter . $before . get_the_title() . $after;
+					}
 
-			}
-			elseif( !is_single() && !is_page() && get_post_type() != 'post' && !is_404() ) {
-				$post_type = get_post_type_object( get_post_type() );
-				echo $before . $post_type->labels->singular_name . $after;
-
-			}
-			elseif( is_attachment() ) {
-				$parent = get_post( $post->post_parent );
-				$cat    = get_the_category( $parent->ID );
-
-				if( isset( $cat[0] ) ) {
-					$cat = $cat[0];
 				}
+				elseif( is_tag() ) {
+					echo $before . sprintf( $text['tag'], single_tag_title( '', false ) ) . $after;
 
-				if( $cat ) {
-					$cats = get_category_parents( $cat, true, $delimiter );
-					$cats = str_replace( '<a', $linkBefore . '<a' . $linkAttr, $cats );
-					$cats = str_replace( '</a>', '</a>' . $linkAfter, $cats );
-					echo $cats;
 				}
+				elseif( is_author() ) {
+					global $author;
+					$userdata = get_userdata( $author );
+					echo $before . sprintf( $text['author'], $userdata->display_name ) . $after;
 
-				printf( $link, get_permalink( $parent ), $parent->post_title );
-				if( $showCurrent == 1 ) {
-					echo $delimiter . $before . get_the_title() . $after;
 				}
+				elseif( is_404() ) {
+					echo $before . $text['404'] . $after;
 
-			}
-			elseif( is_page() && !$post->post_parent ) {
-				if( $showCurrent == 1 ) {
-					echo $before . get_the_title() . $after;
 				}
-
-			}
-			elseif( is_page() && $post->post_parent ) {
-				$parent_id   = $post->post_parent;
-				$breadcrumbs = array();
-				while( $parent_id ) {
-					$page_child    = get_page( $parent_id );
-					$breadcrumbs[] = sprintf( $link, get_permalink( $page_child->ID ), get_the_title( $page_child->ID ) );
-					$parent_id     = $page_child->post_parent;
-				}
-				$breadcrumbs = array_reverse( $breadcrumbs );
-				for( $i = 0; $i < count( $breadcrumbs ); $i++ ) {
-					echo $breadcrumbs[$i];
-					if( $i != count( $breadcrumbs ) - 1 ) {
-						echo $delimiter;
+				if( get_query_var( 'paged' ) ) {
+					if( is_category() || is_day() || is_month() || is_year() || is_search() || is_tag() || is_author() ) {
+						echo ' (';
+					}
+					echo $delimiter . sprintf( __( 'Page %s', 'responsive' ), max( $paged, $page ) );
+					if( is_category() || is_day() || is_month() || is_year() || is_search() || is_tag() || is_author() ) {
+						echo ')';
 					}
 				}
-				if( $showCurrent == 1 ) {
-					echo $delimiter . $before . get_the_title() . $after;
-				}
+
+				echo '</div>';
 
 			}
-			elseif( is_tag() ) {
-				echo $before . sprintf( $text['tag'], single_tag_title( '', false ) ) . $after;
-
-			}
-			elseif( is_author() ) {
-				global $author;
-				$userdata = get_userdata( $author );
-				echo $before . sprintf( $text['author'], $userdata->display_name ) . $after;
-
-			}
-			elseif( is_404() ) {
-				echo $before . $text['404'] . $after;
-
-			}
-			if( get_query_var( 'paged' ) ) {
-				if( is_category() || is_day() || is_month() || is_year() || is_search() || is_tag() || is_author() ) {
-					echo ' (';
-				}
-				echo $delimiter . sprintf( __( 'Page %s', 'responsive' ), max( $paged, $page ) );
-				if( is_category() || is_day() || is_month() || is_year() || is_search() || is_tag() || is_author() ) {
-					echo ')';
-				}
-			}
-
-			echo '</div>';
-
 		}
 	} // end responsive_breadcrumb_lists
 
@@ -737,13 +688,15 @@ if( !is_admin() ) {
 if( !function_exists( 'responsive_css' ) ) {
 
 	function responsive_css() {
-		wp_enqueue_style( 'responsive-style', get_template_directory_uri() . '/style.css', false, '1.9.3.4' );
-		wp_enqueue_style( 'responsive-media-queries', get_template_directory_uri() . '/core/css/style.css', false, '1.9.3.4' );
+		$theme  = wp_get_theme();
+		$responsive  = wp_get_theme( 'responsive' );
+		wp_enqueue_style( 'responsive-style', get_template_directory_uri() . '/style.css', false, $responsive['Version'] );
+		wp_enqueue_style( 'responsive-media-queries', get_template_directory_uri() . '/core/css/style.css', false, $responsive['Version'] );
 		if( is_rtl() ) {
-			wp_enqueue_style( 'responsive-rtl-style', get_template_directory_uri() . '/rtl.css', false, '1.9.3.4' );
+			wp_enqueue_style( 'responsive-rtl-style', get_template_directory_uri() . '/rtl.css', false, $responsive['Version'] );
 		}
 		if( is_child_theme() ) {
-			wp_enqueue_style( 'responsive-child-style', get_stylesheet_uri(), false, '1.9.3.4' );
+			wp_enqueue_style( 'responsive-child-style', get_stylesheet_uri(), false, $theme['Version'] );
 		}
 	}
 
@@ -759,12 +712,17 @@ if( !is_admin() ) {
 if( !function_exists( 'responsive_js' ) ) {
 
 	function responsive_js() {
+		$suffix = ( defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ) ? '' : '.min';
+		$directory = ( defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ) ? 'js-dev' : 'js';
 		$template_directory_uri = get_template_directory_uri();
 
 		// JS at the bottom for fast page loading.
 		// except for Modernizr which enables HTML5 elements & feature detects.
-		wp_enqueue_script( 'modernizr', $template_directory_uri . '/core/js/responsive-modernizr.js', array( 'jquery' ), '2.6.1', false );
-		wp_enqueue_script( 'responsive-scripts', $template_directory_uri . '/core/js/responsive-scripts.js', array( 'jquery' ), '1.2.4', true );
+		wp_enqueue_script( 'modernizr', $template_directory_uri . '/core/' . $directory . '/responsive-modernizr' . $suffix . '.js', array( 'jquery' ), '2.6.1', false );
+		wp_enqueue_script( 'responsive-scripts', $template_directory_uri . '/core/' . $directory . '/responsive-scripts' . $suffix . '.js', array( 'jquery' ), '1.2.5', true );
+		if ( ! wp_script_is( 'tribe-placeholder' ) ) {
+			wp_enqueue_script( 'jquery-placeholder', $template_directory_uri . '/core/' . $directory . '/jquery.placeholder' . $suffix . '.js', array( 'jquery' ), '2.0.7', true );
+		}
 	}
 
 }
@@ -836,8 +794,7 @@ function responsive_theme_support() {
 			<a class="button button-primary" href="<?php echo esc_url( 'http://cyberchimps.com/forum/free/responsive/' ); ?>" title="<?php esc_attr_e( 'Help', 'responsive' ); ?>" target="_blank">
 				<?php _e( 'Help', 'responsive' ); ?></a>
 
-			<a class="button" href="<?php echo esc_url( 'https://webtranslateit.com/en/projects/3598-Responsive-Theme' ); ?>" title="<?php esc_attr_e( 'Translate',
-																																					   'responsive' ); ?>" target="_blank">
+			<a class="button" href="<?php echo esc_url( 'https://webtranslateit.com/en/projects/3598-Responsive-Theme' ); ?>" title="<?php esc_attr_e( 'Translate', 'responsive' ); ?>" target="_blank">
 				<?php _e( 'Translate', 'responsive' ); ?></a>
 
 			<a class="button" href="<?php echo esc_url( 'http://cyberchimps.com/showcase/' ); ?>" title="<?php esc_attr_e( 'Showcase', 'responsive' ); ?>" target="_blank">
@@ -861,57 +818,57 @@ function responsive_widgets_init() {
 
 	register_sidebar( array(
 						  'name'          => __( 'Main Sidebar', 'responsive' ),
-						  'description'   => __( 'Area 1 - sidebar.php', 'responsive' ),
+						  'description'   => __( 'Area 1 - sidebar.php - Displays on Default, Blog, Blog Excerpt page templates', 'responsive' ),
 						  'id'            => 'main-sidebar',
-						  'before_title'  => '<div class="widget-title">',
-						  'after_title'   => '</div>',
+						  'before_title'  => '<div class="widget-title"><h3>',
+						  'after_title'   => '</h3></div>',
 						  'before_widget' => '<div id="%1$s" class="widget-wrapper %2$s">',
 						  'after_widget'  => '</div>'
 					  ) );
 
 	register_sidebar( array(
 						  'name'          => __( 'Right Sidebar', 'responsive' ),
-						  'description'   => __( 'Area 2 - sidebar-right.php', 'responsive' ),
+						  'description'   => __( 'Area 2 - sidebar-right.php - Displays on Content/Sidebar page templates', 'responsive' ),
 						  'id'            => 'right-sidebar',
-						  'before_title'  => '<div class="widget-title">',
-						  'after_title'   => '</div>',
+						  'before_title'  => '<div class="widget-title"><h3>',
+						  'after_title'   => '</h3></div>',
 						  'before_widget' => '<div id="%1$s" class="widget-wrapper %2$s">',
 						  'after_widget'  => '</div>'
 					  ) );
 
 	register_sidebar( array(
 						  'name'          => __( 'Left Sidebar', 'responsive' ),
-						  'description'   => __( 'Area 3 - sidebar-left.php', 'responsive' ),
+						  'description'   => __( 'Area 3 - sidebar-left.php - Displays on Sidebar/Content page templates', 'responsive' ),
 						  'id'            => 'left-sidebar',
-						  'before_title'  => '<div class="widget-title">',
-						  'after_title'   => '</div>',
+						  'before_title'  => '<div class="widget-title"><h3>',
+						  'after_title'   => '</h3></div>',
 						  'before_widget' => '<div id="%1$s" class="widget-wrapper %2$s">',
 						  'after_widget'  => '</div>'
 					  ) );
 
 	register_sidebar( array(
 						  'name'          => __( 'Left Sidebar Half Page', 'responsive' ),
-						  'description'   => __( 'Area 4 - sidebar-left-half.php', 'responsive' ),
+						  'description'   => __( 'Area 4 - sidebar-left-half.php - Displays on Sidebar Half Page/Content page templates', 'responsive' ),
 						  'id'            => 'left-sidebar-half',
-						  'before_title'  => '<div class="widget-title">',
-						  'after_title'   => '</div>',
+						  'before_title'  => '<div class="widget-title"><h3>',
+						  'after_title'   => '</h3></div>',
 						  'before_widget' => '<div id="%1$s" class="widget-wrapper %2$s">',
 						  'after_widget'  => '</div>'
 					  ) );
 
 	register_sidebar( array(
 						  'name'          => __( 'Right Sidebar Half Page', 'responsive' ),
-						  'description'   => __( 'Area 5 - sidebar-right-half.php', 'responsive' ),
+						  'description'   => __( 'Area 5 - sidebar-right-half.php - Displays on Content/Sidebar Half Page page templates', 'responsive' ),
 						  'id'            => 'right-sidebar-half',
-						  'before_title'  => '<div class="widget-title">',
-						  'after_title'   => '</div>',
+						  'before_title'  => '<div class="widget-title"><h3>',
+						  'after_title'   => '</h3></div>',
 						  'before_widget' => '<div id="%1$s" class="widget-wrapper %2$s">',
 						  'after_widget'  => '</div>'
 					  ) );
 
 	register_sidebar( array(
 						  'name'          => __( 'Home Widget 1', 'responsive' ),
-						  'description'   => __( 'Area 6 - sidebar-home.php', 'responsive' ),
+						  'description'   => __( 'Area 6 - sidebar-home.php - Displays on the Home Page', 'responsive' ),
 						  'id'            => 'home-widget-1',
 						  'before_title'  => '<div id="widget-title-one" class="widget-title-home"><h3>',
 						  'after_title'   => '</h3></div>',
@@ -921,7 +878,7 @@ function responsive_widgets_init() {
 
 	register_sidebar( array(
 						  'name'          => __( 'Home Widget 2', 'responsive' ),
-						  'description'   => __( 'Area 7 - sidebar-home.php', 'responsive' ),
+						  'description'   => __( 'Area 7 - sidebar-home.php - Displays on the Home Page', 'responsive' ),
 						  'id'            => 'home-widget-2',
 						  'before_title'  => '<div id="widget-title-two" class="widget-title-home"><h3>',
 						  'after_title'   => '</h3></div>',
@@ -931,7 +888,7 @@ function responsive_widgets_init() {
 
 	register_sidebar( array(
 						  'name'          => __( 'Home Widget 3', 'responsive' ),
-						  'description'   => __( 'Area 8 - sidebar-home.php', 'responsive' ),
+						  'description'   => __( 'Area 8 - sidebar-home.php - Displays on the Home Page', 'responsive' ),
 						  'id'            => 'home-widget-3',
 						  'before_title'  => '<div id="widget-title-three" class="widget-title-home"><h3>',
 						  'after_title'   => '</h3></div>',
@@ -941,36 +898,68 @@ function responsive_widgets_init() {
 
 	register_sidebar( array(
 						  'name'          => __( 'Gallery Sidebar', 'responsive' ),
-						  'description'   => __( 'Area 9 - sidebar-gallery.php', 'responsive' ),
+						  'description'   => __( 'Area 9 - sidebar-gallery.php - Displays on the page after an image has been clicked in a Gallery', 'responsive' ),
 						  'id'            => 'gallery-widget',
-						  'before_title'  => '<div class="widget-title">',
-						  'after_title'   => '</div>',
+						  'before_title'  => '<div class="widget-title"><h3>',
+						  'after_title'   => '</h3></div>',
 						  'before_widget' => '<div id="%1$s" class="widget-wrapper %2$s">',
 						  'after_widget'  => '</div>'
 					  ) );
 
 	register_sidebar( array(
 						  'name'          => __( 'Colophon Widget', 'responsive' ),
-						  'description'   => __( 'Area 10 - sidebar-colophon.php', 'responsive' ),
+						  'description'   => __( 'Area 10 - sidebar-colophon.php, 100% width Footer widgets', 'responsive' ),
 						  'id'            => 'colophon-widget',
-						  'before_title'  => '<div class="widget-title">',
-						  'after_title'   => '</div>',
+						  'before_title'  => '<div class="widget-title"><h3>',
+						  'after_title'   => '</h3></div>',
 						  'before_widget' => '<div id="%1$s" class="colophon-widget widget-wrapper %2$s">',
 						  'after_widget'  => '</div>'
 					  ) );
 
 	register_sidebar( array(
 						  'name'          => __( 'Top Widget', 'responsive' ),
-						  'description'   => __( 'Area 11 - sidebar-top.php', 'responsive' ),
+						  'description'   => __( 'Area 11 - sidebar-top.php - Displays on the right of the header', 'responsive' ),
 						  'id'            => 'top-widget',
-						  'before_title'  => '<div class="widget-title">',
-						  'after_title'   => '</div>',
+						  'before_title'  => '<div class="widget-title"><h3>',
+						  'after_title'   => '</h3></div>',
 						  'before_widget' => '<div id="%1$s" class="%2$s">',
 						  'after_widget'  => '</div>'
+					  ) );
+					  
+	register_sidebar( array(
+						  'name'          => __( 'Footer Widget', 'responsive' ),
+						  'description'   => __( 'Area 12 - sidebar-footer.php - Maximum of 3 widgets per row', 'responsive' ),
+						  'id'            => 'footer-widget',
+						  'before_title'  => '<div class="widget-title"><h3>',
+						  'after_title'   => '</h3></div>',
+						  'before_widget' => '<div id="%1$s" class="grid col-300 %2$s"><div class="widget-wrapper">',
+						  'after_widget'  => '</div></div>'
 					  ) );
 }
 
 add_action( 'widgets_init', 'responsive_widgets_init' );
+
+/* Add fit class to third footer widget */
+function footer_widgets( $params ) {
+
+	global $footer_widget_num; //Our widget counter variable
+
+	//Check if we are displaying "Footer Sidebar"
+	if( $params[0]['id'] == 'footer-widget' ){
+		$footer_widget_num++;
+		$divider = 3; //This is number of widgets that should fit in one row
+
+		//If it's third widget, add last class to it
+		if( $footer_widget_num % $divider == 0 ){
+			$class = 'class="fit ';
+			$params[0]['before_widget'] = str_replace( 'class="', $class, $params[0]['before_widget'] );
+		}
+
+	}
+
+	return $params;
+}
+add_filter( 'dynamic_sidebar_params', 'footer_widgets' );
 
 /**
  * Front Page function starts here. The Front page overides WP's show_on_front option. So when show_on_front option changes it sets the themes front_page to 0 therefore displaying the new option
@@ -1062,4 +1051,124 @@ function responsive_install_plugins() {
 
 }
 
-add_action( 'tgmpa_register', 'responsive_install_plugins' );
+// Add plugin notification only if the current user is admin.
+if( current_user_can( 'manage_options' ) ) {
+	add_action( 'tgmpa_register', 'responsive_install_plugins' );
+}
+
+/*
+ * Add notification to Reading Settings page to notify if Custom Front Page is enabled.
+ *
+ * @since    1.9.4.0
+ */
+function responsive_front_page_reading_notice() {
+	$screen = get_current_screen();
+	$responsive_options = responsive_get_options();
+	if ( 'options-reading' == $screen->id ) {
+		$html = '<div class="updated">';
+			if ( 1 == $responsive_options['front_page'] ) {
+				$html .= '<p>' . sprintf( __( 'The Custom Front Page is enabled. You can disable it in the <a href="%1$s">theme settings</a>.', 'responsive' ), admin_url( 'themes.php?page=theme_options' ) ) . '</p>';
+			} else {
+				$html .= '<p>' . sprintf( __( 'The Custom Front Page is disabled. You can enable it in the <a href="%1$s">theme settings</a>.', 'responsive' ), admin_url( 'themes.php?page=theme_options' ) ) . '</p>';
+			}
+		$html .= '</div>';
+		echo $html;
+	}
+}
+add_action( 'admin_notices', 'responsive_front_page_reading_notice' );
+
+/**
+ * Use shortcode_atts_gallery filter to add new defaults to the WordPress gallery shortcode.
+ * Allows user input in the post gallery shortcode.
+ *
+ */
+function responsive_gallery_atts( $out, $pairs, $atts ) {
+
+	$full_width = is_page_template( 'full-width-page.php' ) || is_page_template( 'landing-page.php' );
+
+	if ( $full_width ) {
+		switch ( $out['columns'] ) {
+			case 1:
+				$size = 'responsive-900'; //900
+				break;
+			case 2:
+				$size = 'responsive-450'; //450
+				break;
+			case 3:
+				$size = 'responsive-300'; //300
+				break;
+			case 4:
+				$size = 'responsive-200'; //225
+				break;
+			case 5:
+				$size = 'responsive-200'; //180
+				break;
+			case 6:
+				$size = 'responsive-150'; //150
+				break;
+			case 7:
+				$size = 'responsive-150'; //125
+				break;
+			case 8:
+				$size = 'responsive-150'; //112
+				break;
+			case 9:
+				$size = 'responsive-100'; //100
+				break;
+		}
+	} else {
+		switch ( $out['columns'] ) {
+			case 1:
+				$size = 'responsive-600'; //600
+				break;
+			case 2:
+				$size = 'responsive-300'; //300
+				break;
+			case 3:
+				$size = 'responsive-200'; //200
+				break;
+			case 4:
+				$size = 'responsive-150'; //150
+				break;
+			case 5:
+				$size = 'responsive-150'; //120
+				break;
+			case 6:
+				$size = 'responsive-100'; //100
+				break;
+			case 7:
+				$size = 'responsive-100'; //85
+				break;
+			case 8:
+				$size = 'responsive-100'; //75
+				break;
+			case 9:
+				$size = 'responsive-100'; //66
+				break;
+		}
+	}
+
+	$atts = shortcode_atts(
+		array(
+			'size' => $size,
+		),
+		$atts
+	);
+
+	$out['size'] = $atts['size'];
+
+	return $out;
+
+}
+add_filter( 'shortcode_atts_gallery', 'responsive_gallery_atts', 10, 3 );
+
+/*
+ * Create image sizes for the galley
+ */
+add_image_size( 'responsive-100', 100, 9999 );
+add_image_size( 'responsive-150', 150, 9999 );
+add_image_size( 'responsive-200', 200, 9999 );
+add_image_size( 'responsive-300', 300, 9999 );
+add_image_size( 'responsive-450', 450, 9999 );
+add_image_size( 'responsive-600', 600, 9999 );
+add_image_size( 'responsive-900', 900, 9999 );

@@ -99,12 +99,7 @@ function responsive_theme_options_do_page() {
 	?>
 
 	<div class="wrap">
-	<?php
-	/**
-	 * < 3.4 Backward Compatibility
-	 */
-	?>
-	<?php $theme_name = function_exists( 'wp_get_theme' ) ? wp_get_theme() : get_current_theme(); ?>
+	<?php $theme_name = wp_get_theme() ?>
 	<?php screen_icon();
 	echo "<h2>" . $theme_name . " " . __( 'Theme Options', 'responsive' ) . "</h2>"; ?>
 
@@ -286,7 +281,7 @@ function responsive_theme_options_do_page() {
 																	 'heading'     => '',
 																	 'type'        => 'editor',
 																	 'id'          => 'featured_content',
-																	 'description' => __( 'Enter your call to action text', 'responsive' ),
+																	 'description' => __( 'Paste your shortcode, video or image source', 'responsive' ),
 																	 'placeholder' => "<img class='aligncenter' src='" . get_template_directory_uri() . "'/core/images/featured-image.png' width='440' height='300' alt='' />"
 																 )
 

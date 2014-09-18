@@ -76,7 +76,7 @@
 		width: auto;
 	}
 
-	.top-widget .widget-title {
+	.top-widget .widget-title h3 {
 		text-align: center;
 	}
 
@@ -219,16 +219,12 @@
 		text-align: center;
 	}
 
-	.tinynav {
-		display: block;
-	}
-
-	.sb-holder {
-		display: block;
-	}
-
 	#author-meta {
 		padding: 20px;
+	}
+
+	#wrapper .gallery .gallery-item {
+		max-width: 100%;
 	}
 
 	.hide-650 {
@@ -296,6 +292,10 @@
 		float: none;
 		text-align: center;
 		text-rendering: optimizeSpeed;
+	}
+
+	#wrapper .gallery .gallery-item {
+		float: none;
 	}
 
 	.hide-480 {
@@ -379,7 +379,7 @@
 		width: 75%;
 	}
 
-	.widget-title,
+	.widget-title h3,
 	.widget-title-home h3 {
 		font-size: 14px;
 		height: 13px;
