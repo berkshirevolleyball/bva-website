@@ -3,8 +3,8 @@ Contributors: TobiasBg
 Donate link: http://tablepress.org/donate/
 Tags: html,table,data,editor,csv,excel,import,export
 Requires at least: 3.8
-Tested up to: 3.8
-Stable tag: 1.3
+Tested up to: 4.0
+Stable tag: 1.4
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,7 +55,7 @@ Many questions, regarding different features or styling, have been answered on t
 
 = Support? =
 
-For support questions, bug reports, or feature requests, please use the [WordPress Support Forums](http://wordpress.org/support/plugin/tablepress). Please [search](http://wordpress.org/support/) through the forums first, and only [open a new thread](http://wordpress.org/support/plugin/tablepress) if you don't find an existing answer. Thank you!
+For support questions, bug reports, or feature requests, please use the [WordPress Support Forums](https://wordpress.org/support/plugin/tablepress). Please [search](https://wordpress.org/support/) through the forums first, and only [open a new thread](https://wordpress.org/support/plugin/tablepress) if you don't find an existing answer. Thank you!
 
 = Requirements? =
 
@@ -64,9 +64,9 @@ In short: WordPress 3.8 or higher, while the latest version of WordPress is alwa
 = Languages and Localization? =
 
 The plugin currently includes the following languages:
-Brazilian Portuguese, Chinese (Simplified), Chinese (Taiwan), Czech, Dutch, English, Finnish, French, German, Hebrew, Icelandic, Italian, Japanese, Latvian, Polish, Russian, Slovak, Spanish, and Turkish.
+Brazilian Portuguese, Chinese (Simplified), Chinese (Taiwan), Czech, Dutch, English, Finnish, French, German, Hebrew, Icelandic, Italian, Japanese, Latvian, Polish, Russian, Serbian, Slovak, Spanish, and Turkish.
 
-I'd really appreciate it, if you would translate the plugin into your language! Using Heiko Rabe's WordPress plugin [Codestyling Localization](http://wordpress.org/plugins/codestyling-localization/) that really is as easy as pie. Just install the plugin, add your language, create the .po-file, translate the strings in the comfortable editor and create the .mo-file. It will automatically be saved in TablePress's plugin folder. If you send me the .mo- and .po-file, I will gladly include them into future plugin releases.
+I'd really appreciate it, if you would translate the plugin into your language! Using Heiko Rabe's WordPress plugin [Codestyling Localization](https://wordpress.org/plugins/codestyling-localization/) that really is as easy as pie. Just install the plugin, add your language, create the .po-file, translate the strings in the comfortable editor and create the .mo-file. It will automatically be saved in TablePress's plugin folder. If you send me the .mo- and .po-file, I will gladly include them into future plugin releases.
 There is also a .pot-file available to use in the "i18n" subfolder. Of course you can also use [poEdit](http://www.poedit.net/) as your editor, which also works nicely.
 
 = Development =
@@ -107,8 +107,21 @@ I'm also happy about [donations](http://tablepress.org/donate/) or something fro
 
 == Changelog ==
 
+= Version 1.4 =
+* Compatibility with WordPress 3.9
+* Bugfix: Determine the correct Worksheet ID during XLSX import
+* Bugfix: Displaying empty Shortcodes was broken
+* Enhancement: Improve JSON import to also allow import of JSON objects
+* Enhancement: Use more sophisticated error handling and debugging
+* Enhancement: Reduce memory usage when loading tables
+* Added inline documentation to all plugin filter and action hooks
+* Updated external libraries
+* Internal improvements to coding standards, inline documentation, and build tools
+* Added Serbian translation
+* Updated several translations (Chinese (Simplified), Croatian, German, Spanish)
+
 = Version 1.3 =
-* Compatiblity with WordPress 3.8 and the new admin styling
+* Compatibility with WordPress 3.8 and the new admin styling
 * Bugfix: Import of JSON files did not take row/column visibility into account
 * Bugfix: File names of exported files were sometimes broken
 * Bugfix: Translations for some strings were not loaded properly
@@ -120,7 +133,7 @@ I'm also happy about [donations](http://tablepress.org/donate/) or something fro
 * TablePress 1.3 requires WordPress 3.8!
 
 = Version 1.2 =
-* Compatiblity with WordPress 3.7
+* Compatibility with WordPress 3.7
 * Bugfix: WordPress search did not find tables in some cases
 * Bugfix: Cells were sometimes erroneously interpreted as formulas
 * Bugfix: HTML export did not encode entities properly
@@ -131,7 +144,7 @@ I'm also happy about [donations](http://tablepress.org/donate/) or something fro
 * Updated external libraries
 * Updated several translations (Brazilian Portuguese, Czech, French, German, Latvian)
 * Many more internal code improvements
-* TablePress now requires WordPress 3.6!
+* TablePress 1.2 requires WordPress 3.6!
 
 = Version 1.1.1 =
 * Fixed a bug with CSS handling that broke some TablePress Extensions
@@ -158,6 +171,9 @@ Release candidate in which all intended features are included and very stable.
 Initial version where most features are ready and pretty stable.
 
 == Upgrade Notice ==
+
+= 1.4 =
+This update is a stability, maintenance, and compatibility release. Updating is recommended.
 
 = 1.3 =
 This update is a stability, maintenance, and compatibility release. Updating is recommended.

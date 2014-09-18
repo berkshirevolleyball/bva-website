@@ -27,7 +27,7 @@ abstract class TablePress {
 	 *
 	 * @const string
 	 */
-	const version = '1.3';
+	const version = '1.4';
 
 	/**
 	 * TablePress internal plugin version ("options scheme" version)
@@ -38,7 +38,7 @@ abstract class TablePress {
 	 *
 	 * @const int
 	 */
-	const db_version = 23;
+	const db_version = 24;
 
 	/**
 	 * TablePress "table scheme" (data format structure) version
@@ -106,6 +106,11 @@ abstract class TablePress {
 	 * @uses load_controller()
 	 */
 	public static function run() {
+		/**
+		 * Fires when TablePress is loaded.
+		 *
+		 * @since 1.0.0
+		 */
 		do_action( 'tablepress_run' );
 
 		// exit early if TablePress doesn't have to be loaded
@@ -116,7 +121,7 @@ abstract class TablePress {
 		}
 
 		// check if minimum requirements are fulfilled, currently WordPress 3.8
-		if ( version_compare( $GLOBALS['wp_version'], '3.8', '<' ) ) {
+		if ( version_compare( str_replace( '-src', '', $GLOBALS['wp_version'] ), '3.8', '<' ) ) {
 			// show error notice to admins, if WP is not installed in the minimum required version, in which case TablePress will not work
 			if ( current_user_can( 'update_plugins' ) ) {
 				add_action( 'admin_notices', array( 'TablePress', 'show_minimum_requirements_error_notice' ) );
@@ -125,8 +130,21 @@ abstract class TablePress {
 			return;
 		}
 
-		// some filtering of "global" class variables
+		/**
+		 * Filter the string that is used as the [table] Shortcode.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $shortcode The [table] Shortcode string.
+		 */
 		self::$shortcode = apply_filters( 'tablepress_table_shortcode', self::$shortcode );
+		/**
+		 * Filter the string that is used as the [table-info] Shortcode.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $shortcode_info The [table-info] Shortcode string.
+		 */
 		self::$shortcode_info = apply_filters( 'tablepress_table_info_shortcode', self::$shortcode_info );
 
 		// Load modals for table and options, to be accessible from everywhere via `TablePress::$model_options` and `TablePress::$model_table`
@@ -154,6 +172,15 @@ abstract class TablePress {
 	 */
 	public static function load_file( $file, $folder ) {
 		$full_path = TABLEPRESS_ABSPATH . $folder . '/' . $file;
+		/**
+		 * Filter the full path of a file that shall be loaded.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $full_path Full path of the file that shall be loaded.
+		 * @param string $file      File name of the file that shall be loaded.
+		 * @param string $folder    Folder name of the file that shall be loaded.
+		 */
 		$full_path = apply_filters( 'tablepress_load_file_full_path', $full_path, $file, $folder );
 		if ( $full_path ) {
 			require_once $full_path;
@@ -173,6 +200,13 @@ abstract class TablePress {
 	 * @return object Initialized instance of the class
 	 */
 	public static function load_class( $class, $file, $folder, $params = null ) {
+		/**
+		 * Filter name of the class that shall be loaded.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $class Name of the class that shall be loaded.
+		 */
 		$class = apply_filters( 'tablepress_load_class_name', $class );
 		if ( ! class_exists( $class ) ) {
 			self::load_file( $file, $folder );
@@ -374,7 +408,7 @@ abstract class TablePress {
 		$default_params = array(
 			'page' => false,
 			'action' => false,
-			'item' => false
+			'item' => false,
 		);
 		$params = array_merge( $default_params, $params );
 

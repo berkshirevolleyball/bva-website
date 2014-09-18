@@ -57,15 +57,15 @@ class TablePress_Export {
 		$this->export_formats = array(
 			'csv' => __( 'CSV - Character-Separated Values', 'tablepress' ),
 			'html' => __( 'HTML - Hypertext Markup Language', 'tablepress' ),
-			'json' => __( 'JSON - JavaScript Object Notation', 'tablepress' )
+			'json' => __( 'JSON - JavaScript Object Notation', 'tablepress' ),
 		);
 		$this->csv_delimiters = array(
 			';' => __( '; (semicolon)', 'tablepress' ),
 			',' => __( ', (comma)', 'tablepress' ),
-			'tab' => __( '\t (tabulator)', 'tablepress' )
+			'tab' => __( '\t (tabulator)', 'tablepress' ),
 		);
 
-		// filter from @see unzip_file() in WordPress
+		/** This filter is documented in the WordPress function unzip_file() in wp-admin/includes/file.php */
 		if ( class_exists( 'ZipArchive' ) && apply_filters( 'unzip_file_use_ziparchive', true ) ) {
 			$this->zip_support_available = true;
 		}

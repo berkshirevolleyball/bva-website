@@ -46,7 +46,7 @@ class TablePress_List_View extends TablePress_View {
 				'shortcode_popup' => __( 'To embed this table into a post or page, use this Shortcode:', 'tablepress' ),
 				'donation-message-already-donated' => __( 'Thank you very much! Your donation is highly appreciated. You just contributed to the further development of TablePress!', 'tablepress' ),
 				'donation-message-maybe-later' => sprintf( __( 'No problem! I still hope you enjoy the benefits that TablePress adds to your site. If you should change your mind, you&#8217;ll always find the &#8220;Donate&#8221; button on the <a href="%s">TablePress website</a>.', 'tablepress' ), 'http://tablepress.org/' ),
-			)
+			),
 		) );
 
 		if ( $data['messages']['first_visit'] ) {
@@ -110,7 +110,7 @@ class TablePress_List_View extends TablePress_View {
 			'error_delete_not_all_tables' => __( 'Notice: Not all selected tables could be deleted!', 'tablepress' ),
 			'error_copy_not_all_tables' => __( 'Notice: Not all selected tables could be copied!', 'tablepress' ),
 			'success_import' => __( 'The tables were imported successfully.', 'tablepress' ),
-			'success_import_wp_table_reloaded' => __( 'The tables were imported successfully from WP-Table Reloaded.', 'tablepress' )
+			'success_import_wp_table_reloaded' => __( 'The tables were imported successfully from WP-Table Reloaded.', 'tablepress' ),
 		) );
 
 		$this->add_text_box( 'head', array( $this, 'textbox_head' ), 'normal' );
@@ -118,7 +118,7 @@ class TablePress_List_View extends TablePress_View {
 
 		add_screen_option( 'per_page', array( 'label' => __( 'Tables', 'tablepress' ), 'default' => 20 ) ); // Admin_Controller contains function to allow changes to this in the Screen Options to be saved
 		$this->wp_list_table = new TablePress_All_Tables_List_Table();
-		$this->wp_list_table->set_items( $this->data['tables'] );
+		$this->wp_list_table->set_items( $this->data['table_ids'] );
 		$this->wp_list_table->prepare_items();
 
 		// cleanup Request URI string, which WP_List_Table uses to generate the sort URLs
@@ -241,7 +241,7 @@ class TablePress_List_View extends TablePress_View {
  * @package TablePress
  * @subpackage Views
  * @author Tobias Bäthge
- * @see http://codex.wordpress.org/Class_Reference/WP_List_Table
+ * @see https://codex.wordpress.org/Class_Reference/WP_List_Table
  * @since 1.0.0
  * @uses WP_List_Table
  */
@@ -273,7 +273,7 @@ class TablePress_All_Tables_List_Table extends WP_List_Table {
 			'singular'	=> 'tablepress-table',		// singular name of the listed records
 			'plural'	=> 'tablepress-all-tables', // plural name of the listed records
 			'ajax'		=> false,					// does this list table support AJAX?
-			'screen'	=> $screen					// WP_Screen object
+			'screen'	=> $screen,					// WP_Screen object
 		) );
 	}
 
@@ -317,7 +317,7 @@ class TablePress_All_Tables_List_Table extends WP_List_Table {
 			'table_description' => __( 'Description', 'tablepress' ),
 			'table_author' => __( 'Author', 'tablepress' ),
 			'table_last_modified_by' => __( 'Last Modified By', 'tablepress' ),
-			'table_last_modified' => __( 'Last Modified', 'tablepress' )
+			'table_last_modified' => __( 'Last Modified', 'tablepress' ),
 		);
 		return $columns;
 	}
@@ -342,7 +342,7 @@ class TablePress_All_Tables_List_Table extends WP_List_Table {
 			'table_description' => array( 'description', false ),
 			'table_author' => array( 'author', false ),
 			'table_last_modified_by' => array( 'last_modified_by', false ),
-			'table_last_modified' => array( 'last_modified', false )
+			'table_last_modified' => array( 'last_modified', false ),
 		);
 		return $sortable_columns;
 	}
@@ -524,7 +524,7 @@ class TablePress_All_Tables_List_Table extends WP_List_Table {
 	public function bulk_actions() {
 		if ( is_null( $this->_actions ) ) {
 			$no_new_actions = $this->_actions = $this->get_bulk_actions();
-			// This filter can currently only be used to remove actions.
+			/** This filter is documented in the WordPress function WP_List_Table::bulk_actions() in wp-admin/includes/class-wp-list-table.php */
 			$this->_actions = apply_filters( 'bulk_actions-' . $this->screen->id, $this->_actions );
 			$this->_actions = array_intersect_assoc( $this->_actions, $no_new_actions );
 			$two = '';
@@ -602,16 +602,26 @@ class TablePress_All_Tables_List_Table extends WP_List_Table {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $item Item that shall be searched
+	 * @param string $item Table ID that shall be searched
 	 * @return bool Whether the search term was found or not
 	 */
-	protected function _search_callback( array $item ) {
-		static $term;
-		if ( is_null( $term ) ) {
+	protected function _search_callback( $item ) {
+		static $term, $json_encoded_term;
+		if ( is_null( $term ) || is_null( $json_encoded_term ) ) {
 			$term = wp_unslash( $_GET['s'] );
+			$json_encoded_term = substr( json_encode( $term ), 1, -1 );
 		}
 
-		$item = TablePress::$model_table->load( $item['id'] ); // load table again, with data
+		static $debug;
+		if ( is_null( $debug ) ) {
+			$debug = isset( $_GET['debug'] ) ? ( 'true' == $_GET['debug'] ) : WP_DEBUG; // Set debug variable to allow searching in corrupted tables
+		}
+
+		$item = TablePress::$model_table->load( $item, true, true ); // load table again, with data and options (for last_editor)
+
+		if ( ! $debug && isset( $item['is_corrupted'] ) && $item['is_corrupted'] ) {
+			return false; // Don't search corrupted tables, except when debug mode is enabled via $_GET parameter or WP_DEBUG constant
+		}
 
 		// search from easy to hard, so that "expensive" code maybe doesn't have to run
 		if ( false !== stripos( $item['id'], $term )
@@ -620,7 +630,7 @@ class TablePress_All_Tables_List_Table extends WP_List_Table {
 		|| false !== stripos( TablePress::get_user_display_name( $item['author'] ), $term )
 		|| false !== stripos( TablePress::get_user_display_name( $item['options']['last_editor'] ), $term )
 		|| false !== stripos( TablePress::format_datetime( $item['last_modified'], 'mysql', ' ' ), $term )
-		|| false !== stripos( json_encode( $item['data'] ), $term ) ) {
+		|| false !== stripos( json_encode( $item['data'] ), $json_encoded_term ) ) {
 			return true;
 		}
 
@@ -685,6 +695,12 @@ class TablePress_All_Tables_List_Table extends WP_List_Table {
 			$this->items = array_filter( $this->items, array( $this, '_search_callback' ) );
 		}
 
+		// Load actual tables after search for less memory consumption
+		foreach ( $this->items as &$item ) {
+			$item = TablePress::$model_table->load( $item, false, true ); // Don't load data, but load table options for access to last_editor
+		}
+		unset( $item ); // Break reference in foreach iterator
+
 		// Maybe sort the items
 		$_sortable_columns = $this->get_sortable_columns();
 		if ( $orderby && ! empty( $this->items ) && isset( $_sortable_columns["table_{$orderby}"] ) ) {
@@ -703,9 +719,9 @@ class TablePress_All_Tables_List_Table extends WP_List_Table {
 
 		// Register pagination options and calculation results
 		$this->set_pagination_args( array(
-			'total_items' => $total_items,					// total number of records/items
-			'per_page' => $per_page,						// number of items per page
-			'total_pages' => ceil( $total_items/$per_page ) // total number of pages
+			'total_items' => $total_items,                     // Total number of records/items
+			'per_page' => $per_page,                           // Number of items per page
+			'total_pages' => ceil( $total_items / $per_page ), // Total number of pages
 		) );
 	}
 

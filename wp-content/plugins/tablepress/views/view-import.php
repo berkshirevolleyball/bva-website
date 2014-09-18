@@ -42,8 +42,8 @@ class TablePress_Import_View extends TablePress_View {
 
 		$this->admin_page->enqueue_script( 'import', array( 'jquery' ), array(
 			'import' => array(
-				'error_wp_table_reloaded_nothing_selected' => __( 'Error: You did not select what to import from WP-Table Reloaded!', 'tablepress' )
-			)
+				'error_wp_table_reloaded_nothing_selected' => __( 'Error: You did not select what to import from WP-Table Reloaded!', 'tablepress' ),
+			),
 		) );
 
 		$this->process_action_messages( array(
@@ -57,7 +57,7 @@ class TablePress_Import_View extends TablePress_View {
 			'error_wp_table_reloaded_nothing_selected' => __( 'Error: You did not select what to import from WP-Table Reloaded!', 'tablepress' ),
 			'error_wp_table_reloaded_not_installed' => __( 'Error: Existing WP-Table Reloaded tables were not found in the database.', 'tablepress' ),
 			'error_import_wp_table_reloaded'=> __( 'Error: The tables from WP-Table Reloaded could not be imported.', 'tablepress' ),
-			'error_wp_table_reloaded_dump_file' => __( 'Error: The WP-Table Reloaded Dump File could not be imported!', 'tablepress' )
+			'error_wp_table_reloaded_dump_file' => __( 'Error: The WP-Table Reloaded Dump File could not be imported!', 'tablepress' ),
 		) );
 
 		$this->add_text_box( 'head', array( $this, 'textbox_head' ), 'normal' );
@@ -197,7 +197,8 @@ class TablePress_Import_View extends TablePress_View {
 			<select id="tables-import-existing-table" name="import[existing_table]"<?php disabled( $data['tables_count'] > 0, false, true ); ?>>
 				<option value=""><?php _e( 'Select:', 'tablepress' ); ?></option>
 			<?php
-				foreach ( $data['tables'] as $table ) {
+				foreach ( $data['table_ids'] as $table_id ) {
+					$table = TablePress::$model_table->load( $table_id, false, false ); // Load table, without table data, options, and visibility settings
 					if ( ! current_user_can( 'tablepress_edit_table', $table['id'] ) ) {
 						continue;
 					}

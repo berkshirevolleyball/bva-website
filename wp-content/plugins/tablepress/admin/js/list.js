@@ -31,9 +31,9 @@ jQuery( document ).ready( function( $ ) {
 	$( '.tablepress-all-tables' ).on( 'click', '.table-preview a', function( /* event */ ) {
 		var width = $( window ).width() - 120,
 			height = $( window ).height() - 120,
-			$this = $( this );
-		if ( $( 'body.admin-bar' ).length ) {
-			height -= 28;
+			$this = $(this);
+		if ( $( '#wpadminbar' ).length ) {
+			height -= parseInt( $( '#wpadminbar' ).css( 'height' ), 10 );
 		}
 		tb_show( $this.text(), $this.attr( 'href' ) + 'TB_iframe=true&height=' + height + '&width=' + width, false );
 		return false;
@@ -45,7 +45,7 @@ jQuery( document ).ready( function( $ ) {
 	 * @since 1.0.0
 	 */
 	$( '#tablepress-page' ).on( 'click', '.ajax-link', function( /* event */ ) {
-		var $link = $( this ),
+		var $link = $(this),
 			action = $link.data( 'action' ),
 			item = $link.data( 'item' ),
 			target = $link.data( 'target' );

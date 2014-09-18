@@ -40,6 +40,11 @@ class TablePress_Edit_View extends TablePress_View {
 	public function setup( $action, array $data ) {
 		parent::setup( $action, $data );
 
+		if ( isset( $data['table']['is_corrupted'] ) && $data['table']['is_corrupted'] ) {
+			$this->add_text_box( 'table-corrupted', array( $this, 'textbox_corrupted_table' ), 'normal' );
+			return;
+		};
+
 		$action_messages = array(
 			'success_save' => __( 'The table was saved successfully.', 'tablepress' ),
 			'success_add' => __( 'The table was added successfully.', 'tablepress' ),
@@ -49,7 +54,7 @@ class TablePress_Edit_View extends TablePress_View {
 			'error_save' => __( 'Error: The table could not be saved.', 'tablepress' ),
 			'error_delete' => __( 'Error: The table could not be deleted.', 'tablepress' ),
 			'success_save_success_id_change' => __( 'The table was saved successfully, and the table ID was changed.', 'tablepress' ),
-			'success_save_error_id_change' => __( 'The table was saved successfully, but the table ID could not be changed!', 'tablepress' )
+			'success_save_error_id_change' => __( 'The table was saved successfully, but the table ID could not be changed!', 'tablepress' ),
 		);
 		// Custom handling instead of $this->process_action_messages(). Also, $action_messages is used below.
 		if ( $data['message'] && isset( $action_messages[ $data['message'] ] ) ) {
@@ -58,6 +63,7 @@ class TablePress_Edit_View extends TablePress_View {
 		}
 
 		wp_enqueue_style( 'wp-jquery-ui-dialog' ); // do this here to get CSS into <head>
+		wp_enqueue_script( 'wpdialogs' ); // For the Advanced Editor
 		add_action( 'admin_footer', array( $this, 'dequeue_media_upload_js' ), 2 ); // remove default media-upload.js, in favor of own code
 		add_thickbox();
 		add_filter( 'media_view_strings', array( $this, 'change_media_view_strings' ) );
@@ -65,25 +71,50 @@ class TablePress_Edit_View extends TablePress_View {
 
 		// Use modified version of wpLink, instead of default version (changes "Title" to "Link Text")
 		wp_deregister_script( 'wplink' );
+		$version = ( 0 === strpos( $GLOBALS['wp_version'], '3.8' ) ) ? '38' : ''; // temporary backward-compatibility with WordPress 3.8, where we keep loading the old version of the customized wplink script
 		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 		// See wp-includes/script-loader.php for default parameters
-		$wplink_url = plugins_url( "admin/js/tp_wplink{$suffix}.js", TABLEPRESS__FILE__ );
-		wp_enqueue_script( 'wplink', $wplink_url, array( 'jquery', 'wpdialogs' ), TablePress::version, true );
+		$wplink_url = plugins_url( "admin/js/tp_wplink{$version}{$suffix}.js", TABLEPRESS__FILE__ );
+		wp_enqueue_script( 'wplink', $wplink_url, array( 'jquery' ), TablePress::version, true );
 		wp_localize_script( 'wplink', 'wpLinkL10n', array(
 			'title' => _x( 'Insert/edit link', 'Insert Link dialog', 'tablepress' ),
 			'update' => _x( 'Update', 'Insert Link dialog', 'tablepress' ),
 			'save' => _x( 'Add Link', 'Insert Link dialog', 'tablepress' ),
 			'noTitle' => _x( '(no title)', 'Insert Link dialog', 'tablepress' ),
 			'noMatchesFound' => _x( 'No matches found.', 'Insert Link dialog', 'tablepress' ),
-			'link_text' => _x( 'Link Text', 'Insert Link dialog', 'tablepress' ) // Previous strings are default strings, this is the string that the modified tp_wplink.js inserts
+			'link_text' => _x( 'Link Text', 'Insert Link dialog', 'tablepress' ), // Previous strings are default strings, this is the string that the modified tp_wplink.js inserts
 		) );
 
 		$this->admin_page->enqueue_style( 'edit' );
 		$this->admin_page->enqueue_script( 'edit', array( 'jquery', 'jquery-ui-sortable', 'json2' ), array(
 			'options' => array(
+				/**
+				 * Filter whether debug output shall be printed to the page.
+				 *
+				 * The value before filtering is determined from the GET parameter "debug" or the WP_DEBUG constant.
+				 *
+				 * @since 1.4.0
+				 *
+				 * @param bool $print Whether debug output shall be printed.
+				 */
+				'print_debug_output' => apply_filters( 'tablepress_print_debug_output', isset( $_GET['debug'] ) ? ( 'true' == $_GET['debug'] ) : WP_DEBUG ),
+				/**
+				 * Filter whether the "Advanced Editor" button shall be enabled.
+				 *
+				 * @since 1.0.0
+				 *
+				 * @param bool $enable Whether the "Advanced Editor" shall be enabled. Default true.
+				 */
 				'cells_advanced_editor' => apply_filters( 'tablepress_edit_cells_advanced_editor', true ),
+				/**
+				 * Filter whether the size of the table input textareas shall increase when they are focused.
+				 *
+				 * @since 1.0.0
+				 *
+				 * @param bool $auto_grow Whether the size of the cell textareas shall increase. Default true.
+				 */
 				'cells_auto_grow' => apply_filters( 'tablepress_edit_cells_auto_grow', true ),
-				'shortcode' => esc_js( TablePress::$shortcode )
+				'shortcode' => esc_js( TablePress::$shortcode ),
 			),
 			'strings' => array_merge( array(
 				'no_remove_all_rows' => __( 'You can not delete all table rows!', 'tablepress' ),
@@ -123,8 +154,8 @@ class TablePress_Edit_View extends TablePress_View {
 				'no_rowspan_first_row' => __( 'You can not add rowspan to the first row!', 'tablepress' ),
 				'no_colspan_first_col' => __( 'You can not add colspan to the first column!', 'tablepress' ),
 				'no_rowspan_table_head' => __( 'You can not connect cells into the table head row!', 'tablepress' ),
-				'no_rowspan_table_foot' => __( 'You can not connect cells out of the table foot row!', 'tablepress' )
-			), $action_messages ) // merge this to have messages available for AJAX after save dialog
+				'no_rowspan_table_foot' => __( 'You can not connect cells out of the table foot row!', 'tablepress' ),
+			), $action_messages ), // merge this to have messages available for AJAX after save dialog
 		) );
 
 		$this->add_text_box( 'head', array( $this, 'textbox_head' ), 'normal' );
@@ -191,7 +222,7 @@ class TablePress_Edit_View extends TablePress_View {
 		<th class="column-1" scope="row"><label for="table-id"><?php _e( 'Table ID', 'tablepress' ); ?>:</label></th>
 		<td class="column-2">
 			<input type="hidden" name="table[id]" id="table-id" value="<?php echo esc_attr( $data['table']['id'] ); ?>" />
-			<input type="text" name="table[new_id]" id="table-new-id" class="small-text" value="<?php echo esc_attr( $data['table']['id'] ); ?>" title="<?php esc_attr_e( 'The Table ID can only consist of letters, numbers, hyphens (-), and underscores (_).', 'tablepress' ); ?>" pattern="[A-Za-z0-9-_]+" required <?php echo ( ! current_user_can( 'tablepress_edit_table_id', $data['table']['id'] ) ) ? 'readonly ' : ''; ?>/>
+			<input type="text" name="table[new_id]" id="table-new-id" value="<?php echo esc_attr( $data['table']['id'] ); ?>" title="<?php esc_attr_e( 'The Table ID can only consist of letters, numbers, hyphens (-), and underscores (_).', 'tablepress' ); ?>" pattern="[A-Za-z0-9-_]+" required <?php echo ( ! current_user_can( 'tablepress_edit_table_id', $data['table']['id'] ) ) ? 'readonly ' : ''; ?>/>
 			<div style="float: right; margin-right: 1%;"><label for="table-information-shortcode"><?php _e( 'Shortcode', 'tablepress' ); ?>:</label>
 			<input type="text" id="table-information-shortcode" class="table-shortcode" value="<?php echo esc_attr( '[' . TablePress::$shortcode . " id={$data['table']['id']} /]" ); ?>" readonly="readonly" /></div>
 		</td>
@@ -452,8 +483,8 @@ class TablePress_Edit_View extends TablePress_View {
 			'textarea_rows' => 10,
 			'tinymce' => false,
 			'quicktags' => array(
-				'buttons' => 'strong,em,link,del,ins,img,code,spell,close'
-			)
+				'buttons' => 'strong,em,link,del,ins,img,code,spell,close',
+			),
 		);
 		wp_editor( '', 'advanced-editor-content', $wp_editor_options );
 	?>
@@ -574,6 +605,38 @@ class TablePress_Edit_View extends TablePress_View {
 </tbody>
 </table>
 <?php
+	}
+
+	/**
+	 * Print a notification about a corrupted table
+	 *
+	 * @since 1.4.0
+	 */
+	public function textbox_corrupted_table( $data, $box ) {
+		?>
+		<div class="error">
+			<p><strong><?php _e( 'Attention: Unfortunately, an error occured.', 'tablepress' ); ?></strong></p>
+			<p>
+				<?php
+					printf( __( 'The internal data of table &#8220;%1$s&#8221 (ID %2$s) is corrupted.', 'tablepress' ), esc_html( $data['table']['name'] ), esc_html( $data['table']['id'] ) );
+					echo ' ';
+					printf( __( 'The following error was registered: <code>%s</code>.', 'tablepress' ), esc_html( $data['table']['json_error'] ) );
+				?>
+			</p>
+			<p>
+				<?php
+					_e( 'Because of this error, the table can not be edited at this time, to prevent possible further data loss.', 'tablepress' );
+					echo ' ';
+					printf( __( 'Please see the <a href="%s">TablePress FAQ page</a> for further instructions.', 'tablepress' ), 'http://tablepress.org/faq/corrupted-tables/' );
+				?>
+			</p>
+			<p>
+				<?php
+					echo '<a href="' . TablePress::url( array( 'action' => 'list' ) ) . '" class="button">' . __( 'Back to the List of Tables', 'tablepress' ) . '</a>';
+				?>
+			</p>
+		</div>
+		<?php
 	}
 
 	/**

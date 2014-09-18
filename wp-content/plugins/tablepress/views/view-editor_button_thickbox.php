@@ -53,7 +53,7 @@ class TablePress_Editor_Button_Thickbox_View extends TablePress_View {
 		$this->data = $data;
 
 		$this->wp_list_table = new TablePress_Editor_Button_Thickbox_List_Table();
-		$this->wp_list_table->set_items( $this->data['tables'] );
+		$this->wp_list_table->set_items( $this->data['table_ids'] );
 		$this->wp_list_table->prepare_items();
 	}
 
@@ -63,7 +63,6 @@ class TablePress_Editor_Button_Thickbox_View extends TablePress_View {
 	 * @since 1.0.0
 	 */
 	public function render() {
- 		register_admin_color_schemes(); // To fix SCRIPT_DEBUG issues that result in wrong colors.css file being loaded
 		_wp_admin_html_begin();
 
 		wp_print_styles( 'colors' );
@@ -127,6 +126,7 @@ body {
 }
 .tablepress-editor-button-list tbody .column-table_action {
 	padding: 4px 7px 1px;
+	vertical-align: middle;
 }
 
 /* Shortcode input field */
@@ -163,7 +163,6 @@ body.rtl {
 }
 .rtl #tablepress-page .table-shortcode-inline {
 	width: 125px;
-	direction: ltr;
 	font-size: 13px;
 	vertical-align: baseline;
 }
@@ -177,7 +176,7 @@ body.rtl {
 <p>
 <?php _e( 'This is a list of all available tables.', 'tablepress' ); ?> <?php _e( 'You may insert a table into a post or page here.', 'tablepress' ); ?>
 </p><p>
-<?php printf( __( 'Click the &#8220;%1$s&#8221; button for the desired table to automatically insert the<br />corresponding Shortcode (%2$s) into the editor.', 'tablepress' ), __( 'Insert Shortcode', 'tablepress' ), '<input type="text" class="table-shortcode table-shortcode-inline" value="' . esc_attr( '[' . TablePress::$shortcode . " id=<ID> /]" ) . '" readonly="readonly" />' ); ?>
+<?php printf( __( 'Click the &#8220;%1$s&#8221; button for the desired table to automatically insert the<br />corresponding Shortcode (%2$s) into the editor.', 'tablepress' ), __( 'Insert Shortcode', 'tablepress' ), '<input type="text" class="table-shortcode table-shortcode-inline ltr" value="' . esc_attr( '[' . TablePress::$shortcode . " id=<ID> /]" ) . '" readonly="readonly" />' ); ?>
 </p>
 <?php
 	if ( ! empty( $_GET['s'] ) ) {
@@ -213,7 +212,7 @@ jQuery( document ).ready( function( $ ) {
  * @package TablePress
  * @subpackage Views
  * @author Tobias Bäthge
- * @see http://codex.wordpress.org/Class_Reference/WP_List_Table
+ * @see https://codex.wordpress.org/Class_Reference/WP_List_Table
  * @since 1.0.0
  * @uses WP_List_Table
  */
@@ -238,7 +237,7 @@ class TablePress_Editor_Button_Thickbox_List_Table extends WP_List_Table {
 			'singular'	=> 'tablepress-table',				// singular name of the listed records
 			'plural'	=> 'tablepress-editor-button-list', // plural name of the listed records
 			'ajax'		=> false,							// does this list table support AJAX?
-			'screen'	=> get_current_screen()				// WP_Screen object
+			'screen'	=> get_current_screen(),			// WP_Screen object
 		) );
 	}
 
@@ -279,7 +278,7 @@ class TablePress_Editor_Button_Thickbox_List_Table extends WP_List_Table {
 			'table_id' => __( 'ID', 'tablepress' ),
 			'table_name' => __( 'Table Name', 'tablepress' ), // just "name" is special in WP, which is why we prefix every entry here, to be safe!
 			'table_description' => __( 'Description', 'tablepress' ),
-			'table_action' => __( 'Action', 'tablepress' )
+			'table_action' => __( 'Action', 'tablepress' ),
 		);
 		return $columns;
 	}
@@ -301,7 +300,7 @@ class TablePress_Editor_Button_Thickbox_List_Table extends WP_List_Table {
 		$sortable_columns = array(
 			'table_id' => array( 'id', true ), //true means its already sorted
 			'table_name' => array( 'name', false ),
-			'table_description' => array( 'description', false )
+			'table_description' => array( 'description', false ),
 		);
 		return $sortable_columns;
 	}
@@ -403,16 +402,21 @@ class TablePress_Editor_Button_Thickbox_List_Table extends WP_List_Table {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $item Item that shall be searched
+	 * @param string $item Table ID that shall be searched
 	 * @return bool Whether the search term was found or not
 	 */
-	protected function _search_callback( array $item ) {
-		static $term;
-		if ( is_null( $term ) ) {
+	protected function _search_callback( $item ) {
+		static $term, $json_encoded_term;
+		if ( is_null( $term ) || is_null( $json_encoded_term ) ) {
 			$term = wp_unslash( $_GET['s'] );
+			$json_encoded_term = substr( json_encode( $term ), 1, -1 );
 		}
 
-		$item = TablePress::$model_table->load( $item['id'] ); // load table again, with data
+		$item = TablePress::$model_table->load( $item, true, false ); // Load table again, with table data, but without options and visibility settings
+
+		if ( isset( $item['is_corrupted'] ) && $item['is_corrupted'] ) {
+			return false; // Don't search corrupted tables
+		}
 
 		// search from easy to hard, so that "expensive" code maybe doesn't have to run
 		if ( false !== stripos( $item['id'], $term )
@@ -420,7 +424,7 @@ class TablePress_Editor_Button_Thickbox_List_Table extends WP_List_Table {
 		|| false !== stripos( $item['description'], $term )
 		|| false !== stripos( TablePress::get_user_display_name( $item['author'] ), $term )
 		|| false !== stripos( TablePress::format_datetime( $item['last_modified'], 'mysql', ' ' ), $term )
-		|| false !== stripos( json_encode( $item['data'] ), $term ) ) {
+		|| false !== stripos( json_encode( $item['data'] ), $json_encoded_term ) ) {
 			return true;
 		}
 
@@ -463,6 +467,12 @@ class TablePress_Editor_Button_Thickbox_List_Table extends WP_List_Table {
 			$this->items = array_filter( $this->items, array( $this, '_search_callback' ) );
 		}
 
+		// Load actual tables after search for less memory consumption
+		foreach ( $this->items as &$item ) {
+			$item = TablePress::$model_table->load( $item, false, false ); // Don't load data nor table options
+		}
+		unset( $item ); // Break reference in foreach iterator
+
 		// Maybe sort the items
 		$_sortable_columns = $this->get_sortable_columns();
 		if ( $orderby && ! empty( $this->items ) && isset( $_sortable_columns["table_{$orderby}"] ) ) {
@@ -481,9 +491,9 @@ class TablePress_Editor_Button_Thickbox_List_Table extends WP_List_Table {
 
 		// Register pagination options and calculation results
 		$this->set_pagination_args( array(
-			'total_items' => $total_items,					// total number of records/items
-			'per_page' => $per_page,						// number of items per page
-			'total_pages' => ceil( $total_items/$per_page ) // total number of pages
+			'total_items' => $total_items,                     // Total number of records/items
+			'per_page' => $per_page,                           // Number of items per page
+			'total_pages' => ceil( $total_items / $per_page ), // Total number of pages
 		) );
 	}
 

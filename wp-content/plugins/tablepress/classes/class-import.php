@@ -71,7 +71,7 @@ class TablePress_Import {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		// filter from @see unzip_file() in WordPress
+		/** This filter is documented in the WordPress function unzip_file() in wp-admin/includes/file.php */
 		if ( class_exists( 'ZipArchive' ) && apply_filters( 'unzip_file_use_ziparchive', true ) ) {
 			$this->zip_support_available = true;
 		}
@@ -207,7 +207,7 @@ class TablePress_Import {
 
 		$html_table = array(
 			'data' => array(),
-			'options' => array()
+			'options' => array(),
 		);
 		if ( isset( $table->thead ) ) {
 			$html_table['data'] = array_merge( $html_table['data'], $this->_import_html_rows( $table->thead[0]->tr ) );
@@ -305,7 +305,10 @@ class TablePress_Import {
 			$table = $json_table;
 		} else {
 			// JSON data contained only the data of a table, but no options
-			$table = array( 'data' => $json_table );
+			$table = array( 'data' => array() );
+			foreach ( $json_table as $row ) {
+				$table['data'][] = array_values( (array) $row );
+			}
 		}
 
 		$table['data'] = $this->pad_array_to_max_cols( $table['data'] );
@@ -385,8 +388,11 @@ class TablePress_Import {
 		TablePress::load_file( 'simplexlsx.class.php', 'libraries' );
 		$simplexlsx = new SimpleXLSX( $this->import_data, true );
 
-		if ( $simplexlsx->success() ) {
-			$this->imported_table = array( 'data' => $this->pad_array_to_max_cols( $simplexlsx->rows() ) );
+		if ( $simplexlsx->success() && 0 < $simplexlsx->sheetsCount() ) {
+			// Get Worksheet ID of the first Worksheet (not necessarily "1", which is the default in SimpleXLSX)
+			$sheet_ids = array_keys( $simplexlsx->sheetNames() );
+			$worksheet_id = $sheet_ids[0];
+			$this->imported_table = array( 'data' => $this->pad_array_to_max_cols( $simplexlsx->rows( $worksheet_id ) ) );
 		} else {
 			$output = '<strong>' . __( 'The imported file contains errors:', 'tablepress' ) . '</strong><br /><br />' . $simplexlsx->error() . '<br />';
 			wp_die( $output, 'Import Error', array( 'response' => 200, 'back_link' => true ) );

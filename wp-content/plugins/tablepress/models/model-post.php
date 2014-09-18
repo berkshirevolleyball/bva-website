@@ -46,10 +46,17 @@ class TablePress_Post_Model extends TablePress_Model {
 	 * @uses register_post_type()
 	 */
 	protected function _register_post_type() {
+		/**
+		 * Filter the "Custom Post Type" that TablePress uses for storing tables in the database.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $post_type The "Custom Post Type" that TablePress uses.
+		 */
 		$this->post_type = apply_filters( 'tablepress_post_type', $this->post_type );
 		$post_type_args = array(
 			'labels' => array(
-				'name' => 'TablePress Tables'
+				'name' => 'TablePress Tables',
 			),
 			'public' => false,
 			'show_ui' => false,
@@ -58,8 +65,15 @@ class TablePress_Post_Model extends TablePress_Model {
 			'capability_type' => 'tablepress_table', // this ensures, that WP's regular CPT UI respects our capabilities
 			'map_meta_cap' => false, // integrated WP mapping does not fit our needs, therefore use our own in a filter
 			'supports' => array( 'title', 'editor', 'excerpt', 'revisions' ),
-			'can_export' => true
+			'can_export' => true,
 		);
+		/**
+		 * Filter the arguments for the registration of the "Custom Post Type" that TablePress uses.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $post_type_args Arguments for the registration of the TablePress "Custom Post Type".
+		 */
 		$post_type_args = apply_filters( 'tablepress_post_type_args', $post_type_args );
 		register_post_type( $this->post_type, $post_type_args );
 	}
@@ -71,7 +85,7 @@ class TablePress_Post_Model extends TablePress_Model {
 	 * @uses wp_insert_post()
 	 *
 	 * @param array $post Post to insert
-	 * @return int Post ID of the inserted post on success, int 0 on error
+	 * @return int|WP_Error Post ID of the inserted post on success, WP_Error on error
 	 */
 	public function insert( array $post ) {
 		$default_post = array(
@@ -87,7 +101,7 @@ class TablePress_Post_Model extends TablePress_Model {
 			'post_title' => '',
 			'post_type' => $this->post_type,
 			'tags_input' => '',
-			'to_ping' => ''
+			'to_ping' => '',
 		);
 		$post = array_merge( $default_post, $post );
 		$post = wp_slash( $post ); // WP expects everything to be slashed
@@ -96,10 +110,10 @@ class TablePress_Post_Model extends TablePress_Model {
 		remove_filter( 'content_save_pre', 'balanceTags', 50 );
 		remove_filter( 'excerpt_save_pre', 'balanceTags', 50 );
 		// remove possible KSES filtering here, as it can destroy the JSON when messing with HTML
-		// saving is done to table cells individually, when saving
+		// KSES filtering is done to table cells individually, when saving
 		remove_filter( 'content_save_pre', 'wp_filter_post_kses' );
 
-		$post_id = wp_insert_post( $post, false ); // false means: no WP_Error object on error, but int 0
+		$post_id = wp_insert_post( $post, true );
 
 		// re-add balanceTags() to sanitize_post()
 		add_filter( 'content_save_pre', 'balanceTags', 50 );
@@ -119,7 +133,7 @@ class TablePress_Post_Model extends TablePress_Model {
 	 * @uses wp_update_post()
 	 *
 	 * @param array $post Post
-	 * @return int Post ID of the updated post on success, int 0 on error
+	 * @return int|WP_Error Post ID of the updated post on success, WP_Error on error
 	 */
 	public function update( array $post ) {
 		$default_post = array(
@@ -135,7 +149,7 @@ class TablePress_Post_Model extends TablePress_Model {
 			'post_title' => '',
 			'post_type' => $this->post_type,
 			'tags_input' => '',
-			'to_ping' => ''
+			'to_ping' => '',
 		);
 		$post = array_merge( $default_post, $post );
 		$post = wp_slash( $post ); // WP expects everything to be slashed
@@ -147,7 +161,7 @@ class TablePress_Post_Model extends TablePress_Model {
 		// saving is done to table cells individually, when saving
 		remove_filter( 'content_save_pre', 'wp_filter_post_kses' );
 
-		$post_id = wp_update_post( $post );
+		$post_id = wp_update_post( $post, true );
 
 		// re-add balanceTags() to sanitize_post()
 		add_filter( 'content_save_pre', 'balanceTags', 50 );
@@ -225,8 +239,9 @@ class TablePress_Post_Model extends TablePress_Model {
 	 * @since 1.0.0
 	 *
 	 * @param array $all_post_ids List of Post IDs
+	 * @param bool $update_meta_cache Whether to update the Post Meta Cache (for table options and visibility)
 	 */
-	public function load_posts( array $all_post_ids ) {
+	public function load_posts( array $all_post_ids, $update_meta_cache = true ) {
 		global $wpdb;
 
 		// Split post loading, to save memory
@@ -235,15 +250,15 @@ class TablePress_Post_Model extends TablePress_Model {
 		$number_of_posts = count( $all_post_ids );
 		while ( $offset < $number_of_posts ) {
 			$post_ids = array_slice( $all_post_ids, $offset, $length );
-			$post_ids_list = implode( ',', $post_ids );
-			$all_posts = $wpdb->get_results( "SELECT * FROM {$wpdb->posts} WHERE ID IN ({$post_ids_list})" );
-			// loop is similar to update_post_cache( $all_posts ), but with sanitization
-			foreach ( $all_posts as $single_post ) {
-				$single_post = sanitize_post( $single_post, 'raw' ); // just minimal sanitization of int fields
-				wp_cache_add( $single_post->ID, $single_post, 'posts' );
+			$post_ids = _get_non_cached_ids( $post_ids, 'posts' ); // Don't load posts that are in the cache already
+			if ( ! empty( $post_ids ) ) {
+				$post_ids_list = implode( ',', $post_ids );
+				$posts = $wpdb->get_results( "SELECT {$wpdb->posts}.* FROM {$wpdb->posts} WHERE ID IN ({$post_ids_list})" );
+				update_post_cache( $posts );
+				if ( $update_meta_cache ) {
+					update_meta_cache( 'post', $post_ids ); // get all post meta data for all table posts, @see get_post_meta()
+				}
 			}
-			// get all post meta data for all table posts, @see get_post_meta()
-			update_meta_cache( 'post', $post_ids );
 			$offset += $length; // next array_slice() $offset
 		}
 	}

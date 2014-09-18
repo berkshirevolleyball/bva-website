@@ -35,16 +35,16 @@ class TablePress_Options_View extends TablePress_View {
 		$this->admin_page->enqueue_script( 'codemirror', array(), false, true );
 		$this->admin_page->enqueue_script( 'options', array( 'jquery', 'tablepress-codemirror' ), array(
 			'strings' => array(
-		  		'uninstall_warning_1' => __( 'Do you really want to uninstall TablePress and delete ALL data?', 'tablepress' ),
-		  		'uninstall_warning_2' => __( 'Are you really sure?', 'tablepress' )
-			)
+				'uninstall_warning_1' => __( 'Do you really want to uninstall TablePress and delete ALL data?', 'tablepress' ),
+				'uninstall_warning_2' => __( 'Are you really sure?', 'tablepress' ),
+			),
 		) );
 
 		$this->process_action_messages( array(
 			'success_save' => __( 'Options saved successfully.', 'tablepress' ),
 			'success_save_error_custom_css' => __( 'Options saved successfully, but &#8220;Custom CSS&#8221; was not saved to file.', 'tablepress' ),
 			'error_save' => __( 'Error: Options could not be saved.', 'tablepress' ),
-			'success_import_wp_table_reloaded' => __( 'The WP-Table Reloaded &#8220;Custom CSS&#8221; was imported successfully.', 'tablepress' )
+			'success_import_wp_table_reloaded' => __( 'The WP-Table Reloaded &#8220;Custom CSS&#8221; was imported successfully.', 'tablepress' ),
 		) );
 
 		$this->add_text_box( 'head', array( $this, 'textbox_head' ), 'normal' );
@@ -184,10 +184,10 @@ class TablePress_Options_View extends TablePress_View {
 		?>
 		<h2 style="margin-top:40px;"><?php _e( 'Uninstall TablePress', 'tablepress' ); ?></h2>
 		<p><?php
-		 	echo __( 'Uninstalling <strong>will permanently delete</strong> all TablePress tables and options from the database.', 'tablepress' ) . '<br />'
-			   	. __( 'It is recommended that you create a backup of the tables (by exporting the tables in the JSON format), in case you later change your mind.', 'tablepress' ) . '<br />'
-			   	. __( 'You will manually need to remove the plugin&#8217;s files from the plugin folder afterwards.', 'tablepress' ) . '<br />'
-			   	. __( 'Be very careful with this and only click the button if you know what you are doing!', 'tablepress' );
+			echo __( 'Uninstalling <strong>will permanently delete</strong> all TablePress tables and options from the database.', 'tablepress' ) . '<br />'
+				. __( 'It is recommended that you create a backup of the tables (by exporting the tables in the JSON format), in case you later change your mind.', 'tablepress' ) . '<br />'
+				. __( 'You will manually need to remove the plugin&#8217;s files from the plugin folder afterwards.', 'tablepress' ) . '<br />'
+				. __( 'Be very careful with this and only click the button if you know what you are doing!', 'tablepress' );
 		?></p>
 		<p><a href="<?php echo TablePress::url( array( 'action' => 'uninstall_tablepress' ), true, 'admin-post.php' ); ?>" id="uninstall-tablepress" class="button"><?php _e( 'Uninstall TablePress', 'tablepress' ); ?></a></p>
 		<?php

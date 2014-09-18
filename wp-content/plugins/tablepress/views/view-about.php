@@ -102,7 +102,7 @@ class TablePress_About_View extends TablePress_View {
 	public function postbox_more_information( $data, $box ) {
 		?>
 	<p>
-		<?php printf( __( 'More information about TablePress can be found on the <a href="%s">plugin&#8217;s website</a> or on its page in the <a href="%s">WordPress Plugin Directory</a>.', 'tablepress' ), 'http://tablepress.org/', 'http://wordpress.org/plugins/tablepress/' ); ?>
+		<?php printf( __( 'More information about TablePress can be found on the <a href="%s">plugin&#8217;s website</a> or on its page in the <a href="%s">WordPress Plugin Directory</a>.', 'tablepress' ), 'http://tablepress.org/', 'https://wordpress.org/plugins/tablepress/' ); ?>
 		<?php printf( __( 'For technical information, please see the <a href="%s">documentation</a>.', 'tablepress' ), 'http://tablepress.org/documentation/' ); ?>
 	</p>
 		<?php
@@ -120,7 +120,7 @@ class TablePress_About_View extends TablePress_View {
 		<?php _e( 'It is licensed as Free Software under GNU General Public License 2 (GPL 2).', 'tablepress' ); ?>
 	<br />
 		<?php printf( __( 'If you like the plugin, <a href="%s"><strong>giving a donation</strong></a> is recommended.', 'tablepress' ), 'http://tablepress.org/donate/' ); ?>
-		<?php printf( __( 'Please rate and review the plugin in the <a href="%s">WordPress Plugin Directory</a>.', 'tablepress' ), 'http://wordpress.org/support/view/plugin-reviews/tablepress' ); ?>
+		<?php printf( __( 'Please rate and review the plugin in the <a href="%s">WordPress Plugin Directory</a>.', 'tablepress' ), 'https://wordpress.org/support/view/plugin-reviews/tablepress' ); ?>
 	<br />
 		<?php _e( 'Donations and good ratings encourage me to further develop the plugin and to provide countless hours of support. Any amount is appreciated! Thanks!', 'tablepress' ); ?>
 	</p>
@@ -135,11 +135,11 @@ class TablePress_About_View extends TablePress_View {
 	public function postbox_help_support( $data, $box ) {
 		?>
 	<p>
-		<?php printf( __( '<a href="%s">Support</a> is provided through the <a href="%s">WordPress Support Forums</a>.', 'tablepress' ), 'http://tablepress.org/support/', 'http://wordpress.org/support/plugin/tablepress' ); ?>
+		<?php printf( __( '<a href="%s">Support</a> is provided through the <a href="%s">WordPress Support Forums</a>.', 'tablepress' ), 'http://tablepress.org/support/', 'https://wordpress.org/support/plugin/tablepress' ); ?>
 		<?php printf( __( 'Before asking for support, please carefully read the <a href="%s">Frequently Asked Questions</a>, where you will find answers to the most common questions, and search through the forums.', 'tablepress' ), 'http://tablepress.org/faq/' ); ?>
 	</p>
 	<p>
-		<?php printf( __( 'If you do not find an answer there, please <a href="%s">open a new thread</a> in the WordPress Support Forums.', 'tablepress' ), 'http://wordpress.org/support/plugin/tablepress' ); ?>
+		<?php printf( __( 'If you do not find an answer there, please <a href="%s">open a new thread</a> in the WordPress Support Forums.', 'tablepress' ), 'https://wordpress.org/support/plugin/tablepress' ); ?>
 	</p>
 		<?php
 	}
@@ -150,11 +150,12 @@ class TablePress_About_View extends TablePress_View {
 	 * @since 1.0.0
 	 */
 	public function postbox_debug_version_information( $data, $box ) {
+		$mysqli = ( isset( $GLOBALS['wpdb'] ) && isset( $GLOBALS['wpdb']->use_mysqli ) && $GLOBALS['wpdb']->use_mysqli && isset( $GLOBALS['wpdb']->dbh ) );
 		?>
 		<p>
 			<strong><?php _e( 'Please provide this information in bug reports and support requests.', 'tablepress' ); ?></strong>
 		</p>
-		<p>
+		<p class="ltr">
 			&middot; Website: <?php echo site_url(); ?>
 			<br />&middot; TablePress: <?php echo TablePress::version; ?>
 			<br />&middot; TablePress (DB): <?php echo TablePress::db_version; ?>
@@ -163,8 +164,9 @@ class TablePress_About_View extends TablePress_View {
 			<br />&middot; WordPress: <?php echo $GLOBALS['wp_version']; ?>
 			<br />&middot; Multisite: <?php echo is_multisite() ? 'yes' : 'no'; ?>
 			<br />&middot; PHP: <?php echo phpversion(); ?>
-			<br />&middot; mySQL (Server): <?php echo mysql_get_server_info(); ?>
-			<br />&middot; mySQL (Client): <?php echo mysql_get_client_info(); ?>
+			<br />&middot; mysqli Extension: <?php echo $mysqli ? 'true' : 'false'; ?>
+			<br />&middot; mySQL (Server): <?php echo $mysqli ? mysqli_get_server_info( $GLOBALS['wpdb']->dbh ) : mysql_get_server_info(); ?>
+			<br />&middot; mySQL (Client): <?php echo $mysqli ? mysqli_get_client_info( $GLOBALS['wpdb']->dbh ) : mysql_get_client_info(); ?>
 			<br />&middot; ZIP support: <?php echo $data['zip_support_available'] ? 'yes' : 'no'; ?>
 			<br />&middot; UTF-8 conversion: <?php echo ( function_exists( 'mb_detect_encoding' ) && function_exists( 'iconv' ) ) ? 'yes' : 'no'; ?>
 			<br />&middot; WP Memory Limit: <?php echo WP_MEMORY_LIMIT; ?>
