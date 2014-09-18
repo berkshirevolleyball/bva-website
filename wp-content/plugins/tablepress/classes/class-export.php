@@ -66,8 +66,9 @@ class TablePress_Export {
 		);
 
 		// filter from @see unzip_file() in WordPress
-		if ( class_exists( 'ZipArchive' ) && apply_filters( 'unzip_file_use_ziparchive', true ) )
+		if ( class_exists( 'ZipArchive' ) && apply_filters( 'unzip_file_use_ziparchive', true ) ) {
 			$this->zip_support_available = true;
+		}
 	}
 
 	/**
@@ -84,8 +85,9 @@ class TablePress_Export {
 		switch ( $export_format ) {
 			case 'csv':
 				$output = '';
-				if ( 'tab' == $csv_delimiter )
+				if ( 'tab' == $csv_delimiter ) {
 					$csv_delimiter = "\t";
+				}
 				foreach ( $table['data'] as $row_idx => $row ) {
 					$csv_row = array();
 					foreach ( $row as $column_idx => $cell_content ) {
@@ -105,26 +107,30 @@ class TablePress_Export {
 				}
 				foreach ( $table['data'] as $row_idx => $row ) {
 					if ( 0 == $row_idx ) {
-						if ( $table['options']['table_head'] )
+						if ( $table['options']['table_head'] ) {
 							$output .= "\t<thead>\n";
-						else
+						} else {
 							$output .= "\t<tbody>\n";
+						}
 					} elseif ( $last_row_idx == $row_idx ) {
-						if ( $table['options']['table_foot'] )
+						if ( $table['options']['table_foot'] ) {
 							$output .= "\t</tbody>\n\t<tfoot>\n";
+						}
 					}
 					$output .= "\t\t<tr>\n";
 					$row = array_map( array( $this, 'html_wrap_and_escape' ), $row );
 					$output .= implode( '', $row );
 					$output .= "\t\t</tr>\n";
 					if ( $last_row_idx == $row_idx ) {
-						if ( $table['options']['table_foot'] )
+						if ( $table['options']['table_foot'] ) {
 							$output .= "\t</tfoot>\n";
-						else
+						} else {
 							$output .= "\t</tbody>\n";
+						}
 					} elseif ( 0 == $row_idx ) {
-						if ( $table['options']['table_head'] )
+						if ( $table['options']['table_head'] ) {
 							$output .= "\t</thead>\n\t<tbody>\n";
+						}
 					}
 				}
 				$output .= '</table>';
@@ -145,6 +151,7 @@ class TablePress_Export {
 	 * @since 1.0.0
 	 *
 	 * @param string $string Content of a cell
+	 * @param string $delimiter CSV delimiter character
 	 * @return string Wrapped string for CSV export
 	 */
 	protected function csv_wrap_and_escape( $string, $delimiter ) {

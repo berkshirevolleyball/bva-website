@@ -27,7 +27,7 @@ abstract class TablePress {
 	 *
 	 * @const string
 	 */
-	const version = '1.2';
+	const version = '1.3';
 
 	/**
 	 * TablePress internal plugin version ("options scheme" version)
@@ -38,7 +38,7 @@ abstract class TablePress {
 	 *
 	 * @const int
 	 */
-	const db_version = 22;
+	const db_version = 23;
 
 	/**
 	 * TablePress "table scheme" (data format structure) version
@@ -51,6 +51,24 @@ abstract class TablePress {
 	 * @const int
 	 */
 	const table_scheme_version = 3;
+
+	/**
+	 * Instance of the Options Model
+	 *
+	 * @since 1.3.0
+	 *
+	 * @var object
+	 */
+	public static $model_options;
+
+	/**
+	 * Instance of the Table Model
+	 *
+	 * @since 1.3.0
+	 *
+	 * @var object
+	 */
+	public static $model_table;
 
 	/**
 	 * Instance of the controller
@@ -97,11 +115,12 @@ abstract class TablePress {
 			return;
 		}
 
-		// check if minimum requirements are fulfilled, currently WordPress 3.6
-		if ( version_compare( $GLOBALS['wp_version'], '3.6', '<' ) ) {
+		// check if minimum requirements are fulfilled, currently WordPress 3.8
+		if ( version_compare( $GLOBALS['wp_version'], '3.8', '<' ) ) {
 			// show error notice to admins, if WP is not installed in the minimum required version, in which case TablePress will not work
-			if ( current_user_can( 'update_plugins' ) )
+			if ( current_user_can( 'update_plugins' ) ) {
 				add_action( 'admin_notices', array( 'TablePress', 'show_minimum_requirements_error_notice' ) );
+			}
 			// and exit TablePress
 			return;
 		}
@@ -110,10 +129,15 @@ abstract class TablePress {
 		self::$shortcode = apply_filters( 'tablepress_table_shortcode', self::$shortcode );
 		self::$shortcode_info = apply_filters( 'tablepress_table_info_shortcode', self::$shortcode_info );
 
+		// Load modals for table and options, to be accessible from everywhere via `TablePress::$model_options` and `TablePress::$model_table`
+		self::$model_options = self::load_model( 'options' );
+		self::$model_table = self::load_model( 'table' );
+
 		if ( is_admin() ) {
 			$controller = 'admin';
-			if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
+			if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
 				$controller .= '_ajax';
+			}
 		} else {
 			$controller = 'frontend';
 		}
@@ -131,8 +155,9 @@ abstract class TablePress {
 	public static function load_file( $file, $folder ) {
 		$full_path = TABLEPRESS_ABSPATH . $folder . '/' . $file;
 		$full_path = apply_filters( 'tablepress_load_file_full_path', $full_path, $file, $folder );
-		if ( $full_path )
+		if ( $full_path ) {
 			require_once $full_path;
+		}
 	}
 
 	/**
@@ -149,8 +174,9 @@ abstract class TablePress {
 	 */
 	public static function load_class( $class, $file, $folder, $params = null ) {
 		$class = apply_filters( 'tablepress_load_class_name', $class );
-		if ( ! class_exists( $class ) )
+		if ( ! class_exists( $class ) ) {
 			self::load_file( $file, $folder );
+		}
 		$the_class = new $class( $params );
 		return $the_class;
 	}
@@ -211,13 +237,14 @@ abstract class TablePress {
 	 * @since 1.0.0
 	 *
 	 * @param string $action Action for which the nonce is needed
-	 * @param string $item (optional) Item for which the action will be performed, like "table"
+	 * @param string|bool $item (optional) Item for which the action will be performed, like "table"
 	 * @return string The resulting nonce string
 	 */
 	public static function nonce( $action, $item = false ) {
 		$nonce = "tablepress_{$action}";
-		if ( $item )
+		if ( $item ) {
 			$nonce .= "_{$item}";
+		}
 		return $nonce;
 	}
 
@@ -228,16 +255,17 @@ abstract class TablePress {
 	 * @uses nonce()
 	 *
 	 * @param string $action Action for which the nonce should be checked
-	 * @param string $item (optional) Item for which the action should be performed, like "table"
+	 * @param string|bool $item (optional) Item for which the action should be performed, like "table"
 	 * @param string $query_arg (optional) Name of the nonce query string argument in $_POST
 	 * @param bool $ajax Whether the nonce comes from an AJAX request
 	 */
 	public static function check_nonce( $action, $item = false, $query_arg = '_wpnonce', $ajax = false ) {
 		$nonce_action = self::nonce( $action, $item );
-		if ( $ajax )
+		if ( $ajax ) {
 			check_ajax_referer( $nonce_action, $query_arg );
-		else
+		} else {
 			check_admin_referer( $nonce_action, $query_arg );
+		}
 	}
 
 	/**
@@ -288,10 +316,11 @@ abstract class TablePress {
 	 * @return string Nice looking string with the date and time
 	 */
 	public static function format_datetime( $datetime, $type = 'mysql', $separator = ' ' ) {
-		if ( 'mysql' == $type )
+		if ( 'mysql' == $type ) {
 			return mysql2date( get_option( 'date_format' ), $datetime ) . $separator . mysql2date( get_option( 'time_format' ), $datetime );
-		else
+		} else {
 			return date_i18n( get_option( 'date_format' ), $datetime ) . $separator . date_i18n( get_option( 'time_format' ), $datetime );
+		}
 	}
 
 	/**
@@ -318,8 +347,9 @@ abstract class TablePress {
 	public static function url( array $params = array(), $add_nonce = false, $target = '' ) {
 
 		// default action is "list", if no action given
-		if ( ! isset( $params['action'] ) )
+		if ( ! isset( $params['action'] ) ) {
 			$params['action'] = 'list';
+		}
 		$nonce_action = $params['action'];
 
 		if ( $target ) {
@@ -329,10 +359,12 @@ abstract class TablePress {
 			// top-level parent page needs special treatment for better action strings
 			if ( self::$controller->is_top_level_page ) {
 				$target = 'admin.php';
-				if ( ! in_array( $params['action'], array( 'list', 'edit' ), true ) )
+				if ( ! in_array( $params['action'], array( 'list', 'edit' ), true ) ) {
 					$params['page'] = "tablepress_{$params['action']}";
-				if ( ! in_array( $params['action'], array( 'edit' ), true ) )
+				}
+				if ( ! in_array( $params['action'], array( 'edit' ), true ) ) {
 					$params['action'] = false;
+				}
 			} else {
 				$target = self::$controller->parent_page;
 			}
@@ -347,8 +379,9 @@ abstract class TablePress {
 		$params = array_merge( $default_params, $params );
 
 		$url = add_query_arg( $params, admin_url( $target ) );
-		if ( $add_nonce )
+		if ( $add_nonce ) {
 			$url = wp_nonce_url( $url, self::nonce( $nonce_action, $params['item'] ) ); // wp_nonce_url() does esc_html()
+		}
 		return $url;
 	}
 
@@ -364,8 +397,9 @@ abstract class TablePress {
 	public static function redirect( array $params = array(), $add_nonce = false ) {
 		$redirect = self::url( $params );
 		if ( $add_nonce ) {
-			if ( ! isset( $params['item'] ) )
+			if ( ! isset( $params['item'] ) ) {
 				$params['item'] = false;
+			}
 			// don't use wp_nonce_url(), as that uses esc_html()
 			$redirect = add_query_arg( '_wpnonce', wp_create_nonce( self::nonce( $params['action'], $params['item'] ) ), $redirect );
 		}
