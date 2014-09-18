@@ -615,13 +615,28 @@ var acf = {
 						
 						// if this sub field is within a flexible content layout, hide the entire column because 
 						// there will never be another row added to this table
-						if( $target.parent('tr').parent().parent('table').parent('.layout').exists() )
+						var parent = $target.parent('tr').parent().parent('table').parent('.layout');
+						if( parent.exists() )
 						{
 							hide_all = true;
 							
 							if( $target.is('th') && $toggle.is('th') )
 							{
 								$toggle = $target.closest('.layout').find('td.field_key-' + rule.field);
+							}
+
+						}
+						
+						// if this sub field is within a repeater field which has a max row of 1, hide the entire column because 
+						// there will never be another row added to this table
+						var parent = $target.parent('tr').parent().parent('table').parent('.repeater');
+						if( parent.exists() && parent.attr('data-max_rows') == '1' )
+						{
+							hide_all = true;
+							
+							if( $target.is('th') && $toggle.is('th') )
+							{
+								$toggle = $target.closest('table').find('td.field_key-' + rule.field);
 							}
 
 						}
@@ -1185,8 +1200,12 @@ var acf = {
 		},
 		init : function(){
 			
+			// vars (reference)
+			var $input = this.$input;
+			
+			
 			// is clone field?
-			if( acf.helpers.is_clone_field(this.$input) )
+			if( acf.helpers.is_clone_field($input) )
 			{
 				return;
 			}
@@ -1759,13 +1778,14 @@ var acf = {
 	*
 	*/
 	
-	acf.fields.location = {
+	acf.fields.google_map = {
 		
 		$el : null,
 		$input : null,
 		
 		o : {},
 		
+		ready : false,
 		geocoder : false,
 		map : false,
 		maps : {},
@@ -1791,16 +1811,23 @@ var acf = {
 			}
 			
 			
-			// geocode
-			this.geocoder = new google.maps.Geocoder();
-			
-				
 			// return this for chaining
 			return this;
 			
 		},
 		init : function(){
-
+			
+			// geocode
+			if( !this.geocoder )
+			{
+				this.geocoder = new google.maps.Geocoder();
+			}
+			
+			
+			// google maps is loaded and ready
+			this.ready = true;
+			
+			
 			// is clone field?
 			if( acf.helpers.is_clone_field(this.$input) )
 			{
@@ -1819,7 +1846,7 @@ var acf = {
 			
 			// vars
 			var args = {
-        		zoom		: 14,
+        		zoom		: parseInt(this.o.zoom),
         		center		: new google.maps.LatLng(this.o.lat, this.o.lng),
         		mapTypeId	: google.maps.MapTypeId.ROADMAP
         	};
@@ -1990,7 +2017,19 @@ var acf = {
 			
 			// vars
 			var position = this.map.marker.getPosition(),
-				latlng = new google.maps.LatLng( position.lat(), position.lng() );
+				lat = this.o.lat,
+				lng = this.o.lng;
+			
+			
+			// if marker exists, center on the marker
+			if( position )
+			{
+				lat = position.lat();
+				lng = position.lng();
+			}
+			
+			
+			var latlng = new google.maps.LatLng( lat, lng );
 				
 			
 			// set center of map
@@ -2106,6 +2145,16 @@ var acf = {
 			
 			this.$el.find('.search').val( val ).focus();
 			
+		},
+		
+		refresh : function(){
+			
+			// trigger resize on div
+			google.maps.event.trigger(this.map, 'resize');
+			
+			// center map
+			this.center();
+			
 		}
 	
 	};
@@ -2126,34 +2175,42 @@ var acf = {
 	
 	$(document).on('acf/setup_fields', function(e, el){
 		
-		if( $(el).find('.acf-google-map').exists() )
+		// vars
+		$fields = $(el).find('.acf-google-map');
+		
+		
+		// validate
+		if( ! $fields.exists() )
 		{
-			// validate google
-			if( typeof google === 'undefined' )
-			{
-				$.getScript('https://www.google.com/jsapi', function(){
-				
-				    google.load('maps', '3', { other_params: 'sensor=false&libraries=places', callback: function(){
-				    
-				        $(el).find('.acf-google-map').each(function(){
+			return;
+		}
+		
+		
+		// validate google
+		if( typeof google === 'undefined' )
+		{
+			$.getScript('https://www.google.com/jsapi', function(){
+			
+			    google.load('maps', '3', { other_params: 'sensor=false&libraries=places', callback: function(){
+			    
+			        $fields.each(function(){
+					
+						acf.fields.google_map.set({ $el : $(this) }).init();
 						
-							acf.fields.location.set({ $el : $(this) }).init();
-							
-						});
-				        
-				    }});
-				});
+					});
+			        
+			    }});
+			});
+			
+		}
+		else
+		{
+			$fields.each(function(){
 				
-			}
-			else
-			{
-				$(el).find('.acf-google-map').each(function(){
-					
-					acf.fields.location.set({ $el : $(this) }).init();
-					
-				});
+				acf.fields.google_map.set({ $el : $(this) }).init();
 				
-			}
+			});
+			
 		}
 		
 	});
@@ -2175,7 +2232,7 @@ var acf = {
 		
 		e.preventDefault();
 		
-		acf.fields.location.set({ $el : $(this).closest('.acf-google-map') }).clear();
+		acf.fields.google_map.set({ $el : $(this).closest('.acf-google-map') }).clear();
 		
 		$(this).blur();
 		
@@ -2186,7 +2243,7 @@ var acf = {
 		
 		e.preventDefault();
 		
-		acf.fields.location.set({ $el : $(this).closest('.acf-google-map') }).locate();
+		acf.fields.google_map.set({ $el : $(this).closest('.acf-google-map') }).locate();
 		
 		$(this).blur();
 		
@@ -2196,7 +2253,7 @@ var acf = {
 		
 		e.preventDefault();
 		
-		acf.fields.location.set({ $el : $(this).closest('.acf-google-map') }).edit();
+		acf.fields.google_map.set({ $el : $(this).closest('.acf-google-map') }).edit();
 			
 	});
 	
@@ -2221,8 +2278,26 @@ var acf = {
 		{
 			$el.addClass('active');
 		}
-			
+		
 	});
+	
+	$(document).on('acf/fields/tab/show acf/conditional_logic/show', function( e, $field ){
+		
+		// validate
+		if( ! acf.fields.google_map.ready )
+		{
+			return;
+		}
+		
+		
+		// validate
+		if( $field.attr('data-field_type') == 'google_map' )
+		{
+			acf.fields.google_map.set({ $el : $field.find('.acf-google-map') }).refresh();
+		}
+		
+	});
+
 	
 
 })(jQuery);
@@ -3095,6 +3170,125 @@ var acf = {
 
 (function($){
 
+	acf.fields.tab = {
+		
+		add_group : function( $wrap ){
+			
+			// vars
+			var html = '';
+			
+			
+			// generate html
+			if( $wrap.is('tbody') )
+			{
+				html = '<tr class="acf-tab-wrap"><td colspan="2"><ul class="hl clearfix acf-tab-group"></ul></td></tr>';
+			}
+			else
+			{
+				html = '<div class="acf-tab-wrap"><ul class="hl clearfix acf-tab-group"></ul></div>';
+			}
+			
+			
+			// append html
+			$wrap.children('.field_type-tab:first').before( html );
+			
+		},
+		
+		add_tab : function( $tab ){
+			
+			// vars
+			var $field	= $tab.closest('.field'),
+				$wrap	= $field.parent(),
+				
+				key		= $field.attr('data-field_key'),
+				label 	= $tab.text();
+				
+				
+			// create tab group if it doesnt exist
+			if( ! $wrap.children('.acf-tab-wrap').exists() )
+			{
+				this.add_group( $wrap );
+			}
+			
+			// add tab
+			$wrap.children('.acf-tab-wrap').find('.acf-tab-group').append('<li class="field_key-' + key + '" data-field_key="' + key + '"><a class="acf-tab-button" href="#" data-key="' + key + '">' + label + '</a></li>');
+			
+		},
+		
+		toggle : function( $a ){
+			
+			// vars
+			var $wrap	= $a.closest('.acf-tab-wrap').parent(),
+				key		= $a.attr('data-key');
+			
+			
+			// classes
+			$a.parent('li').addClass('active').siblings('li').removeClass('active');
+			
+			
+			// hide / show
+			$wrap.children('.field_type-tab').each(function(){
+				
+				// vars
+				var $tab = $(this),
+					show =  false;
+					
+				
+				if( $tab.hasClass('field_key-' + key) )
+				{
+					show = true;
+				}
+				
+				
+				$tab.nextUntil('.field_type-tab').each(function(){
+					
+					if( show )
+					{
+						$(this).removeClass('acf-tab_group-hide').addClass('acf-tab_group-show');
+						$(document).trigger('acf/fields/tab/show', [ $(this) ]);
+					}
+					else
+					{
+						$(this).removeClass('acf-tab_group-show').addClass('acf-tab_group-hide');
+						$(document).trigger('acf/fields/tab/hide', [ $(this) ]);
+					}
+					
+				});
+				
+			});
+	
+			
+			// blur to remove dotted lines around button
+			$a.trigger('blur');
+			
+		},
+		
+		refresh : function( $el ){
+			
+			// reference
+			var _this = this;
+			
+			
+			// trigger
+			$el.find('.acf-tab-group').each(function(){
+				
+				$(this).find('.acf-tab-button:first').each(function(){
+					
+					_this.toggle( $(this) );
+					
+				});
+				
+			});
+			
+			
+			// trigger conditional logic
+			// this code ( acf/setup_fields ) is run after the main acf.conditional_logic.init();
+			acf.conditional_logic.change();
+			
+		}
+		
+	};
+	
 	
 	/*
 	*  acf/setup_fields
@@ -3111,63 +3305,21 @@ var acf = {
 	
 	$(document).on('acf/setup_fields', function(e, el){
 		
-		// validate
-		if( ! $(el).find('.acf-tab').exists() )
-		{
-			return;
-		}
-		
-		
-		// init
+		// add tabs
 		$(el).find('.acf-tab').each(function(){
 			
-			// vars
-			var $el		=	$(this),
-				$field	=	$el.parent(),
-				$wrap	=	$field.parent(),
-				
-				id		=	$el.attr('data-id'),
-				label 	= 	$el.html();
-				
-
-
-			// only run once for each tab
-			if( $el.hasClass('acf-tab-added') )
-			{
-				return;
-			}
-			
-			$el.addClass('acf-tab-added');
-			
-			
-			// create tab group if it doesnt exist
-			if( ! $wrap.children('.acf-tab-group').exists() )
-			{
-				$wrap.children('.field_type-tab:first').before('<ul class="hl clearfix acf-tab-group"></ul>');
-			}
-			
-			
-			// add tab
-			$wrap.children('.acf-tab-group').append('<li class="field_key-' + id + '" data-field_key="' + id + '"><a class="acf-tab-button" href="#" data-id="' + id + '">' + label + '</a></li>');
+			acf.fields.tab.add_tab( $(this) );
 			
 		});
 		
-		// trigger
-		$(el).find('.acf-tab-group').each(function(){
-			
-			$(this).find('li:first a').trigger('click');
-			
-		});
-		// trigger conditional logic
-		// this code ( acf/setup_fields ) is run after the main acf.conditional_logic.init();
-		acf.conditional_logic.change();
 		
+		// activate first tab
+		acf.fields.tab.refresh( $(el) );
 		
-		
-
-	
 	});
 	
+	
+		
 	
 	/*
 	*  Events
@@ -3183,42 +3335,9 @@ var acf = {
 	
 	$(document).on('click', '.acf-tab-button', function( e ){
 		
-		
 		e.preventDefault();
 		
-		
-		// vars
-		var $a		=	$(this),
-			$ul		=	$a.closest('ul'),
-			$wrap	=	$ul.parent(),
-			id		=	$a.attr('data-id');
-		
-		
-		// classes
-		$ul.find('li').removeClass('active');
-		$a.parent('li').addClass('active');
-		
-		
-		// hide / show
-		$wrap.children('.field_type-tab').each(function(){
-			
-			var $tab = $(this);
-			
-			if( $tab.hasClass('field_key-' + id) )
-			{
-				$tab.nextUntil('.field_type-tab').removeClass('acf-tab_group-hide').addClass('acf-tab_group-show');
-			}
-			else
-			{
-				$tab.nextUntil('.field_type-tab').removeClass('acf-tab_group-show').addClass('acf-tab_group-hide');
-			}
-			
-		});
-
-		
-		// blur to remove dotted lines around button
-		$a.trigger('blur');
-
+		acf.fields.tab.toggle( $(this) );
 		
 	});
 	
@@ -3326,6 +3445,11 @@ var acf = {
 		
 		validate : function( div ){
 			
+			// var
+			var ignore = false,
+				$tab = null;
+			
+			
 			// set validation data
 			div.data('validation', true);
 			
@@ -3333,24 +3457,47 @@ var acf = {
 			// not visible
 			if( div.is(':hidden') )
 			{
-				return;
+				// ignore validation
+				ignore = true;
+				
+				
+				// if this field is hidden by a tab group, allow validation
+				if( div.hasClass('acf-tab_group-hide') )
+				{
+					ignore = false;
+					
+					
+					// vars
+					var $tab_field = div.prevAll('.field_type-tab:first'),
+						$tab_group = div.prevAll('.acf-tab-wrap:first');
+					
+					
+					// if the tab itself is hidden, bypass validation
+					if( $tab_field.hasClass('acf-conditional_logic-hide') )
+					{
+						ignore = true;
+					}
+					else
+					{
+						// activate this tab as it holds hidden required field!
+						$tab = $tab_group.find('.acf-tab-button[data-key="' + $tab_field.attr('data-field_key') + '"]');
+					}
+				}
 			}
+			
 			
 			// if is hidden by conditional logic, ignore
 			if( div.hasClass('acf-conditional_logic-hide') )
 			{
+				ignore = true;
+			}
+			
+			
+			if( ignore )
+			{
 				return;
 			}
 			
-			
-			// if is hidden by conditional logic on a parent tab, ignore
-			if( div.hasClass('acf-tab_group-hide') )
-			{
-				if( div.prevAll('.field_type-tab:first').hasClass('acf-conditional_logic-hide') )
-				{
-					return;
-				}
-			}
 			
 			
 			// text / textarea
@@ -3455,9 +3602,12 @@ var acf = {
 			// set validation
 			if( ! div.data('validation') )
 			{
+				// show error
 				this.status = false;
 				div.closest('.field').addClass('error');
 				
+				
+				// custom validation message
 				if( div.data('validation_message') )
 				{
 					var $label = div.find('p.label:first'),
@@ -3470,6 +3620,14 @@ var acf = {
 					
 					$label.append( '<span class="acf-error-message"><i class="bit"></i>' + div.data('validation_message') + '</span>' );
 				}
+				
+				
+				// display field (curently hidden due to another tab being active)
+				if( $tab )
+				{
+					$tab.trigger('click');
+				}
+				
 			}
 		}
 		
