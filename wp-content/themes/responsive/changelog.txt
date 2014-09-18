@@ -8,6 +8,217 @@ Changelog Legend:
 [x] = Deleted
 [!] = Bugs
 
+(09/06/14) - Improvements - Version 1.9.7.3
+
+[+] Add iFeatured Slider as recommended plugin
+[*] Escape variables to improve security
+[*] Small code improvements
+
+----
+
+(08/24/14) - Improvements - Version 1.9.7.2
+
+[!] Fix stray p tag in activation notice
+[+] Add wrapper for Breadcrumb NavXT
+[+] Define content width depending on page template
+
+----
+
+(08/10/14) - Improvements - Version 1.9.7.1
+
+[*] Improve the organisation of the functions
+[*] Clean up code
+[!] Fix screen reader link
+[+] Add filter `responsive_number_footer_widgets` to change when the `fit` class is added in the footer widgets.
+
+----
+
+(07/25/14) - Improvements - Version 1.9.7.0
+
+[!] Improve Responsive Grid
+[x] Remove default logo as per WordPress.org guidelines
+[*] Update Screenshot
+
+----
+
+(07/18/14) - Improvements - Version 1.9.6.9
+
+[!] Fix very long submenu items
+[!] Fix path to ie7-fix.gif
+[!] Fix front page error message
+
+----
+
+(07/11/14) - Improvements - Version 1.9.6.8
+
+[*] Add taxonomy description to archive page
+[*] Seperate featured area from front page
+
+----
+
+(07/04/14) - Improvements - Version 1.9.6.7
+
+[*] Update cs_CZ translation
+[*] Small code style improvements
+
+----
+
+(06/27/14) - Improvements - Version 1.9.6.6
+
+[!] Update NL translation to fix theme options bug
+[*] Improve page template switch from Responsive v2.0
+[*] Enclose add_image_size within a function
+
+----
+
+(06/20/14) - Improvements - Version 1.9.6.4-5
+
+[+] Change page templates when reverting from Responsive v2.0
+[*] Move tags under categories under posts
+
+----
+
+(06/11/14) - Improvements - Version 1.9.6.3
+
+[*] Fix minified js
+
+----
+
+(06/06/14) - Improvements - Version 1.9.6.2
+
+[*] Updated Hindi Translation
+[*] Updated FitVids.js in minified version
+[*] Changed some codestyling
+
+----
+
+(05/30/14) - Improvements - Version 1.9.6.1
+
+[*] Updated Ukrainian, Bulgarian, German, French(Canada), Hindi and Dutch Translation
+[*] Updated FitVids.js in development version
+
+----
+
+(05/23/14) - Improvements - Version 1.9.6.0
+
+[*] Updated Hungarian Translation
+[+] Added new Canadian French Translation
+
+----
+
+(05/16/14) - Improvements - Version 1.9.5.9
+
+[*] Updated new landing page for Responsive 2.o
+[*] Updated Danish Translation
+
+----
+
+(05/09/14) - Improvements - Version 1.9.5.8
+
+[*] Readded default logo
+[*] Updated translations
+
+----
+
+(04/30/14) - Improvements - Version 1.9.5.7
+
+[+] Added new recommended Plugin
+[*] Updated logo
+[*] Changed some code styling
+[!] Fixed translations files
+
+----
+
+(04/22/14) - Improvements - Version 1.9.5.6
+
+[*] Update POT File
+[*] Update translations
+[*] Improve strings for i18n
+[!] Fixed wp_editor issue with WordPress 3.9
+
+----
+
+(04/16/14) - Improvements - Version 1.9.5.5
+
+[*] Change post layout selection from radio buttons to dropdown menu
+[!] Fixed "Default" showing twice on post layout
+
+----
+
+(04/08/14) - Improvements - Version 1.9.5.4
+
+[*] Updated POT file
+[*] Added logo to featured image
+[!] Fixed check if Yoast SEO breadcrumbs activated
+[!] Fixed image links in admin area
+
+----
+
+(03/14/14) - Improvements - Version 1.9.5.3
+
+[*] Updated other cyberchimps page
+[^] Moved theme options to own folder
+[!] Fixed loading correct sidebar when using post templates
+
+----
+
+(02/25/14) - Improvements - Version 1.9.5.2
+
+[+] Added admin notice for when Responsive 2.0 releases
+[+] Added missing text domain
+[+] Added skip link
+[*] Changed widget menu class to WordPress standards
+[*] Tweeked "Posted on" time info
+[*] Updated screenshot
+[*] Updated translations
+
+----
+
+(02/13/14) - Improvements - Version 1.9.5.1
+
+[!] Fixed widget bug
+
+----
+
+(02/09/14) - Improvements - Version 1.9.5.0
+
+[+] Added support for minified css version
+[*] Restructured CSS files - moved styles to core/css/
+[*] Dispaly plugin install notification only on theme.php
+[*] Customized theme activation notice
+[^] Moved sidebar functions in functions-sidebar.php
+
+----
+
+(02/02/14) - Improvements - Version 1.9.4.9
+
+[+] Updated to new social icon function
+
+----
+
+(01/28/14) - Improvements - Version 1.9.4.7-8
+
+[*] Allow for gallery image size can be defined
+[!] Fixed disabling breadcrumbs
+
+----
+
+(01/19/14) - Improvements - Version 1.9.4.6
+
+[*] Improved Responsive Breadcrumbs
+[+] Added support for Breadcrumb NavXT, Breadcrum Trail and Yoast SEO
+breadcrumbs.
+
+----
+
+(01/12/14) - Improvements - Version 1.9.4.5
+
+[*] Made Theme Options responsive
+[*] Update coyright to 2014
+[x] Removed old code in header.php
+
+----
+
 (01/07/14) - Improvements - Version 1.9.4.4
 
 [+] Added improved support gallery images

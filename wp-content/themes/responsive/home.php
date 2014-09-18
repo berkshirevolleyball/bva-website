@@ -11,7 +11,7 @@ if( !defined( 'ABSPATH' ) ) {
  * @file           home.php
  * @package        Responsive
  * @author         Emil Uzelac
- * @copyright      2003 - 2013 ThemeID
+ * @copyright      2003 - 2014 CyberChimps
  * @license        license.txt
  * @version        Release: 1.1.0
  * @filesource     wp-content/themes/responsive/home.php
@@ -25,7 +25,7 @@ global $more;
 $more = 0;
 ?>
 
-	<div id="content-blog" class="<?php echo implode( ' ', responsive_get_content_classes() ); ?>">
+	<div id="content-blog" class="<?php echo esc_attr( implode( ' ', responsive_get_content_classes() ) ); ?>">
 
 		<!-- Blog page title -->
 		<?php if( responsive_free_get_option( 'blog_post_title_toggle' ) ) { ?>

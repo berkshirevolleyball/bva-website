@@ -12,7 +12,7 @@ if( !defined( 'ABSPATH' ) ) {
  * @file           404.php
  * @package        Responsive
  * @author         Emil Uzelac
- * @copyright      2003 - 2013 ThemeID
+ * @copyright      2003 - 2014 CyberChimps
  * @license        license.txt
  * @version        Release: 1.0
  * @filesource     wp-content/themes/responsive/404.php
@@ -32,12 +32,10 @@ if( !defined( 'ABSPATH' ) ) {
 
 			<?php get_template_part( 'loop-no-posts' ); ?>
 
-		</div>
-		<!-- end of .post-entry -->
+		</div><!-- end of .post-entry -->
 
 		<?php responsive_entry_bottom(); ?>
-	</div>
-	<!-- end of #post-0 -->
+	</div><!-- end of #post-0 -->
 	<?php responsive_entry_after(); ?>
 
 </div><!-- end of #content-full -->

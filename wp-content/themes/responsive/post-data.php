@@ -11,7 +11,7 @@ if( !defined( 'ABSPATH' ) ) {
  * @file           post-data.php
  * @package        Responsive
  * @author         Emil Uzelac
- * @copyright      2003 - 2013 ThemeID
+ * @copyright      2003 - 2014 CyberChimps
  * @license        license.txt
  * @version        Release: 1.1.0
  * @filesource     wp-content/themes/responsive/post-data.php
@@ -23,8 +23,8 @@ if( !defined( 'ABSPATH' ) ) {
 <?php if( !is_page() && !is_search() ) { ?>
 
 	<div class="post-data">
-		<?php the_tags( __( 'Tagged with:', 'responsive' ) . ' ', ', ', '<br />' ); ?>
 		<?php printf( __( 'Posted in %s', 'responsive' ), get_the_category_list( ', ' ) ); ?>
+		<?php the_tags( __( 'Tagged with:', 'responsive' ) . ' ', ', ', '<br />' ); ?>
 	</div><!-- end of .post-data -->
 
 <?php } ?>

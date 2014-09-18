@@ -13,7 +13,7 @@ Template Name: Blog (full posts)
  * @file           blog.php
  * @package        Responsive
  * @author         Emil Uzelac
- * @copyright      2003 - 2013 ThemeID
+ * @copyright      2003 - 2014 CyberChimps
  * @license        license.txt
  * @version        Release: 1.1.0
  * @filesource     wp-content/themes/responsive/blog.php
@@ -27,7 +27,7 @@ global $more;
 $more = 0;
 ?>
 
-<div id="content-blog" class="<?php echo implode( ' ', responsive_get_content_classes() ); ?>">
+<div id="content-blog" class="<?php echo esc_attr( implode( ' ', responsive_get_content_classes() ) ); ?>">
 
 	<?php get_template_part( 'loop-header' ); ?>
 
@@ -35,11 +35,9 @@ $more = 0;
 	global $wp_query, $paged;
 	if( get_query_var( 'paged' ) ) {
 		$paged = get_query_var( 'paged' );
-	}
-	elseif( get_query_var( 'page' ) ) {
+	} elseif( get_query_var( 'page' ) ) {
 		$paged = get_query_var( 'page' );
-	}
-	else {
+	} else {
 		$paged = 1;
 	}
 	$blog_query = new WP_Query( array( 'post_type' => 'post', 'paged' => $paged ) );
@@ -66,8 +64,7 @@ $more = 0;
 					<?php endif; ?>
 					<?php the_content( __( 'Read more &#8250;', 'responsive' ) ); ?>
 					<?php wp_link_pages( array( 'before' => '<div class="pagination">' . __( 'Pages:', 'responsive' ), 'after' => '</div>' ) ); ?>
-				</div>
-				<!-- end of .post-entry -->
+				</div><!-- end of .post-entry -->
 
 				<?php get_template_part( 'post-data' ); ?>
 

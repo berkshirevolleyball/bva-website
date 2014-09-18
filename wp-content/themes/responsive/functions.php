@@ -15,7 +15,13 @@ if( !defined( 'ABSPATH' ) ) {
 $template_directory = get_template_directory();
 
 require( $template_directory . '/core/includes/functions.php' );
-require( $template_directory . '/core/includes/theme-options.php' );
+require( $template_directory . '/core/includes/functions-update.php' );
+require( $template_directory . '/core/includes/functions-sidebar.php' );
+require( $template_directory . '/core/includes/functions-install.php' );
+require( $template_directory . '/core/includes/functions-admin.php' );
+require( $template_directory . '/core/includes/functions-extras.php' );
+require( $template_directory . '/core/includes/functions-extentions.php' );
+require( $template_directory . '/core/includes/theme-options/theme-options.php' );
 require( $template_directory . '/core/includes/post-custom-meta.php' );
 require( $template_directory . '/core/includes/tha-theme-hooks.php' );
 require( $template_directory . '/core/includes/hooks.php' );
@@ -33,5 +39,3 @@ function responsive_free_get_option( $option, $default = false ) {
 
 	return $default;
 }
-
-?>

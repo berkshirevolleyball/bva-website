@@ -12,7 +12,7 @@ if( !defined( 'ABSPATH' ) ) {
  * @file           post-custom-meta.php
  * @package        Responsive
  * @author         Emil Uzelac
- * @copyright      2003 - 2013 ThemeID
+ * @copyright      2003 - 2014 CyberChimps
  * @license        license.txt
  * @version        Release: 1.1
  * @filesource     wp-content/themes/responsive/includes/post-custom-meta.php
@@ -162,6 +162,7 @@ function responsive_get_layout() {
  */
 function responsive_get_valid_layouts() {
 	$layouts = array(
+		'default'                   => __( 'Default', 'responsive' ),
 		'content-sidebar-page'      => __( 'Content/Sidebar', 'responsive' ),
 		'sidebar-content-page'      => __( 'Sidebar/Content', 'responsive' ),
 		'content-sidebar-half-page' => __( 'Content/Sidebar Half Page', 'responsive' ),
@@ -185,7 +186,12 @@ function responsive_add_layout_meta_box( $post ) {
 	$priority = apply_filters( 'responsive_layout_meta_box_priority', 'default' ); // 'high', 'core', 'low', 'default'
 
 	add_meta_box(
-		'responsive_layout', __( 'Layout', 'responsive' ), 'responsive_layout_meta_box', 'post', $context, $priority
+		'responsive_layout',
+		__( 'Layout', 'responsive' ),
+		'responsive_layout_meta_box',
+		'post',
+		$context,
+		$priority
 	);
 }
 
@@ -215,12 +221,12 @@ function responsive_layout_meta_box() {
 	$valid_layouts = responsive_get_valid_layouts();
 	?>
 	<p>
-		<input type="radio" name="_responsive_layout" <?php checked( 'default' == $layout ); ?> value="default"/>
-		<label><?php _e( 'Default', 'responsive' ); ?></label><br/>
+		<select name="_responsive_layout">
 		<?php foreach( $valid_layouts as $slug => $name ) { ?>
-			<input type="radio" name="_responsive_layout" <?php checked( $slug == $layout ); ?> value="<?php echo $slug; ?>"/>
-			<label><?php echo $name; ?></label><br/>
+			<?php $selected = selected( $layout, $slug, false ); ?>
+			<option value="<?php echo $slug; ?>" <?php echo $selected; ?>><?php echo $name; ?></option>
 		<?php } ?>
+		</select>
 	</p>
 <?php
 }

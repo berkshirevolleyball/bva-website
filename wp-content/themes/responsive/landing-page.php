@@ -13,7 +13,7 @@ Template Name:  Landing Page (no menu)
  * @file           landing-page.php
  * @package        Responsive
  * @author         Emil Uzelac
- * @copyright      2003 - 2011 ThemeID
+ * @copyright      2003 - 2014 CyberChimps
  * @license        license.txt
  * @version        Release: 1.0
  * @filesource     wp-content/themes/responsive/landing-page.php
@@ -38,8 +38,7 @@ get_header(); ?>
 				<div class="post-entry">
 					<?php the_content( __( 'Read more &#8250;', 'responsive' ) ); ?>
 					<?php wp_link_pages( array( 'before' => '<div class="pagination">' . __( 'Pages:', 'responsive' ), 'after' => '</div>' ) ); ?>
-				</div>
-				<!-- end of .post-entry -->
+				</div><!-- end of .post-entry -->
 
 				<?php get_template_part( 'post-data' ); ?>
 

@@ -12,7 +12,7 @@ if( !defined( 'ABSPATH' ) ) {
  * @file           sidebar.php
  * @package        Responsive
  * @author         Emil Uzelac
- * @copyright      2003 - 2013 ThemeID
+ * @copyright      2003 - 2014 CyberChimps
  * @license        license.txt
  * @version        Release: 1.0
  * @filesource     wp-content/themes/responsive/sidebar.php
@@ -21,10 +21,28 @@ if( !defined( 'ABSPATH' ) ) {
  */
 
 /*
- * If this is a full-width page, exit
+ * Load the correct sidebar according to the page layout
  */
-if( 'full-width-page' == responsive_get_layout() ) {
-	return;
+$layout = responsive_get_layout();
+switch ( $layout ) {
+	case 'sidebar-content-page':
+		get_sidebar( 'left' );
+		return;
+		break;
+
+	case 'content-sidebar-half-page':
+		get_sidebar( 'right-half' );
+		return;
+		break;
+
+	case 'sidebar-content-half-page':
+		get_sidebar( 'left-half' );
+		return;
+		break;
+
+	case 'full-width-page':
+		return;
+		break;
 }
 ?>
 

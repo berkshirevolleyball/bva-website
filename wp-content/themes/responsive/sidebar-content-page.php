@@ -13,7 +13,7 @@ Template Name:  Sidebar/Content
  * @file           sidebar-content-page.php
  * @package        Responsive
  * @author         Emil Uzelac
- * @copyright      2003 - 2011 ThemeID
+ * @copyright      2003 - 2014 CyberChimps
  * @license        license.txt
  * @version        Release: 1.0
  * @filesource     wp-content/themes/responsive/sidebar-content-page.php
@@ -29,7 +29,7 @@ Template Name:  Sidebar/Content
 
 		<?php while( have_posts() ) : the_post(); ?>
 
-			<?php responsive_breadcrumb_lists(); ?>
+			<?php get_responsive_breadcrumb_lists(); ?>
 
 			<?php responsive_entry_before(); ?>
 			<div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
