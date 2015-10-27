@@ -1,0 +1,22 @@
+.page .container {
+	max-width:960px;
+	padding:32px;
+}
+
+.page-content {
+	background-color:#000;
+}
+
+.page {
+	.body {
+		background-color:white;
+		height:100%;
+		margin-left:200px;
+		padding:40px;
+
+		h1 {
+			color:black;
+			line-height:40px;
+		}
+	}
+}

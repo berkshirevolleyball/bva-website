@@ -1,0 +1,55 @@
+.faqs-block {
+	background-color:$subtle-lightest;
+	padding:50px 32px;
+
+	.faqs {
+		max-width:960px;
+		margin:0 auto;
+
+		h2 {
+			margin-bottom:40px;
+		}
+
+		nav {
+			a {
+				border-bottom:1px solid $subtle-light;
+				display:block;
+				font-weight:400;
+				padding:15px 50px 15px 15px;
+				position:relative;
+				text-decoration:none;
+
+				.arrow {
+					background:url('../images/arrow-small.png') no-repeat;
+					display:none;
+					height:11px;
+					position:absolute;
+					right:10px;
+					top:20px;
+					width:26px;
+				}
+
+				&.selected {
+					background-color:$attentive;
+					color:$subtle-lightest;
+					cursor:default;
+
+					.arrow {
+						display:block;
+					}
+				}
+			}
+		}
+
+		.answers {
+			article {
+				display:none;
+				padding:0 32px;
+
+				&.selected {
+					display:block;
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,18 @@
+.question-block {
+	.questions {
+		max-width:960px;
+		margin:0 auto;
+
+		.question {
+			padding:12px;
+		}
+
+		h4 {
+			margin-bottom:15px;
+		}
+
+		p {
+			color:$subtle-darker;
+		}
+	}
+}

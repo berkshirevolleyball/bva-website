@@ -1,0 +1,128 @@
+.tag {
+	background-color:$subtle-lightest;
+	border:1px solid $subtle;
+	border-radius:3px;
+	color:$calm-light;
+	cursor:default;
+	display:inline-block;
+	font-size:14px;
+	font-weight:300;
+	line-height:12px;
+	padding:4px 6px;
+	text-align:center;
+	text-transform:capitalize;
+	transition:background-color 300ms, border 300ms;
+
+	/* Colours */
+	&.indifferent {
+		background-color:$indifferent;
+		border:0;
+		color:$subtle-lightest;
+		font-weight:400;
+		padding:5px 7px;
+		text-transform:uppercase;
+	}
+
+	&.assertive {
+		background-color:$assertive-lighter;
+		border:0;
+		color:$assertive;
+		padding:5px 7px;
+	}
+
+	&.positive {
+		background-color:$positive-lighter;
+		border:0;
+		color:$positive-dark;
+		padding:5px 7px;
+	}
+
+	&.strong {
+		background-color:$strong;
+		border:0;
+		color:$subtle-lightest;
+		padding:5px 7px;
+	}
+
+	&.informative {
+		background-color:$informative-lighter;
+		border:0;
+		color:$informative-dark;
+		padding:5px 7px;
+	}
+
+	/* Sizes */
+	&.tiny {
+		border:1px solid transparent;
+		font-size:10px;
+		line-height:10px;
+		padding:1px 3px;
+	}
+	&.small {
+		border:1px solid $subtle;
+		font-size:12px;
+		line-height:12px;
+		padding:3px 5px;
+
+		&.indifferent, &.assertive, &.positive, &.informative {
+			border:1px solid transparent;
+		}
+	}
+
+	/* Styles */
+	&.super {
+		margin-left:3px;
+		vertical-align:super;
+	}
+
+	&:before {
+		margin-right:5px;
+	}
+}
+
+a.tag {
+	border:1px solid $subtle;
+	cursor:pointer;
+
+	&:hover {
+		background-color:$calm-light;
+		border:1px solid $calm-light;
+		color:$subtle-lightest;
+	}
+
+	/* Colours */
+	&.indifferent {
+		&:hover {
+			background-color:$indifferent-dark;
+			color:$subtle-lightest;
+		}
+	}
+
+	&.assertive {
+		&:hover {
+			background-color:$assertive-dark;
+			color:$subtle-lightest;
+		}
+	}
+
+	&.positive {
+		&:hover {
+			background-color:$positive-dark;
+			color:$subtle-lightest;
+		}
+	}
+
+	&.strong {
+		&:hover {
+			background-color:$strong;
+			color:$subtle-lightest;
+		}
+	}
+
+	&.informative {
+		&:hover {
+			background-color:$informative-dark;
+			color:$subtle-lightest;
+		}
+	}
+}

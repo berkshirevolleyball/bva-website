@@ -1,0 +1,390 @@
+/* =============================================================================
+   CSS3 Buttons
+   ========================================================================== */
+
+@mixin button {
+	background:none;
+	border:0;
+	color:$subtle-lightest;
+	cursor: pointer;
+	display: inline-block;
+	font-size:14px;
+	font-weight:400;
+	line-height:14px;
+	outline: none;
+	padding:10px 20px 11px;
+	text-align: center;
+	text-decoration: none;
+
+	@include vendor(border-radius, 3px);
+	@include vendor(box-shadow, 0 1px 1px rgba(0, 0, 0, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.3));
+
+	&:before, &:after {
+		color:$subtle-lightest;
+	}
+
+	&:focus {
+		padding:9px 19px 10px;
+	}
+
+	&:hover {
+		color:$subtle-lightest;
+	}
+}
+
+@mixin active-inset {
+	@include vendor(box-shadow, inset 0 1px 3px rgba(0, 0, 0, 0.2));
+}
+
+
+/* =============================================================================
+   Types
+   ========================================================================== */
+
+@mixin button-icon {
+	background-color:transparent;
+	color:$strong;
+	padding:3px 5px;
+	font-size:16px;
+
+	&:before {
+		color:$subtle-lightest;
+		line-height:20px;
+		margin:0;
+		text-align:center;
+	}
+
+	&:hover {
+		&:before {
+			color:$strong;
+		}
+	}
+
+	&:focus {
+		border-color:$strong-lightened;
+	}
+}
+
+
+/* =============================================================================
+   Colours
+   ========================================================================== */
+
+/* Strong */
+@mixin button-strong {
+	background-color:$strong;
+	@include vendor(text-shadow, 0 -1px $strong-darkened);
+
+	&.tiny {
+		&:focus {
+			padding:3px 9px;
+		}
+		&:active {
+			padding:4px 10px;
+		}
+	}
+	&.small {
+		&:focus {
+			padding:5px 19px;
+		}
+		&:active {
+			padding:6px 20px;
+		}
+	}
+	&.large {
+		&:focus {
+			padding:7px 29px;
+		}
+		&:active {
+			padding:8px 30px;
+		}
+	}
+
+	&:hover {
+		background-color:$strong-lightened;
+	}
+
+	&:focus {
+		border:1px solid $strong-dark;
+		@include vendor(box-shadow, 0 0 5px $strong);
+	}
+
+	&:active {
+		background-color:$strong-lightened;
+		border:0;
+		padding:10px 20px 11px;
+		@include active-inset;
+	}
+}
+
+/* Calm */
+@mixin button-calm {
+	background-color:$calm-lighter;
+	@include vendor(text-shadow, 0 -1px $calm-light);
+
+	&.tiny {
+		&:focus {
+			padding:3px 9px;
+		}
+		&:active {
+			padding:4px 10px;
+		}
+	}
+	&.small {
+		&:focus {
+			padding:5px 19px;
+		}
+		&:active {
+			padding:6px 20px;
+		}
+	}
+	&.large {
+		&:focus {
+			padding:7px 29px;
+		}
+		&:active {
+			padding:8px 30px;
+		}
+	}
+
+	&:hover {
+		background-color:$calm-lightest;
+	}
+
+	&:focus {
+		border-color:$calm-light;
+		@include vendor(box-shadow, 0 0 5px $calm-lighter);
+	}
+
+	&:active, &.selected, &.loading {
+		background-color:$calm-lightest;
+		border:0;
+		padding:10px 20px 11px;
+		@include active-inset;
+	}
+}
+
+/* Subtle */
+@mixin button-subtle {
+	background-color:$subtle-lightest;
+	border:1px solid $subtle-dark;
+	color:$calm-light;
+	padding:9px 19px 10px;
+	@include vendor(box-shadow, 0 1px 1px rgba(0, 0, 0, 0.1), inset 0 -1px 7px $subtle-light	);
+	@include vendor(text-shadow, none);
+
+	&.tiny {
+		padding:3px 9px;
+	}
+	&.small {
+		padding:5px 19px;
+	}
+	&.large {
+		padding:7px 29px;
+	}
+
+	&:hover {
+		border:1px solid $calm-lightened;
+		color:$calm-lightened;
+	}
+
+	&:focus {
+		border:1px solid $calm-lightened;
+		@include active-inset;
+		@include vendor(box-shadow, 0 0 5px $calm-lighter, inset 0 -10px 10px $subtle-light);
+	}
+
+	&:active, &.selected, &.loading {
+		background-color:$subtle-lighter;
+		border:1px solid $calm-light;
+		@include active-inset;
+	}
+}
+
+/* Clear */
+@mixin button-clear {
+	background:none;
+	border:0;
+	color:$subtle-lightest;
+	@include vendor(box-shadow, none);
+	@include vendor(text-shadow, none);
+
+	&:hover {
+		color:$strong;
+	}
+
+	&:focus {
+		
+	}
+}
+
+/* Disabled */
+@mixin button-disabled {
+	background-color:$subtle-light;
+	border:1px solid $subtle-light;
+	color:$subtle-darkened;
+	cursor:default;
+	@include vendor(box-shadow, 0 1px 1px $subtle-darkened);
+	@include vendor(text-shadow, none);
+
+	&:hover {
+		background-color:$subtle-light;
+	}
+	
+	&:focus {
+		border:0;
+	}
+
+	&:active, &.selected, &.loading {
+		border:0;
+	}
+}
+
+/* =============================================================================
+   Buttons
+   ========================================================================== */
+
+.button, button, input[type="submit"], input[type="button"], input[type="reset"]/*, input[type="file"]:-webkit-file-upload-button*/ {
+	@include button;
+	@include button-strong;
+
+	&:after, &:before {
+		color:$subtle-lightest;
+		margin-right:5px;
+	}
+
+	&.tiny {
+		font-size:11px;
+		line-height:12px;
+		padding:4px 10px;
+	}
+	&.small {
+		font-size:12px;
+		line-height:14px;
+		padding:6px 20px;
+	}
+	&.large {
+		font-size:18px;
+		line-height:30px;
+		padding:8px 30px;
+	}
+
+	&.flush-top {
+		@include vendor(border-radius, 0 0 3px 3px);
+	}
+
+	&.working {
+		i:before {
+			display: block;
+			height: 12px;
+			line-height: 12px;
+			text-align: center;
+			width: 12px;
+		}
+	}
+
+	/* Icon */
+	&.icon {
+		@include button-icon;
+
+		&.large {
+			font-size:22px;
+			line-height:22px;
+
+			&:before {
+				font-size:30px;
+				line-height:30px;
+			}
+		}
+
+		&:disabled {
+			background:none;
+			border:0;
+
+			&:before {
+				color:$subtle-lightened;
+			}
+
+			&:hover {
+				background-color:transparent;
+				
+				&:before {
+					color:$subtle-lightened;
+				}
+			}
+		}
+	}
+
+	/* Positive */
+	&.strong, &.primary {
+		@include button-strong;
+	}
+
+	/* Calm */
+	&.calm, &.secondary {
+		@include button-calm;
+	}
+
+	/* Subtle */
+	&.subtle, &.tertiary {
+		@include button-subtle;
+	}
+
+	/* Clear */
+	&.clear {
+		@include button-clear;
+	}
+
+	/* Disabled */
+	&:disabled, &.disabled {
+		@include button-disabled;
+	}
+
+
+	/* Can continue with quaternary, quinary, senary, septenary, octonary, nonary... */
+	&.loading {
+		position:relative;
+
+		&:before {
+			background:url("../images/paycircle-loader.gif");
+			background-size:20px;
+			content: " ";
+			display:block;
+			height:20px;
+			left:30px;
+			margin-top:-10px;
+			position:absolute;
+			top:50%;
+			width:20px;
+		}
+	}
+
+	&.bordered {
+		background-color:$subtle-lightest;
+		border-width: 5px;
+		border-style: solid;
+	}
+
+	&.block {
+		display:block;
+		width:100%;
+		@include vendor(box-sizing, border-box);
+	}
+
+	+ .button, + button, + input[type="submit"], + input[type="button"], + input[type="reset"] {
+		margin-left:10px;
+	}
+
+}
+
+input[type="reset"] {
+	background-color: $subtle;
+
+	&:hover {
+		background-color:$subtle-lightened;
+	}
+
+	&:active {
+		background-color:$subtle-darkened;
+	}
+}

@@ -1,0 +1,16 @@
+.border {
+
+	height:1px;
+
+	/* Colours */
+	&.calm {
+		background-color:$calm;
+	}
+	&.calm-dark {
+		background-color:$calm-dark;
+	}
+	&.subtle-light {
+		background-color:$subtle-light;
+	}
+
+}

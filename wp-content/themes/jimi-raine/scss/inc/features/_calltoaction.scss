@@ -1,0 +1,47 @@
+/* =============================================================================
+   Call to action
+   ========================================================================== */
+
+.cta {
+	background: #e62479;
+	color: #fff;
+	padding: 3.5em 0 4em 0;
+	text-align: center;
+
+	h2, h3, h4, h5, h6 {
+		color: inherit;
+	}
+
+	form {
+		margin: 0 auto;
+		max-width: 100%;
+		width: 25em;
+	}
+
+	input[type="submit"],
+	input[type="reset"],
+	input[type="button"],
+	.button {
+		@include vendor(box-shadow, none);
+		background: #fff;
+		color: #e62479;
+	}
+
+	input[type="text"],
+	input[type="password"],
+	input[type="email"],
+	select,
+	textarea {
+		color: #ffffff;
+		background: rgba(255, 255, 255, 0.15);
+		border: 0;
+
+		&:focus {
+			@include vendor(box-shadow, inset 0 0 0 2px #fff);
+		}
+	}
+
+	@include placeholder(color, rgba(255, 255, 255, 0.75) !important);
+
+}
+

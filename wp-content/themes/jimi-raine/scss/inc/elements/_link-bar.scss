@@ -1,0 +1,14 @@
+a {
+	&.link-bar {
+		border-bottom:1px solid $subtle-light;
+		display:block;
+		font-weight:400;
+		padding:25px;
+		text-decoration:none;
+		text-align:center;
+
+		&.white {
+			background-color:$subtle-lightest;
+		}
+	}
+}

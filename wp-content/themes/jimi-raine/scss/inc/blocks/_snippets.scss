@@ -1,0 +1,18 @@
+.snippets-block {
+	background-color:$subtle-lightest;
+
+	.snippets {
+		margin:0 auto;
+		max-width:960px;
+
+		.snippet {
+			padding:60px 20px 50px;
+
+			h3 {
+				font-size: 20px;
+				font-weight:600;
+				margin-bottom:15px;
+			}
+		}
+	}
+}

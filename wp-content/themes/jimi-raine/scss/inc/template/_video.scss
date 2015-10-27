@@ -1,0 +1,22 @@
+
+.template-video {
+	padding-bottom:50px;
+
+	.video-cont {
+		padding:76px 0 50px;
+		.video-js {
+			margin:0 auto;
+		}
+	}
+
+	.action-bar {
+		h1, h2, h3 {
+			margin:0;
+		}
+		.button {
+			display:block;
+			margin-top:42px;
+		}
+	}
+
+}

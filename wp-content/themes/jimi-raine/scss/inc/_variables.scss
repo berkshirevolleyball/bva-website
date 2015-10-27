@@ -1,0 +1,316 @@
+/*==================================================*/
+/*  Fonts
+/*==================================================*/
+
+	/* Fonts */
+	$font-family-alpha: 'Bebas', 'Source Sans Pro', 'Open Sans', Helvetica, Arial, sans-serif;
+	$font-family-beta: 'Verveine', 'Open Sans', Helvetica, Arial, sans-serif;
+	
+	/* Icons */
+	$font-family-icons-alpha: 'Paycircle';
+	$font-family-icons-beta: 'Social';
+
+
+/*==================================================*/
+/*  Colour Palette
+/*==================================================*/
+
+	/* Reference
+	$colour-lightest:     none;
+	$colour-lighter:      none;
+	$colour-light:        none;
+	$colour-lightened:    none;
+	$colour:              none;
+	$colour-darkened:     none;
+	$colour-dark:         none;
+	$colour-darker:       none;
+	$colour-darkest:      none;
+	*/
+
+	/* Blue */
+	$blue-lightest:     none;
+	$blue-lighter:      #daeef6;
+	$blue-light:        none;
+	$blue-lightened:    none;
+	$blue:              #69b5cd;
+	$blue-darkened:     none;
+	$blue-dark:         #2a7a94;
+	$blue-darker:       none;
+	$blue-darkest:      none;
+
+	/* Brown */
+	$brown-lightest:    #ccc3b5;
+	$brown-lighter:     #b8ad9a;
+	$brown-light:       #776b56;
+	$brown-lightened:   #605a58;
+	$brown:             #373332;
+	$brown-darkened:    #2a2726;
+	$brown-dark:        #23201F;
+	$brown-darker:      none;
+	$brown-darkest:     none;
+
+	/* Green */
+	$green-lightest:    none;
+	$green-lighter:     #d5ecb1;
+	$green-light:       none;
+	$green-lightened:   none;
+	$green:             #9ac05f;
+	$green-darkened:    none;
+	$green-dark:        #6b942a;
+	$green-darker:      none;
+	$green-darkest:     none;
+
+	/* Grey */
+	$grey-lightest:     #ffffff;
+	$grey-lighter:      #f7f6f4;
+	$grey-light:        #edebe6;
+	$grey-lightened:    #dcd9d3;
+	$grey:              #cec9c8;
+	$grey-darkened:     #beb8b6;
+	$grey-dark:         #a39c9a;
+	$grey-darker:       #8d8481;
+	$grey-darkest:      none;
+
+	/* Paycircle Green */
+	$pc-green-lightest:   #e2fbf9;
+	$pc-green-lighter:    none;
+	$pc-green-light:      none;
+	$pc-green-lightened:  none;
+	$pc-green:            #1ea195;
+	$pc-green-darkened:   #1e9186;
+	$pc-green-dark:       #14756c;
+	$pc-green-darker:     none;
+	$pc-green-darkest:    none;
+
+	/* Paycircle Pink */
+	$pc-pink-lightest:    #f8e6ee;
+	$pc-pink-lighter:     none;
+	$pc-pink-light:       none;
+	$pc-pink-lightened:   #fc5b9d;
+	$pc-pink:             #e62479;
+	$pc-pink-darkened:    #c11d61;
+	$pc-pink-dark:        #981149;
+	$pc-pink-darker:      none;
+	$pc-pink-darkest:     none;
+
+	/* Red */
+	$red-lightest:      none;
+	$red-lighter:       #fedcd1;
+	$red-light:         none;
+	$red-lightened:     none;
+	$red:               #db0000;
+	$red-darkened:      none;
+	$red-dark:          #c83c0e;
+	$red-darker:        none;
+	$red-darkest:       none;
+
+	/* Yellow */
+	$yellow-lightest:   none;
+	$yellow-lighter:    #fff9b4;
+	$yellow-light:      none;
+	$yellow-lightened:  #e5c64c;
+	$yellow:            #cdb248;
+	$yellow-darkened:   none;
+	$yellow-dark:       #a5901b;
+	$yellow-darker:     none;
+	$yellow-darkest:    none;
+
+
+/*==================================================*/
+/*  Colour Palette Aliases
+/*==================================================*/
+
+	/* Strong */
+	$strong-lightest:     $red-lightest;
+	$strong-lighter:    $red-lighter;
+	$strong-light:      $red-light;
+	$strong-lightened:    $red-lightened;
+	$strong:        $red;
+	$strong-darkened:     $red-darkened;
+	$strong-dark:       $red-dark;
+	$strong-darker:     $red-darker;
+	$strong-darkest:    $red-darkest;
+
+	/* Attentive */
+	$attentive-lightest:  $pc-green-lightest;
+	$attentive-lighter:   $pc-green-lighter;
+	$attentive-light:     $pc-green-light;
+	$attentive-lightened:   $pc-green-lightened;
+	$attentive:       $pc-green;
+	$attentive-darkened:  $pc-green-darkened;
+	$attentive-dark:    $pc-green-dark;
+	$attentive-darker:    $pc-green-darker;
+	$attentive-darkest:   $pc-green-darkest;
+
+	/* Calm */
+	$calm-lightest:     $brown-lightest;
+	$calm-lighter:      $brown-lighter;
+	$calm-light:      $brown-light;
+	$calm-lightened:    $brown-lightened;
+	$calm:          $brown;
+	$calm-darkened:     $brown-darkened;
+	$calm-dark:       $brown-dark;
+	$calm-darker:       $brown-darker;
+	$calm-darkest:      $brown-darkest;
+
+	/* Subtle */
+	$subtle-lightest:     $grey-lightest;
+	$subtle-lighter:    $grey-lighter;
+	$subtle-light:      $grey-light;
+	$subtle-lightened:    $grey-lightened;
+	$subtle:        $grey;
+	$subtle-darkened:     $grey-darkened;
+	$subtle-dark:       $grey-dark;
+	$subtle-darker:     $grey-darker;
+	$subtle-darkest:    $grey-darkest;
+
+	/* Positive */
+	$positive-lightest:   $green-lightest;
+	$positive-lighter:    $green-lighter;
+	$positive-light:    $green-light;
+	$positive-lightened:  $green-lightened;
+	$positive:        $green;
+	$positive-darkened:   $green-darkened;
+	$positive-dark:     $green-dark;
+	$positive-darker:     $green-darker;
+	$positive-darkest:    $green-darkest;
+
+	/* Assertive */
+	$assertive-lightest:  $red-lightest;
+	$assertive-lighter:   $red-lighter;
+	$assertive-light:     $red-light;
+	$assertive-lightened:   $red-lightened;
+	$assertive:       $red;
+	$assertive-darkened:  $red-darkened;
+	$assertive-dark:    $red-dark;
+	$assertive-darker:    $red-darker;
+	$assertive-darkest:   $red-darkest;
+
+	/* Indifferent */
+	$indifferent-lightest:  $yellow-lightest;
+	$indifferent-lighter:   $yellow-lighter;
+	$indifferent-light:   $yellow-light;
+	$indifferent-lightened: $yellow-lightened;
+	$indifferent:       $yellow;
+	$indifferent-darkened:  $yellow-darkened;
+	$indifferent-dark:    $yellow-dark;
+	$indifferent-darker:  $yellow-darker;
+	$indifferent-darkest:   $yellow-darkest;
+
+	/* Informative */
+	$informative-lightest:  $blue-lightest;
+	$informative-lighter:   $blue-lighter;
+	$informative-light:   $blue-light;
+	$informative-lightened: $blue-lightened;
+	$informative:       $blue;
+	$informative-darkened:  $blue-darkened;
+	$informative-dark:    $blue-dark;
+	$informative-darker:  $blue-darker;
+	$informative-darkest:   $blue-darkest;
+
+	$color-aliases: strong attentive calm subtle positive assertive indifferent informative;
+	$color-shades: lightest lighter light lightened darkened dark darker darkest;
+
+
+/*==================================================*/
+/*  Global Styling
+/*==================================================*/
+
+	$site-background: $subtle-lighter;
+	$site-background-public: $subtle-lighter;
+
+	/* Fonts */
+	$primary-font-size: 16px;
+	$primary-font-line-height: 24px;
+	$secondary-font-size: 14px;
+	$secondary-font-line-height: 22px;
+	$font-alpha: $subtle;
+	$font-beta: $subtle-darker;
+
+	/* Links */
+	$link: $attentive;
+	$link-hover: $strong;
+
+	/* Primary Navigation */
+	$nav-width: 190px;
+	$nav-bg-color: $calm;
+	$nav-bg-color-selected: $calm-dark;
+	$nav-bg-color-hover: $calm-lightened;
+	$nav-link: $subtle-darker;
+	$nav-link-hover: $subtle-lightest;
+	$nav-link-selected: $strong;
+	$nav-icon-size: 26px;
+	$nav-font-size: 14px;
+
+	/* Secondary Navigation */
+	$sub-nav-bg-color: $calm-darkened;
+
+	/* Site Options */
+	$min-page-width: 960px;
+	$max-page-width: inherit;
+	$margin-width: 20px;
+
+	$gutter-width: 20px;
+	$gutter-width-tablet: 30px;
+	$gutter-width-phone: 20px;
+
+
+	/* Responsive Dimenisons */
+	$phone-min-width: 0;
+	$phone-max-width: 375px;
+
+	$phone-plus-min-width: 0;
+	$phone-plus-max-width: 500px;
+
+	$tablet-min-width: 320px;
+	$tablet-max-width: 1024px;
+	$tablet-nav-width: 80px;
+
+	$laptop-min-width: 1025px;
+	$laptop-max-width: 1440px;
+
+	$monitor-min-width: 1441px;
+	$monitor-max-width: 3000px;
+
+
+/* =============================================================================
+	 Mixins
+	 ========================================================================== */
+
+/* Vendor prefix */
+@mixin vendor($property, $value...) {
+	-webkit-#{$property}: $value;
+	   -moz-#{$property}: $value;
+	    -ms-#{$property}: $value;
+	     -o-#{$property}: $value;
+		    #{$property}: $value;
+}
+
+/* Text Shadow */
+@mixin text-shadow($property, $value...) {
+	-moz-#{$property}: $value;
+	 -ms-#{$property}: $value;
+	  -o-#{$property}: $value;
+		 #{$property}: $value;
+}
+
+/* Font Size Primary */
+@mixin primary-font-size {
+	font-size:$primary-font-size;
+	line-height:$primary-font-line-height;
+}
+
+/* Font Size Secondary */
+@mixin secondary-font-size {
+	font-size:$secondary-font-size;
+	font-weight:300;
+	line-height:$secondary-font-line-height;
+}
+
+/* Placeholder */
+@mixin placeholder {
+	::-webkit-input-placeholder {@content}
+	:-moz-placeholder           {@content}
+	::-moz-placeholder          {@content}
+	:-ms-input-placeholder      {@content}  
+}

@@ -1,0 +1,22 @@
+.get-in-touch {
+	background-color: $calm;
+	padding:80px 32px;
+
+	.row {
+		margin:0 auto;
+		max-width:580px;
+	}
+
+	p {
+		color:$subtle-lightest;
+		font-size:20px;
+		font-weight:400;
+		line-height:30px;
+		margin-right:30px;
+		text-align:right;
+	}
+
+	a {
+		margin-top:8px;
+	}
+}

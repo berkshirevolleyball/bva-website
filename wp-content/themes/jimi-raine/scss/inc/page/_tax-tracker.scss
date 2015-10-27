@@ -1,0 +1,17 @@
+.page-tax-tracker {
+	.feature-carousel .feature.feature-1 {
+		padding-bottom:0;
+	}
+	.feature-carousel .feature.feature-2 {
+		article span em {
+			color:$indifferent-lighter;
+			font-family:$font-family-beta;
+			font-size:24px;
+		}
+
+		.next-step a {
+			font-weight:400;
+		}
+	}
+}
+

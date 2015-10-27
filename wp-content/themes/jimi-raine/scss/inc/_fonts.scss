@@ -1,0 +1,54 @@
+/* =============================================================================
+   Fonts
+   ========================================================================== */
+
+/* Verveine */
+@font-face {
+	font-family: 'Verveine';
+	src:url('../fonts/verveine/regular.eot');
+	src:url('../fonts/verveine/regular.eot') 	format('embedded-opentype'),
+		url('../fonts/verveine/regular.woff') 	format('woff'),
+		url('../fonts/verveine/regular.ttf') 	format('truetype'),
+		url('../fonts/verveine/regular.svg') 	format('svg');
+	font-style: normal;
+	font-weight: normal;
+}
+
+/* Paycircle Icons */
+@font-face {
+	font-family: 'Bebas';
+	src:url('../fonts/bebas/bold.eot');
+	src:url('../fonts/bebas/bold.eot') 	format('embedded-opentype'),
+		url('../fonts/bebas/bold.woff')	format('woff'),
+		url('../fonts/bebas/bold.ttf') 	format('truetype'),
+		url('../fonts/bebas/bold.svg') 	format('svg');
+	font-style: normal;
+	font-weight: 600;
+}
+
+
+/* Stroke 7 */
+@font-face {
+	font-family: 'Stroke 7';
+	src:url('../fonts/stroke-7/icons.eot');
+	src:url('../fonts/stroke-7/icons.eot') 	format('embedded-opentype'),
+		url('../fonts/stroke-7/icons.woff')	format('woff'),
+		url('../fonts/stroke-7/icons.ttf') 	format('truetype'),
+		url('../fonts/stroke-7/icons.svg') 	format('svg');
+	font-style: normal;
+	font-weight: normal;
+}
+
+
+
+/* Social */
+@font-face {
+	font-family: 'Social';
+	src:url('../fonts/social/icons.eot');
+	src:url('../fonts/social/icons.eot') 	format('embedded-opentype'),
+		url('../fonts/social/icons.woff')	format('woff'),
+		url('../fonts/social/icons.ttf') 	format('truetype'),
+		url('../fonts/social/icons.svg') 	format('svg');
+	font-style: normal;
+	font-weight: normal;
+}

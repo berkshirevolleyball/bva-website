@@ -1,0 +1,148 @@
+/* =============================================================================
+   Structure
+   ========================================================================== */
+
+body {
+	background-attachment: fixed;
+	background-color:#000;
+	background-position: top center;
+	background-repeat:no-repeat;
+	background-size:cover;
+	height:100%;
+}
+
+/* Main */
+.main {
+	& > section {
+		border-bottom:1px solid $subtle-light;
+		max-width:700px;
+		padding:50px 0;
+
+		> h3, > p {
+			text-align:center;
+		}
+	}
+}
+
+
+/* Sections */
+section {
+	margin:0 auto;
+	max-width:$max-page-width;
+}
+
+/* Rows */
+.row {
+	margin-bottom:$gutter-width;
+	margin-left:-$gutter-width;
+	
+	&.no-margin {
+		margin-bottom:0;
+	}
+	&.has-margin {
+		margin-bottom:$gutter-width !important;
+	}
+
+	&.gutterless {
+		margin-bottom:0;
+		margin-left:0;
+
+		.col {
+			border-left:0;
+		}
+	}
+}
+
+/* Columns */
+.col {
+	border:0px solid rgba(0,0,0,0);
+	border-left:$gutter-width solid transparent;
+	float:left;
+	@include vendor(background-clip, padding-box !important);
+
+	&.no-gutter {
+		border-left:0;
+	}
+
+	a {
+		display:inline-block;
+		position:relative;
+		
+		img {
+			display:block;
+		}
+	}
+	&.one {width:8.33333333333%;}
+	&.two {width:16.6666666667%;}
+	&.three {width:25.0%;}
+	&.four {width:33.3333333333%;}
+	&.five {width:41.6666666667%;}
+	&.six {width:50.0%;}
+	&.seven {width:58.3333333333%;}
+	&.eight {width:66.6666666667%;}
+	&.nine {width:75.0%;}
+	&.ten {width:83.3333333333%;}
+	&.eleven {width:91.6666666667%;}
+	&.twelve {width:100%;}
+}
+
+
+/* =============================================================================
+   Responsive - Individual devices
+   ========================================================================== */
+
+/* Mobile */
+@media screen and (min-width: $phone-min-width) and (max-width: $phone-plus-max-width) {
+
+	.row {
+		margin-left:0;
+	}
+	.col {
+		padding:0;
+	}
+
+	.col {
+		&.one,
+		&.two,
+		&.three,
+		&.four,
+		&.five,
+		&.six,
+		&.seven,
+		&.eight,
+		&.nine,
+		&.ten,
+		&.eleven,
+		&.twelve {
+			border-left:0;
+			width:100%;
+		}
+	}
+}
+
+/* Monitor */
+@media screen and (min-width: $monitor-min-width) and (max-width: $monitor-max-width) {}
+
+/* Laptop */
+@media screen and (min-width: $laptop-min-width) and (max-width: $laptop-max-width) {}
+
+/* Tablet */
+@media screen and (min-width: $tablet-min-width) and (max-width: $tablet-max-width) {}
+
+/* Phone */
+@media screen and (min-width: $phone-min-width) and (max-width: $phone-plus-max-width) {
+
+	section {
+		padding-left:30px;
+		padding-right:30px;
+	}
+}
+
+
+/* =============================================================================
+   Responsive - Combined devices
+   ========================================================================== */
+
+/* Phone - Tablet */
+@media screen and (min-width: $phone-min-width) and (max-width: $tablet-max-width) {}
+

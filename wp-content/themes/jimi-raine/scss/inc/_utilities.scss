@@ -1,0 +1,94 @@
+/* =============================================================================
+   Utilities
+   ========================================================================== */
+
+.align-center {
+	text-align:center !important;
+}
+
+.align-left {
+	text-align:left !important;
+}
+
+.align-right {
+	text-align:right !important;
+}
+
+.block {
+	display:block;
+}
+
+.clear {
+	clear:both;
+}
+
+.clickable {
+	cursor:pointer;
+}
+
+.hidden {
+	display:none !important;
+	visibility:hidden;
+}
+
+.invisible {
+	visibility:hidden;
+}
+
+.ir {
+	display:block;
+	border:0;
+	text-indent:-999em;
+	overflow:hidden;
+	background-color:transparent;
+	background-repeat:no-repeat;
+	text-align:left;
+	direction:ltr;
+	*line-height:0;
+
+	br {
+		display:none;
+	}
+}
+
+
+/* =============================================================================
+   Clearfix
+   ========================================================================== */
+section:before, section:after, .row:before, .row:after, .cf:before, .cf:after {
+	content:"";
+	display:table;
+}
+section:after, .row:after, .cf:after {
+	clear:both;
+}
+section, .row, .cf {
+	*zoom:1;
+}
+
+
+/* =============================================================================
+   Responsive
+   ========================================================================== */
+.visible-phone {display:none;}
+.visible-tablet {display:none;}
+.hidden-desktop {display:none;}
+.visible-desktop {display:inherit;}
+
+/* Mobile */
+@media screen and (min-width: 0px) and (max-width: 319px) {
+	.hidden-desktop {display:inherit;}
+	.visible-desktop {display:none;}
+	.visible-phone {display:inherit;}
+	.hidden-phone {display:none;}
+}
+
+/* Tablets */
+@media screen and (min-width: 320px) and (max-width: 782px) {
+	.hidden-desktop {display:inherit;}
+	.visible-desktop {display:none;}
+	.visible-tablet {display:inherit;}
+	.hidden-tablet {display:none;}
+}
+
+@media screen and (max-width: 782px) {}

@@ -1,0 +1,11 @@
+// Repeater Field
+if (have_rows('###')) {
+    while (have_rows('###')) {
+
+    	the_row();
+
+    	$topic = get_sub_field('###');
+
+    }
+}
+

@@ -1,0 +1,42 @@
+/* =============================================================================
+   Animations
+   ========================================================================== */
+
+/* Hover fade animation - Color */
+@include vendor(transition, color 300ms ease-in);
+
+/* Hover fade animation - BG Color */
+@include vendor(transition, all 300ms ease-in);
+
+/* Hover fade animation - Border Color */
+@include vendor(transition, border 300ms ease-in); /* Hover fade animation */
+
+
+/* =============================================================================
+   CSS3
+   ========================================================================== */
+
+/* Border Radius */
+@include vendor(border-radius, 3px);
+
+/* Box Sizing */
+@include vendor(box-sizing, border-box);
+
+box-sizing
+
+/* Update Placeholder Colour */
+@include placeholder;
+
+
+
+/* Monitor */
+@media screen and (min-width: $monitor-min-width) and (max-width: $monitor-max-width) {}
+
+/* Laptop */
+@media screen and (min-width: $laptop-min-width) and (max-width: $laptop-max-width) {}
+
+/* Tablet */
+@media screen and (min-width: $tablet-min-width) and (max-width: $tablet-max-width) {}
+
+/* Phone */
+@media screen and (min-width: $phone-min-width) and (max-width: $phone-max-width) {}

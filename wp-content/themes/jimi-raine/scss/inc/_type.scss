@@ -1,0 +1,179 @@
+/*==================================================*/
+/*  Global Type
+/*==================================================*/
+body, input, select, textarea {
+  color: $subtle-dark;
+  font-family: $font-family-alpha;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+/*==================================================*/
+/*  Headings
+/*==================================================*/
+h1, h2, h3, h4, h5, h6 {
+	color:$subtle-lightest;
+	font-family:$font-family-alpha;
+	font-weight:400;
+	margin:0;
+
+	em {
+		&.secondary {
+			font-family:$font-family-beta;
+		}
+		&.indifferent {
+			color:$indifferent-lighter;
+		}
+		&.strong {
+			color:$strong;
+		}
+	}
+}
+
+h1 {
+	font-size:40px;
+	font-weight:400;
+	line-height:50px;
+
+	em {
+		font-size:50px;
+		line-height:30px;
+	}
+}
+
+h2 {
+	font-size:30px;
+
+	em {
+		font-size:40px;
+	}
+}
+
+h3 {
+	font-size:24px;
+}
+
+h4 {
+	font-size:20px;
+	line-height:30px;
+
+	em {
+		font-size:28px;
+	}
+}
+
+h5 {
+	font-family:$font-family-alpha;
+	font-size:16px;
+	line-height:26px;
+}
+
+h6 {
+	font-family:$font-family-alpha;
+	font-size:14px;
+}
+
+
+/*==================================================*/
+/*  Links
+/*==================================================*/
+a {
+	color: $link;
+	@include vendor(transition, color 300ms ease-in);
+
+	&:hover {
+		color:$link-hover;
+	}
+
+	&:focus {
+		outline:0;
+	}
+
+	&:hover, &:active {
+		outline:0;
+	}
+
+	&:before, &:after {
+		@include vendor(transition, color 300ms ease-in);
+	}
+
+	&.img {
+		display:inline-block;
+
+		img {
+			display:block;
+		}
+	}
+}
+
+/*==================================================*/
+/*  Copy
+/*==================================================*/
+
+p {
+	line-height:24px;
+	margin:0;
+}
+
+em {
+	font-style:normal;
+}
+
+article {
+
+	p {
+		margin-bottom:15px;
+
+		a {
+			font-weight:400;
+		}
+
+		em {
+			font-style: italic;
+		}
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		margin-top:20px;
+		margin-bottom:5px;
+	}
+
+}
+
+blockquote {
+	color:$subtle-lighter;
+	font-size:18px;
+	line-height:28px;
+	margin:0;
+	padding:0 20px;
+	position:relative;
+	text-align:center;
+
+	&:before, &:after {
+		color:$strong;
+		font-family:$font-family-beta;
+		font-size:40px;
+		position:absolute;
+	}
+
+	&:before {
+		content: "\201C";
+		left:0;
+		top:15px;
+	}
+
+	&:after {
+		bottom:-15px;
+		content: "\201D";
+		right:0;
+	}
+
+	& + p {
+		color:$subtle-darker;
+		font-size:16px;
+		font-weight:400;
+		line-height:22px;
+		margin-top:15px;
+	}
+}
+

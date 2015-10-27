@@ -1,0 +1,102 @@
+.page-support {
+
+	h1 {
+		font-size:50px;
+		line-height:50px;
+	}
+
+	h2 {
+		font-size:30px;
+		line-height:36px;
+	}
+
+	.row {
+		margin-left:-40px;
+	}
+
+	.col {
+		border-left-width:40px;
+	}
+	.icons {
+		.icon {
+			padding:10px 0;
+			text-align:center;
+
+			a {
+
+				&:before {
+					border:8px solid $grey-dark;
+					font-size:70px;
+					height:120px;
+					line-height:120px;
+					width:120px;
+					@include vendor(border-radius, 100%);
+					@include vendor(transition, all 300ms ease-in);
+				}
+				&:hover {
+					color:$strong;
+					&:before {
+						border:8px solid $strong;
+						color: $strong;
+					}
+				}
+			}
+		}
+	}
+
+	.faqs {
+
+		margin-top:50px;
+
+		article {
+			border-bottom:1px solid $grey-light;
+			margin-bottom:15px;
+			padding-bottom:15px;
+		}
+
+		.questions {
+
+			margin:30px 10px 0 0;
+
+			li {
+				display:block;
+				a {
+					display:block;
+					margin:0 10px 5px 0;
+					text-align:left;
+
+					&.selected {
+						margin-right:0;
+					}
+				}
+			}
+		}
+
+		.answers {
+
+			.answer {
+				margin-top:30px;
+
+				blockquote {
+					color: $strong;
+					font-size:18px;
+					font-style:italic;
+					font-weight:400;
+					margin:0 0 0 30px;
+
+					&:before {
+						content: "Q.";
+						font-size:40px;
+						line-height:40px;
+						top:-6px;
+						left:-35px;
+					}
+				}
+
+				div {
+					padding-bottom:20px;
+				}
+			}
+		}
+	}
+}

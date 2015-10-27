@@ -1,0 +1,161 @@
+/*==================================================*/
+/*  Home Page
+/*==================================================*/
+
+
+
+
+/*
+.animation {
+	margin:0 auto;
+	min-height:230px;
+	position:relative;
+	text-align:center;
+	width:750px;
+
+	h4 {
+		margin-bottom:20px;
+		text-align:center;
+	}
+	
+	.tube {
+		border-radius:0 0 50px 50px;
+		height:0;
+		margin:-200px 0 0 326px;
+		overflow:hidden;
+		padding-top:100px;
+		position:relative;
+		width:100px;
+		@include vendor(transition, 1000ms ease-in);
+
+		.lid {
+			cursor:pointer;
+			left:0;
+			opacity:1;
+			position:absolute;
+			top:0;
+			@include vendor(transition, 500ms ease-out);
+		}
+
+		.tubes {
+			display:none;
+			margin-top:-50px;
+		}
+	}
+
+	.tube-pink {
+		background-color:$strong;
+		height:200px;
+		width:50px;
+
+		&:before {
+			background-color:$strong;
+			content:'';
+			height:50px;
+			width:50px;
+		}
+	}
+
+	&.open {
+		.lid {
+			@include vendor(transform, rotateX(60deg));
+		}
+		.tube {
+			height:702px;
+		}
+		.tubes {
+			display:block;
+		}
+	}
+}
+
+.compliancy {
+	padding-top:20px;
+	padding-bottom:20px;
+
+	.info {
+		padding-left:120px;
+		position:relative;
+
+		p {
+			line-height:24px;
+			font-size:13px;
+		}
+
+		.stamp {
+			left:0;
+			position:absolute;
+			top:-50px;
+		}
+	}
+}
+*/
+
+
+/* testimonials */
+.testimonials {
+	background-color:$calm;
+	padding:70px 0 30px;
+
+	.row {
+		margin:0 auto;
+		max-width:960px;
+	}
+
+	h3 {
+		color:$subtle-lighter;
+		margin-bottom:20px;
+		text-align:center;
+	}
+
+	.testimonial {
+		padding:40px;
+		text-align:center;
+
+		img {
+			border-radius:50%;
+			margin-bottom:15px;
+		}
+	}
+}
+
+
+/* Monitor */
+@media screen and (min-width: $monitor-min-width) and (max-width: $monitor-max-width) {}
+
+/* Laptop */
+@media screen and (min-width: $laptop-min-width) and (max-width: $laptop-max-width) {}
+
+/* Tablet */
+@media screen and (min-width: $tablet-min-width) and (max-width: $tablet-max-width) {}
+
+/* Phone */
+@media screen and (min-width: $phone-min-width) and (max-width: $phone-plus-max-width) {
+	.compliancy {
+		padding-bottom:30px;
+
+		.info {
+			padding-left:0;
+			padding-top:50px;
+
+			p {
+				line-height:24px;
+				font-size:13px;
+			}
+
+			.stamp {
+				left:50%;
+				margin-left:-50px;
+				position:absolute;
+				top:-70px;
+			}
+		}
+	}
+
+	.register-cta {
+		a {
+			margin:20px 0 0;
+		}
+	}
+}
+

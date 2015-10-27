@@ -1,0 +1,33 @@
+.detail-block {
+	background-color:$subtle-lightest;
+	
+	.row {
+		margin:0 auto;
+		max-width:960px;
+
+		.box {
+			padding:60px 50px;
+
+			header {
+				margin-bottom:15px;
+
+				i {
+					float:left;
+					margin-right:20px;
+					
+					&:before {
+						color:$strong;
+						font-size:40px;
+					}
+				}
+
+				h3 {
+					color:$calm;
+					display:inline-block;
+					float:left;
+					line-height:40px;
+				}
+			}
+		}
+	}
+}

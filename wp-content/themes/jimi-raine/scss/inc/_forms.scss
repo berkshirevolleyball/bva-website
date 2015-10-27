@@ -1,0 +1,563 @@
+
+@include placeholder {
+	color: $subtle;
+	font-weight:300;
+	opacity:0.8;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+input[type="month"],
+input[type="datetime-local"],
+select,
+textarea {
+	background-color: white;
+	border:1px solid $subtle-darkened;
+	color:$calm;
+	font-size:14px;
+	padding: 8px 10px 9px;
+	width: 100%;
+	@include vendor(box-sizing, border-box);
+	@include vendor(border-radius, 3px);
+	@include placeholder;
+
+	&:focus {
+		border: 1px solid $attentive;
+		outline: 0;
+		@include vendor(box-shadow, 0 0 5px rgba(30, 161, 149, 0.5));
+	}
+
+	&.ng-pristine {
+		background-color:white;
+	}
+
+	&.small {
+		padding:3px 5px 4px;
+	}
+}
+
+/* Text Inputs */
+input[type="text"] {
+	&.error {
+		background-color:$assertive-lighter;
+		border:1px solid $assertive;
+
+		&:focus {
+			@include vendor(box-shadow, 0 0 5px rgba(200, 60, 14, 0.5));
+		}
+	}
+
+	&.success {
+		position:relative;
+
+		&:before {
+			color:$positive-dark;
+			content: "\e66c";
+			display:block;
+			right:-30px;
+			top:3px;
+			position:absolute;
+		}
+	}
+}
+
+/* Radio Buttons */
+input[type=radio] {
+
+	left:2px;
+	position:absolute;
+	top:3px;
+	z-index:-1;
+
+	+ label {
+		cursor:pointer;
+		display:block;
+		margin-bottom:5px;
+		padding-left:20px;
+		position:relative;
+
+		&:before {
+			background-color:$subtle-lightest;
+			border:1px solid $subtle-darker;
+			content:'';
+			cursor:pointer;
+			display:inline-block;
+			height:14px;
+			left:0;
+			line-height:24px;
+			margin-right:5px;
+			position:absolute;
+			top:2px;
+			width:14px;
+			@include vendor(border-radius, 50%);
+		}
+
+		&:after {
+			@include vendor(transition, background-color 300ms ease-in);
+		}
+
+		&:hover {
+			color:$calm-lightened;
+
+			&:before {
+				border:1px solid $attentive-dark;
+				@include vendor(box-shadow, 0 0 5px rgba(30, 161, 149, 0.5));
+			}
+		}
+
+		&:focus {
+
+			cursor:default;
+
+			&:before {
+				@include vendor(box-shadow, 0 0 5px rgba(30, 161, 149, 0.5));
+			}
+		}
+	}
+
+	&:checked + label {
+
+		cursor:default;
+
+		&:before {
+			background-color:$attentive;
+			border:1px solid $attentive-dark;
+		}
+
+		&:after {
+			background-color: white;
+			border:1px solid $attentive-darkened;
+			content:'';
+			display:inline-block;
+			position:absolute;
+			left:4px;
+			width:6px;
+			height:6px;
+			top:6px;
+			@include vendor(border-radius, 50%);
+		}
+	}
+}
+
+/* Checkboxes */
+input[type="checkbox"] {
+	&:focus {
+		outline: $attentive auto 5px;
+	}
+}
+
+/* Elements */
+.checkbox {
+	display:block;
+	margin:0 10px 0 0;
+	position: relative;
+
+	.info {
+		clear: both;
+		margin-left:0;
+	}
+
+	input[type=checkbox] {
+		position: absolute;
+		top: 5px;
+		left: 5px;
+		z-index:-1;
+
+		&:checked {
+
+			+ label {
+				background-color:$attentive;
+				border:1px solid $attentive-dark;
+				z-index: 1;
+
+				&:after {
+					border-color: $subtle-lightest;
+				}
+
+				&:hover {
+					&:after {
+						border-color: $subtle-lighter;
+					}
+				}
+			}
+		}
+
+		&:focus {
+
+			+ label {
+				@include vendor(box-shadow, 0 0 5px rgba(30, 161, 149, 0.5));
+			}
+		}
+	}
+
+	.box {
+		display:inline-block;
+
+		label {
+			background: $subtle-lightest;
+			border:1px solid $subtle-darkened;
+			cursor: pointer;
+			height: 21px;
+			margin: 0;
+			position: absolute;
+			top: 0;
+			width: 21px;
+			@include vendor(border-radius, 3px);
+
+			&:after {
+				content: '';
+				position: absolute;
+				width: 9px;
+				height: 5px;
+				background: transparent;
+				top: 4px;
+				left: 4px;
+				border: 4px solid $subtle-light;
+				border-top: none;
+				border-right: none;
+				@include vendor(transform, rotate(-45deg));
+			}
+
+			&:focus {
+				+ label {
+					@include vendor(box-shadow, 0 0 5px rgba(30, 161, 149, 0.5));
+				}
+			}
+
+			&:hover {
+				&:after {
+					border-color:$subtle;
+				}
+			}
+		}
+	}
+
+	> label {
+		font-size:14px;
+		left:30px;
+		position:absolute;
+		top:1px;
+	}
+
+	+ .info {
+		margin:0 0 0 30px;
+	}
+}
+
+
+
+
+
+/* Select Boxes */
+select {
+	background-color:$subtle-lightest;
+	display:block;
+	height:36px;
+	width:100%;
+
+	&.ng-dirty.ng-invalid {
+		background-color:$assertive-lighter;
+	}
+
+	&.small {
+		height:27px;
+	}
+}
+
+/* Read Only Inputs */
+input[readonly="readonly"], input[readonly] {
+    background-color:$subtle-lighter !important;
+    cursor:not-allowed;
+
+    &:focus {
+		border:1px solid $subtle-lightened;
+		@include vendor(box-shadow, none !important);		
+    }
+}
+
+
+
+form {
+
+	position:relative;
+
+	/* Sizes */
+	&.tiny {
+		margin:0 auto;
+		max-width:350px;
+	}
+	&.small {
+		margin:0 auto;
+		max-width:500px;
+	}
+	&.medium {
+		margin:0 auto;
+		max-width:620px;
+	}
+
+	/* Styling */
+	&.bordered {
+		border:1px solid $subtle-lightened;
+	}
+	&.compact {
+		.row {
+			margin-bottom:10px;
+		}
+	}
+
+
+	> header {
+		background-color:$subtle-lighter;
+		/*border:1px solid $subtle-lightened;*/
+		color:$calm-dark;
+		font-weight:600;
+		padding:10px 20px;
+
+		&.intro {
+			background-color:$subtle-lightest;
+			border-bottom:1px solid $subtle-lightened;
+			color:$calm-dark;
+			font-weight:400;
+			padding:20px;
+			text-align:center;
+
+			.avatar {
+				border:1px solid $subtle-lightened;
+				margin-bottom:10px;
+			}
+
+			h2 + p {
+				margin-top:10px;
+			}
+
+			p {
+				color:$subtle-dark;
+				margin-bottom:0;
+			}
+
+			+ header {
+				border-top:0;
+			}
+		}
+	}
+
+	fieldset {
+		background-color:$subtle-lightest;
+		/*border:1px solid $subtle-lightened;*/
+		/*border-width: 0 1px;*/
+		padding:30px;
+
+		&.no-margin {
+			margin-bottom:0;
+		}
+
+		&:last-child {
+			margin-bottom:0;
+		}
+
+		.row {
+			margin-bottom:20px;
+		}
+
+		label {
+			color:$calm;
+			display:block;
+			font-size:15px;
+			font-weight:400;
+
+			&.placeholder-alt {
+				display: none;
+			}
+
+			&.smallprint {
+				font-size:11px;
+			}
+
+			em {
+				font-weight:800;
+			}
+
+			+ small {
+				color:$subtle;
+				margin-left:5px;
+			}
+
+			&.required {
+				&:after {
+					color:$assertive;
+					content:"*";
+					margin-left:1px;
+				}
+			}
+		}
+
+		.info, .description {
+			color:$subtle-darkened;
+			display:block;
+			font-size:13px;
+			font-style: italic;
+			line-height:18px;
+
+			a {
+				font-size:13px;
+				line-height:18px;
+			}
+		}
+
+		p.info {
+			margin:6px 0 0 10px;
+
+			&.error {
+				color:$assertive;
+			}
+		}
+
+		span.info {
+			float:left;
+			margin:7px 0 0 10px;
+		}
+	}
+
+	hr {
+		border-top:1px solid $subtle-lightened;
+		margin:0;
+	}
+
+	.outro {
+		font-size:14px;
+		margin-top:30px;
+		text-align:center;
+	}
+
+	> footer {
+		bottom:-85px;
+		font-size:14px;
+		font-weight:300;
+		padding:20px 0 40px;
+		position:absolute;
+		width:100%;
+
+		a {
+			font-size:14px;
+			font-weight:400;
+		}
+	}
+
+
+	/* Inline - Form fields & labels sit side by side of eachother */
+	&.inline {
+
+		> h2 {
+			color:$calm-dark;
+			font-size:24px;
+			margin-bottom:20px;
+		}
+
+		h4 {
+			margin-bottom:5px;
+		}
+
+		.col p {
+			margin-top:5px;
+		}
+
+		label {
+			margin-top:7px;
+			text-align:right;
+		}
+
+		table label {
+			margin-top:2px;
+		}
+
+		input[type="text"],
+		input[type="email"],
+		input[type="password"],
+		input[type="date"],
+		input[type="datetime"],
+		input[type="datetime-local"],
+		input[type="number"],
+		input[type="search"],
+		input[type="tel"],
+		input[type="time"],
+		input[type="url"],
+		input[type="week"],
+		input[type="month"],
+		input[type="datetime-local"],
+		input[type="password"],
+		select,
+		textarea,
+		select {
+
+			&.no-margin {
+				margin:0;
+			}
+		}
+
+		input[type="color"] {}
+		input[type="radio"] {
+			margin-top:11px;
+		}
+
+		.right {
+			text-align:right;
+
+			.add-agency-email {
+				font-size:12px;
+
+				&:before {
+					content: "+ ";
+				}
+			}
+		}
+
+		.buttons {
+			.button, input[type="submit"], button, input[type="reset"] {
+				font-size:20px;
+				font-weight:400;
+				padding:10px 20px;
+				width:100%;
+				@include vendor(box-sizing, border-box);
+			}
+		}
+	}
+
+
+}
+
+
+/* IE fix */
+.ltie10 {
+	form {
+		label {
+			&.placeholder-alt {
+				display:block;
+			}
+		}
+	}
+}
+
+
+
+@media screen and (min-width: $phone-min-width) and (max-width: $tablet-max-width) {
+
+	form {
+
+		&.inline {
+			label {
+				margin-bottom:3px;
+				text-align:left;
+			}
+		}
+	}
+}
