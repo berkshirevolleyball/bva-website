@@ -92,7 +92,7 @@ function field_to_ignore() {
 <div class="nk-main">
 	<div class="nk-main-container">
 
-		<h2>NK Google Analytics settings</h2>
+		<h2><?php __( 'NK Google Analytics settings', 'nk-google-analytics' ); ?></h2>
 
 		<div style="">
 			<form name="myform" class="myform" action="options.php" method="post" enctype="multipart/form-data">
@@ -101,12 +101,26 @@ function field_to_ignore() {
 				    <ul class="nk-tabs-menu">
 				        <li class="current"><a href="#basic"><?php _e( 'Basic', 'NKgoogleanalytics' );?></a></li>
 				        <li><a href="#eu-options"><?php _e( 'EU Cookie Law', 'NKgoogleanalytics' );?></a></li>
-				        <li><a href="#more-options"><?php _e( 'More options', 'NKgoogleanalytics' );?></a></li>
+				        <li><a href="#advanced-options"><?php _e( 'Advanced', 'NKgoogleanalytics' );?></a></li>
 				    </ul>
 				    <div class="tab">
-				        <div id="basic" class="nk-tab-content">
-				        	<label class="nk-label" for="nkweb_id">Google Analytics ID:</label>
-				            <input type="text" name="nkweb_id" value="<?php echo get_option('nkweb_id'); ?>" />
+					<div id="basic" class="nk-tab-content">
+					    <table class="form-table">
+								<tr valign="top">
+						        	<th scope="row">Google Analytics ID:</th>
+								<td>
+									<input type="text" name="nkweb_id" value="<?php echo get_option('nkweb_id'); ?>" />
+								</td>
+								</tr>
+
+								<tr valign="top">
+								<th scope="row">NK Google Analytics Status</th>
+								<td>
+									<input type="radio" name="nkweb_Enable_GA" value="true" <?php if (get_option('nkweb_Enable_GA') == "true"){ echo "checked "; } ?>> On<br>
+									<input type="radio" name="nkweb_Enable_GA" value="false"<?php if (get_option('nkweb_Enable_GA') == "false"){ echo "checked "; } ?>>  Off <br>
+								</td>
+								</tr>
+					    </table>
 				        </div>
 				        <div id="eu-options" class="nk-tab-content">
 				            <table class="form-table">
@@ -114,31 +128,39 @@ function field_to_ignore() {
 								<th scope="row">Cookieless tracking with fingerprint.js<br><small>(Only Universal analytics)</small></th>
 								<td>
 									<input type="radio" name="nkweb_fingerprintjs" value="true" <?php if (get_option('nkweb_fingerprintjs') == "true"){ echo "checked "; } ?>> Yes<br>
-									<input type="radio" name="nkweb_fingerprintjs" value="false"<?php if (get_option('nkweb_fingerprintjs') == "false"){ echo "checked "; } ?>>  No<br>
+									<input type="radio" name="nkweb_fingerprintjs" value="false"<?php if (get_option('nkweb_fingerprintjs') != "true"){ echo "checked "; } ?>>  No<br>
 								</td>
 								</tr>
 								<tr valign="top">
 								<th scope="row">Anonymize ip<br><small>(Only Universal analytics)</small></th>
 								<td>
 									<input type="radio" name="nkweb_anonymizeip" value="true" <?php if (get_option('nkweb_anonymizeip') == "true"){ echo "checked "; } ?>> Yes<br>
-									<input type="radio" name="nkweb_anonymizeip" value="false"<?php if (get_option('nkweb_anonymizeip') == "false"){ echo "checked "; } ?>>  No<br>
+									<input type="radio" name="nkweb_anonymizeip" value="false"<?php if (get_option('nkweb_anonymizeip') != "true"){ echo "checked "; } ?>>  No<br>
 								</td>
 								</tr>
-							</table>
+					    </table>
 				        </div>
-				        <div id="more-options" class="nk-tab-content">
+				        <div id="advanced-options" class="nk-tab-content">
 				            <table class="form-table">
 								<tr valign="top">
 								<th scope="row">Google Analytics Type</th>
 								<td>
 									<input type="radio" name="nkweb_Universal_Analytics" value="true" <?php if (get_option('nkweb_Universal_Analytics') == "true"){ echo "checked "; } ?>> Universal Analytics<br>
-									<input type="radio" name="nkweb_Universal_Analytics" value="false"<?php if (get_option('nkweb_Universal_Analytics') == "false"){ echo "checked "; } ?>>  Classic Analytics<br>
+									<input type="radio" name="nkweb_Universal_Analytics" value="false"<?php if (get_option('nkweb_Universal_Analytics') == "false"){ echo "checked "; } ?>> Classic Analytics<br>
+								</td>
+								</tr>
+
+								<tr valign="top">
+								<th scope="row">Automatic Domain Detection<br><small>(Only Universal analytics)</small></th>
+								<td>
+									<input type="radio" name="nkweb_Domain_Auto" value="true" <?php if (get_option('nkweb_Domain_Auto') == "true"){ echo "checked "; } ?>> Yes<br>
+									<input type="radio" name="nkweb_Domain_Auto" value="false"<?php if (get_option('nkweb_Domain_Auto') != "true"){ echo "checked "; } ?>> No<br>
 								</td>
 								</tr>
 
 								<tr valign="top">
 								<th scope="row">Domain :<br><small>(Only Universal analytics)</small></th>
-								<td><input type="text" name="nkweb_Domain" value="<?php echo get_option('nkweb_Domain'); ?>" /></td>
+								<td><input type="text" name="nkweb_Domain" <?php if (get_option('nkweb_Domain_Auto') == "true"){ echo 'class="input-disabled" readonly="readonly"'; }?> value="<?php echo get_option('nkweb_Domain'); ?>" /></td>
 								</tr>
 
 								<tr valign="top">
@@ -167,39 +189,38 @@ function field_to_ignore() {
 								</tr>
 
 								<tr valign="top">
-								<th scope="row">Use custom Google Analytics tracking code</th>
-								<td>
-									<input type="radio" name="nkweb_Use_Custom" value="true" <?php if (get_option('nkweb_Use_Custom') == "true"){ echo "checked "; } ?>> Yes<br>
-									<input type="radio" name="nkweb_Use_Custom" value="false"<?php if (get_option('nkweb_Use_Custom') == "false"){ echo "checked "; } ?>>  No <br>
-								</td>
-								</tr>
-
-								<tr valign="top">
-								<th scope="row">Custom Google Analytics tracking code</small></th>
-								<td><textarea name="nkweb_Custom_Code" ><?php echo get_option('nkweb_Custom_Code'); ?></textarea>
-								</tr>
-
-								<tr valign="top">
 								<th scope="row">Tracking code location</th>
 								<td>
 									<input type="radio" name="nkweb_code_in_head" value="true" <?php if (get_option('nkweb_code_in_head') == "true"){ echo "checked "; } ?>> Head<br>
-									<input type="radio" name="nkweb_code_in_head" value="false"<?php if (get_option('nkweb_code_in_head') == "false"){ echo "checked "; } ?>>  End of the page<br>
+									<input type="radio" name="nkweb_code_in_head" value="false"<?php if (get_option('nkweb_code_in_head') == "false"){ echo "checked "; } ?>> End of the page<br>
 								</td>
 								</tr>
-
-
 
 								<tr valign="top">
-								<th scope="row">NK Google Analytics Status</th>
+								<th scope="row">Javascript code executed before pageview<br><small>(Only Universal analytics)</small></th>
+								<td><textarea name="nkweb_Custom_js" class="nk-textarea"><?php echo get_option('nkweb_Custom_js'); ?></textarea>
+								<div class="description"><?php _e('Get elements from pages and do operations before passing them as values, dimensions or metrics', 'NKgoogleanalytics'); ?></div>
+								</tr>
+
+								<tr valign="top">
+								<th scope="row">Other values, dimensions and metrics<br><small>(Only Universal analytics)</small></th>
+								<td><textarea name="nkweb_Custom_Values" class="nk-textarea"><?php echo get_option('nkweb_Custom_Values'); ?></textarea>
+								<div class="description"><?php esc_attr_e('Example: \'forceSSL\': true, \'dimension1\': \'some data\', \'metric2\': totalprice', 'NKgoogleanalytics'); ?></div>
+								</tr>
+
+								<tr valign="top">
+								<th scope="row">Use custom Google Analytics tracking code</th>
 								<td>
-									<input type="radio" name="nkweb_Enable_GA" value="true" <?php if (get_option('nkweb_Enable_GA') == "true"){ echo "checked "; } ?>> On<br>
-									<input type="radio" name="nkweb_Enable_GA" value="false"<?php if (get_option('nkweb_Enable_GA') == "false"){ echo "checked "; } ?>>  Off <br>
+									<input type="radio" name="nkweb_Use_Custom" value="true" <?php if (get_option('nkweb_Use_Custom') == "true"){ echo "checked "; } ?>> Yes<br>
+									<input type="radio" name="nkweb_Use_Custom" value="false"<?php if (get_option('nkweb_Use_Custom') == "false"){ echo "checked "; } ?>> No<br>
 								</td>
 								</tr>
 
-
-							</table>
-
+								<tr valign="top">
+								<th scope="row">Custom Google Analytics tracking code</th>
+								<td><textarea name="nkweb_Custom_Code" class="nk-textarea<?php if (get_option('nkweb_Use_Custom') != "true"){ echo ' input-disabled" readonly="readonly'; } ?>"><?php echo get_option('nkweb_Custom_Code'); ?></textarea>
+								</tr>
+					    </table>
 				        </div>
 				    </div>
 				</div>
@@ -228,7 +249,7 @@ function field_to_ignore() {
 			}
 		?>
 
-		<p><?php _e( 'If do not know how to setup the plugin, just add Google Analytics ID and press "Save Changes", the default settings works in the most cases.', 'NKgoogleanalytics' );?></p>
+		<p><?php _e( 'If do not know how to setup the plugin, just add Google Analytics ID and press "Save Changes", the default settings work in most of the cases.', 'NKgoogleanalytics' );?></p>
 		<p><?php _e( 'Remember, if you do not have an Google Analytics ID, you need to go to <a href="http://www.google.com/analytics">Google Analytics</a>, create an account and get the code (Similar to UA-0000000-0)', 'NKgoogleanalytics' );?></p>
 		<p><?php _e( 'I am very glad that you like this plugin, i will appreciate a lot if you want to make a donation. Thank you.', 'NKgoogleanalytics' );?></p>
 
