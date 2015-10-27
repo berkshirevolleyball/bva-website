@@ -15,7 +15,7 @@ if(empty($pass)){
 }
 
 
-$url = home_url().'/?mshot='+$pass;
+$url = home_url().'/?mshot='.$pass;
 //$url = 'http://wordpress.com';
 if(empty($comingsoon_bg_image)){
 	$mshot = 'http://s.wordpress.com/mshots/v1/'. urlencode($url) .'?w=1600';

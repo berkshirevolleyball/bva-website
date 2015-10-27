@@ -3,8 +3,8 @@ Contributors: johnnytee
 Donate link: http://seedprod.com/donate/
 Tags: maintenance,admin, administration, construction, under construction, maintenance mode, offline, unavailable, launch, landing page
 Requires at least: 3.3
-Tested up to: 4.0.0
-Stable tag: 1.5.4
+Tested up to: 4.3.1
+Stable tag: 1.6.4
 
 Work on your website behinds the scenes while you display a Maintenance Mode page to your visitors.
 
@@ -29,11 +29,13 @@ The **Ultimate Maintenance Mode** plugin displays a screenshot of your website w
 
 **Included Translations:**
 
-* Turkish(tr_TR) by [Hakan Er](http://hakanertr.wordpress.com)
-* Italian(it_IT) by Luca Barbetti
+* Danish(da_DK) by [Alexander Leo-Hansen](http://alexanderleohansen.dk/)
 * French(fr_FR) by fxbenard
-* Persian(fa_IR) by [rushearn](http://rushearn.com)
 * German(de_DE) by [Daniel Volz](daniel-volz.de)
+* Italian(it_IT) by Luca Barbetti
+* Persian(fa_IR) by [rushearn](http://rushearn.com)
+* Turkish(tr_TR) by [Hakan Er](http://hakanertr.wordpress.com)
+* Spanish(es_ES) by [WebHostingHub](http://www.webhostinghub.com/)
 
 == Installation ==
 
@@ -62,6 +64,22 @@ The first time you view the maintenance mode page, the screenshot may not displa
 
 
 == Changelog ==
+= 1.6.4 =
+* Language Packs Update
+
+= 1.6.3 =
+* Fixed contact function error. Thx @sKaoSnet
+
+= 1.6.2 =
+* Added Danish Translation
+
+= 1.6.1 =
+* WordPress 4.2 Compatibility
+* Added Spanish Translation
+
+= 1.6.0 =
+* WordPress 4.1 Compatibility
+
 = 1.5.4 =
 * Added: Link to free backgrounds
 
@@ -115,6 +133,22 @@ The first time you view the maintenance mode page, the screenshot may not displa
 * Initial Launch
 
 == Upgrade Notice ==
+= 1.6.4 =
+* Language Packs Update
+
+= 1.6.3 =
+* Fixed contact function error. Thx @sKaoSnet
+
+= 1.6.2 =
+* Added Danish Translation
+
+= 1.6.1 =
+* WordPress 4.2 Compatibility
+* Added Spanish Translation
+
+= 1.6.0 =
+* WordPress 4.1 Compatibility
+
 = 1.5.4 =
 * Added: Link to free backgrounds
 
