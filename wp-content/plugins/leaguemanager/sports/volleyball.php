@@ -122,17 +122,21 @@ class LeagueManagerVolleyball extends LeagueManager
 				$data['sets']['won'] += $match->home_points;
 				$data['sets']['lost'] += $match->away_points;
 	
-				foreach ( $match->sets AS $s => $set ) {
-					$data['ballpoints']['plus'] += $set['home'];
-					$data['ballpoints']['minus'] += $set['away'];
+				if (is_array($match->sets)) {
+					foreach ( $match->sets AS $s => $set ) {
+						$data['ballpoints']['plus'] += $set['home'];
+						$data['ballpoints']['minus'] += $set['away'];
+					}
 				}
 			} else {
 				$data['sets']['won'] += $match->away_points;
 				$data['sets']['lost'] += $match->home_points;
 	
-				foreach ( $match->sets AS $s => $set ) {
-					$data['ballpoints']['plus'] += $set['away'];
-					$data['ballpoints']['minus'] += $set['home'];
+				if (is_array($match->sets)) {
+					foreach ( $match->sets AS $s => $set ) {
+						$data['ballpoints']['plus'] += $set['away'];
+						$data['ballpoints']['minus'] += $set['home'];
+					}
 				}
 			}
 		}

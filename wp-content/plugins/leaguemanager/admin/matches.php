@@ -56,7 +56,7 @@
 		<th><?php _e( 'Match','leaguemanager' ) ?></th>
 		<th><?php _e( 'Location','leaguemanager' ) ?></th>
 		<th><?php _e( 'Begin','leaguemanager' ) ?></th>
-		<th style="text-align: center;"><?php _e( 'Score', 'leaguemanager' ) ?></th>
+		<th><?php _e( 'Score', 'leaguemanager' ) ?></th>
 		<?php do_action( 'matchtable_header_'.(isset($league->sport) ? $league->sport : '' )); ?>
 	</tr>
 	</thead>
@@ -77,7 +77,7 @@
 			<td><a href="admin.php?page=leaguemanager&amp;subpage=match&amp;league_id=<?php echo $league->id ?>&amp;edit=<?php echo $match->id ?>&amp;season=<?php echo $season['name'] ?><?php if(isset($group)) echo '&amp;group=' . $group; ?>"><?php echo $leaguemanager->getMatchTitle($match->id) ?></a></td>
 			<td><?php echo ( empty($match->location) ) ? 'N/A' : $match->location ?></td>
 			<td><?php echo ( '00:00' == $match->hour.":".$match->minutes ) ? 'N/A' : mysql2date(get_option('time_format'), $match->date) ?></td>
-			<td style="text-align: center;">
+			<td>
 				<input class="points" type="text" size="2" style="text-align: center;" id="home_points_<?php echo $match->id ?>_regular" name="home_points[<?php echo $match->id ?>]" value="<?php echo (isset($match->home_points) ? $match->home_points : '') ?>" /> : <input class="points" type="text" size="2" style="text-align: center;" id="away_points[<?php echo $match->id ?>]" name="away_points[<?php echo $match->id ?>]" value="<?php echo (isset($match->away_points) ? $match->away_points : '') ?>" />
 			</td>
 			<?php do_action( 'matchtable_columns_'.(isset($league->sport) ? $league->sport : '' ), $match ) ?>

@@ -528,10 +528,17 @@ class LeagueManagerAdminPanel extends LeagueManager
 				$points['minus'] += $match->away_points;
 
 				// Updated for BVA specific rules
+				// Home points
 				if ($match->home_points == 2) {
 					$points['plus'] += 3;
 				} else {
 					$points['plus'] += $match->home_points;		
+				}
+				// Away Points
+				if ($match->away_points == 2) {
+					$points['minus'] += 3;
+				} else {
+					$points['minus'] += $match->away_points;
 				}
 			}
 
@@ -539,7 +546,12 @@ class LeagueManagerAdminPanel extends LeagueManager
 			foreach ( $away AS $match ) {
 
 				// Updated for BVA specific rules
-				$points['plus'] += $match->away_points;
+				if ($match->away_points == 2) {
+					$points['plus'] += 3;
+				} else {
+					$points['plus'] += $match->away_points;		
+				}
+
 				if ($match->home_points == 2) {
 					$points['minus'] += 3;
 				} else {
