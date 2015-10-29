@@ -525,14 +525,26 @@ class LeagueManagerAdminPanel extends LeagueManager
 		if ( 'score' == $rule ) {
 			$home = $this->getMatches( array("home_team" => $team_id) );
 			foreach ( $home AS $match ) {
-				$points['plus'] += $match->home_points;
 				$points['minus'] += $match->away_points;
+
+				// Updated for BVA specific rules
+				if ($match->home_points == 2) {
+					$points['plus'] += 3;
+				} else {
+					$points['plus'] += $match->home_points;		
+				}
 			}
 
 			$away = $this->getMatches( array("away_team" => $team_id) );
 			foreach ( $away AS $match ) {
+
+				// Updated for BVA specific rules
 				$points['plus'] += $match->away_points;
-				$points['minus'] += $match->home_points;
+				if ($match->home_points == 2) {
+					$points['minus'] += 3;
+				} else {
+					$points['minus'] += $match->home_points;
+				}
 			}
 		} else {
 			extract( (array)$rule );

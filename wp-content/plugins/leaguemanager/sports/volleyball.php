@@ -198,7 +198,7 @@ class LeagueManagerVolleyball extends LeagueManager
 	 */
 	function displayMatchesHeader()
 	{
-		echo '<th colspan="5" style="text-align: center;">'.__( 'Sets', 'leaguemanager' ).'</th>';
+		echo '<th colspan="3" style="text-align: left;">'.__( 'Sets', 'leaguemanager' ).'</th>';
 	}
 
 
@@ -214,7 +214,7 @@ class LeagueManagerVolleyball extends LeagueManager
 			$match->sets = array();
 		}
 		
-		for ( $i = 1; $i <= 5; $i++ ) {
+		for ( $i = 1; $i <= 3; $i++ ) {
 			if (!isset($match->sets[$i]['home'])) $match->sets[$i]['home'] = '';
 			if (!isset($match->sets[$i]['away'])) $match->sets[$i]['away'] = '';
 			
