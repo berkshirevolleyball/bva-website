@@ -1,7 +1,6 @@
 <?php
-if ( !current_user_can( 'leagues' ) ) : 
+if ( !current_user_can( 'league_manager' ) ) : 
 	echo '<p style="text-align: center;">'.__("You do not have sufficient permissions to access this page.").'</p>';
- 
 else :
 ?>
 
@@ -24,7 +23,7 @@ else :
 
 		</ul>
 	</li>
-	<li><a href="#donations"><?php _e( 'Donations', 'leaguemanager' ) ?></a></li>
+	<li><a href="#racing"><?php _e( 'Setup Racing Sports', 'leaguemanager' ) ?></a></li>
 </ul>
 
 
@@ -169,8 +168,8 @@ else :
 	</tr>
 	<tr class="alternate" valign="top">
 		<td>match_day</td>
-		<td><?php _e( 'display matches of given match day', 'leaguemanager' ) ?></td>
-		<td><em>integer</em></td>
+		<td><?php _e( 'display matches of given match day. Alternatively use <em>next</em>, <em>last</em> or <em>current/latest</em>', 'leaguemanager' ) ?></td>
+		<td><em>integer</em> or <em>string</em></td>
 		<td>&#160;</td>
 		<td><?php _e( 'Yes', 'leaguemanager' ) ?></td>
 	</tr>
@@ -185,6 +184,20 @@ else :
 		<td>time</td>
 		<td><?php _e( 'use this to get either upcoming (next) or previous (prev) matches', 'leaguemanager' ) ?></td>
 		<td><em>next</em>, <em>prev</em></td>
+		<td>&#160;</td>
+		<td><?php _e( 'Yes', 'leaguemanager' ) ?></td>
+	</tr>
+	<tr class="" valign="top">
+		<td>show_match_day_selection</td>
+		<td><?php _e( 'force showing or hiding dropdown for match days', 'leaguemanager' ) ?></td>
+		<td><em>true</em>, <em>false</em></td>
+		<td>&#160;</td>
+		<td><?php _e( 'Yes', 'leaguemanager' ) ?></td>
+	</tr>
+	<tr class="alternate" valign="top">
+		<td>show_team_selection</td>
+		<td><?php _e( 'force showing or hiding dropdown for teams', 'leaguemanager' ) ?></td>
+		<td><em>true</em>, <em>false</em></td>
 		<td>&#160;</td>
 		<td><?php _e( 'Yes', 'leaguemanager' ) ?></td>
 	</tr>
@@ -474,11 +487,15 @@ else :
 	</tr>
 </tbody>
 </table>
+<h4><?php _e('Customization of template files', 'leaguemanager') ?></h4>
 <p><?php _e( 'If you want to modify existing templates copy it to', 'leaguemanager' ) ?></p>
 <blockquote><p>your_theme_dir/leaguemanager/</p></blockquote>
 <p><?php _e( 'The plugin will then first look in your theme directory. Further it is possible to design own templates, e.g. multiple standings templates. Assume you create a template called <strong>standings-sample1.php</strong>. To load this template use the following code.', 'leaguemanager' ) ?></p>
 <blockquote><p>[standings league_id=ID template=<strong>sample1</strong>]</p></blockquote>
 
+<h4><?php _e('Customization of sport files', 'leaguemanager') ?></h4>
+<p><?php _e( 'If you want to modify existing sports copy it to', 'leaguemanager' ) ?></p>
+<blockquote><p>your_theme_dir/sports/</p></blockquote>
 
 <a href="#top" class="alignright"><?php _e( 'Top', 'leaguemanager' ) ?></a>	<h3 id="template_tags"><?php _e( 'Template Tags', 'leaguemanager' ) ?></h3>
 <p><?php _e( 'Template Tags are functions that can be used in your Wordpress Theme to display the plugin data. Here is a brief listing of available tags. For details see file functions.php', 'leaguemanager' ) ?><p>
@@ -559,7 +576,7 @@ else :
 	<td>&#160;</td>
 </tr>
 <tr class="alternate" valign="top">
-	<td>league_menu_<em>$sport</em> & league_menu_<em>$mode</em></td>
+	<td>league_menu_<em>$sport</em> and league_menu_<em>$mode</em></td>
 	<td><?php _e( 'manipulate league menu based on current sport type and mode', 'leaguemanager' ) ?></td>
 	<td>admin/admin.php: function getMenu()</td>
 	<td>&#160;</td>
@@ -744,20 +761,9 @@ else :
 <p><?php printf( __( 'After having set up the statistics fields you can return to the league overview page and <a href="%s" class="thickbox">add statistics for each match</a> by clicking the link in the matches table. Each field which was defined as roster will have a button next to the input field. Clicking on the button opens a popup window with a selection of players which are taken from ProjectManager. The statistics will be shown with each individual match, e.g. by using the shortcode [match id=ID].', 'leaguemanager' ), LEAGUEMANAGER_URL.'/admin/doc/match_statistics.png' ) ?></p>
 <p><?php printf( __( 'Each Statistics field will automatically create <a href="%s" class="thickbox">another formfield type in ProjectManager</a>. In this way match statistics from LeagueManager can be displayed in each player profile in ProjectManager. Any statistics which only counts the number of entries, e.g. Goals, Assists, Cards will be automatically calculated. ', 'leaguemanager' ), LEAGUEMANAGER_URL.'/admin/doc/goals_field.png') ?></p>
 
-
 <a href="#top" class="alignright"><?php _e( 'Top', 'leaguemanager' ) ?></a>
-<h3 id="donations"><?php _e( 'Donations', 'leaguemanager' ) ?></h3>
-<p><?php _e( 'If you like my plugin and want to support me, I am grateful for any donation.', 'leaguemanager' ) ?></p>
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post" style="float: left; margin-right: 1em;">
-	<input type="hidden" name="cmd" value="_s-xclick">
-	<input type="hidden" name="hosted_button_id" value="2329191">
-	<input type="image" src="<?php echo LEAGUEMANAGER_URL ?>/admin/doc/donate_eur.gif" border="0" name="submit" alt="Donate in Euro">
-</form>
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-	<input type="hidden" name="cmd" value="_s-xclick">
-	<input type="hidden" name="hosted_button_id" value="3408441">
-	<input type="image" src="<?php echo LEAGUEMANAGER_URL ?>/admin/doc/donate_usd.gif" border="0" name="submit" alt="Donate in USD">
-</form>
+<h3 id="racing"><?php _e( 'Setup Racing Sports', 'leaguemanager' ) ?></h3>
+<p><?php printf(__('Racing mode has a special setup and strictly requires my other plugin %s to manage individual racer. After installing the plugin ProjectManager setup different cateogies for each racing team and setup individual profiles for each racer (Name is enough). Having setup the profiles for individual racer, add teams in LeagueManager and choose as team roster the respective project and category. Then add matches as normal only that for each racing event an individual title is used. The results are not required, I think, but the table for each team needs to be updated manually. By clicking on the results page you can insert results for each individual racer.', 'leaguemanager'), '<a href="https://wordpress.org/plugins/projectmanager/" target="_blank" title="Link to Projectmanager">ProjectManager</a>'); ?></p>
 
 </div>
 

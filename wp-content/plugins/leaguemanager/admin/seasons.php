@@ -1,5 +1,5 @@
 <?php
-if ( !current_user_can( 'manage_leagues' ) ) : 
+if ( !current_user_can( 'manage_leaguemanager' ) ) :
 	echo '<p style="text-align: center;">'.__("You do not have sufficient permissions to access this page.").'</p>';
 	
 else :
@@ -7,9 +7,9 @@ else :
 		if ( !empty($_POST['season']) ) {
 			if ( empty($_POST['season_id']) ) {
 				$add_teams = isset($_POST['no_add_teams']) ? false : true;
-				$this->saveSeason( $_POST['season'], $_POST['num_match_days'], $add_teams );
+				$this->saveSeason( htmlspecialchars($_POST['season']), intval($_POST['num_match_days']), $add_teams );
 			} else {
-				$this->saveSeason( $_POST['season'], $_POST['num_match_days'], false, $_POST['season_id'] );
+				$this->saveSeason( htmlspecialchars($_POST['season']), intval($_POST['num_match_days']), false, intval($_POST['season_id']) );
 			}
 		} else {
 			$leaguemanager->setMessage( __( 'Season was empty', 'leaguemanager' ), true );
@@ -24,16 +24,15 @@ else :
 	}
 
 	$league = $leaguemanager->getCurrentLeague();
-	
 	$season_id = false;
 	$season_data = array('name' => '', 'num_match_days' => '');
 	if ( isset($_GET['edit']) ) {
-		$season_id = $_GET['edit'];
+		$season_id = htmlspecialchars($_GET['edit']);
 		$season_data = $league->seasons[$season_id];
 	}
 ?>
 <div class="wrap">
-	<p class="leaguemanager_breadcrumb"><a href="admin.php?page=leaguemanager"><?php _e( 'Leaguemanager', 'leaguemanager' ) ?></a> &raquo; <a href="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league->id ?>"><?php echo $league->title ?></a> &raquo; <?php _e( 'Seasons', 'leaguemanager' ) ?></p>
+	<p class="leaguemanager_breadcrumb"><a href="admin.php?page=leaguemanager"><?php _e( 'LeagueManager', 'leaguemanager' ) ?></a> &raquo; <a href="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league->id ?>"><?php echo $league->title ?></a> &raquo; <?php _e( 'Seasons', 'leaguemanager' ) ?></p>
 
 	<div class="narrow">
 
@@ -59,7 +58,7 @@ else :
 		</tr>
 		</thead>
 		<tbody id="the-list">
-			<?php if ( !empty($league->seasons) ) : ?>
+			<?php if ( !empty($league->seasons) ) : $class = ''; ?>
 			<?php foreach( (array)$league->seasons AS $key => $season ) : $class = ( 'alternate' == $class ) ? '' : 'alternate' ?>
 			<tr class="<?php echo $class ?>">
 				<th scope="row" class="check-column"><input type="checkbox" value="<?php echo $key ?>" name="del_season[<?php echo $key ?>]" /></th>
@@ -83,7 +82,7 @@ else :
 	<form action="" method="post">
 		<table class="form-table">
 			<tr valign="top">
-				<th scope="row"><label for="season"><?php _e( 'Season', 'leaguemanager' ) ?></th>
+				<th scope="row"><label for="season"><?php _e( 'Season', 'leaguemanager' ) ?></label></th>
 				<td>
 					<input type="text" name="season" id="season" value="<?php echo $season_data['name'] ?>" size="8" />&#160;<span class="setting-description"><?php _e('Usually 4-digit year, e.g. 2008. Can also be any kind of string, e.g. 0809', 'leaguemanager') ?></span><br />
 				</td>
@@ -96,7 +95,7 @@ else :
 			</tr>
 			<?php if ( !$season_id ) : ?>
 			<tr valign="top">
-				<th scope="row"><label for="no_add_teams"><?php _e( 'No Teams', 'leaguemanager' ) ?></th>
+				<th scope="row"><label for="no_add_teams"><?php _e( 'No Teams', 'leaguemanager' ) ?></label></th>
 				<td>
 					<input type="checkbox" name="no_add_teams" id="no_add_teams" value="1" />&#160;<span class="setting-description"><?php _e( 'Check this to not automatically get teams from database and add them to the season', 'leaguemanager' ) ?></span>
 				</td>
@@ -105,7 +104,7 @@ else :
 		</table>
 
 		<input type="hidden" name="season_id" value="<?php echo $season_id ?>" />
-		<p class="submit"><input type="submit" name="saveSeason" class="button" value="<?php if ( !$season_id ) _e( 'Add Season', 'leaguemanager' ); else _e( 'Edit Season', 'leaguemanager' ); ?>" /></p>
+		<p class="submit"><input type="submit" name="saveSeason" class="button button-primary" value="<?php if ( !$season_id ) _e( 'Add Season', 'leaguemanager' ); else _e( 'Edit Season', 'leaguemanager' ); ?>" /></p>
 	</form>
 
 	</div>

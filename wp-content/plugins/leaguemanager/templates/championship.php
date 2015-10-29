@@ -21,7 +21,7 @@ The following variables are usable:
 </tr>
 <tbody id="the-list-finals" class="form-table">
 <?php foreach ( $finals AS $final ) : ?>
-<tr class="<?php echo $final->class ?>">
+<tr class="">
 	<th scope="row"><strong><?php echo $final->name ?></strong></th>
 	<?php foreach ( (array)$final->matches AS $no => $match ) : ?>
 	<td colspan="<?php echo $final->colspan ?>" style="text-align: center;">
@@ -69,7 +69,7 @@ The following variables are usable:
 </thead>
 <tbody id="the-list-<?php echo $final->key ?>" class="form-table">
 <?php foreach ( (array)$final->matches AS $no => $match ) : ?>
-<tr class="<?php echo $final->class ?>">
+<tr class="<?php echo $match->class ?>">
 	<td><?php echo $no ?></td>
 	<td><?php echo $match->date ?></td> 
 	<td><?php echo $match->title ?></td>
@@ -85,17 +85,17 @@ The following variables are usable:
 
 <h3><?php _e( 'Preliminary Rounds', 'leaguemanager' ) ?></h3>
 <?php foreach ( $championship->getGroups() AS $key => $group ) : ?>
-<?php $teams = $leaguemanager->getTeams( "`league_id` = '".$league->id."' AND `season` = '".$league->season."' AND `group` = '".$group."'" ); ?>
-<?php $matches = $leaguemanager->getMatches( "`league_id`= '".$league->id."' AND `season` = '".$league->season."' AND `final` = '' AND `group` = '".$group."'" ); ?>
+<?php $teams = $leaguemanager->getTeams( array("league_id" => $league->id, "season" => $league->season, "group" => $group) ); ?>
+<?php $matches = $leaguemanager->getMatches( array("league_id" => $league->id, "season" => $league->season, "final" => '', "group" => $group) ); ?>
 
 <h4><?php printf(__('Group %s', 'leaguemanager'), $group) ?></h4>
 <h5><?php _e( 'Standings', 'leaguemanager' ) ?></h5>
 <?php leaguemanager_standings( $league->id, array('season' => $league->season, 'group' => $group) ); ?>
 
 <h5><?php _e( 'Match Plan', 'leaguemanager' ) ?></h5>
-<?php leaguemanager_matches( $league->id, array('season' => $league->season, 'group' => $group) ); ?>
+<?php leaguemanager_matches( $league->id, array('season' => $league->season, 'limit' => 'false', 'group' => $group) ); ?>
 
 <?php endforeach; ?>
 
 <h5><?php _e( 'Inter Group Matches', 'leaguemanager' ) ?></h5>
-<?php leaguemanager_matches( $league->id, array('season' => $league->season, 'group' => '') ); ?>
+<?php leaguemanager_matches( $league->id, array('season' => $league->season, 'group' => '', 'limit' => 'false') ); ?>

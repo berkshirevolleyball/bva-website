@@ -4,7 +4,7 @@
  * 
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerTennis extends LeagueManager
 {
@@ -113,6 +113,7 @@ class LeagueManagerTennis extends LeagueManager
 	 */
 	function leagueSettings( $league )
 	{
+		$league->num_sets = isset($league->num_sets) ? $league->num_sets : '';
 		echo "<tr valign='top'>";
 		echo "<th scope='row'><label for='num_sets'>".__('Number of Sets', 'leaguemanager')."</label></th>";
 		echo "<td><input type='text' name='settings[num_sets]' id='num_sets' value='".$league->num_sets."' size='3' /></td>";
@@ -172,7 +173,7 @@ class LeagueManagerTennis extends LeagueManager
 		$league = $leaguemanager->getCurrentLeague();
 		$season = $leaguemanager->getSeason($league);
 
-		$matches = $leaguemanager->getMatches( "`league_id` = {$league->id} AND `season` = '".$season['name']."' AND `final` = '' AND `home_points` IS NOT NULL and `away_points` IS NOT NULL" );
+		$matches = $leaguemanager->getMatches( array("league_id" => $league->id, "season" => $season['name'], "final" => '', "home_points" => "not_null", "away_points" => "not_null", "limit" => false) );
 		foreach ( $matches AS $match ) {
 			if ( isset($match->home_partner) && isset($match->guest_partner) ) {
 				if ( $match->home_partner == $team_id || $match->guest_partner == $team_id )
@@ -196,7 +197,7 @@ class LeagueManagerTennis extends LeagueManager
 		$league = $leaguemanager->getCurrentLeague();
 		$season = $leaguemanager->getSeason($league);
 
-		$matches = $leaguemanager->getMatches( "`league_id` = {$league->id} AND `season` = '".$season['name']."' AND `final` = ''" );
+		$matches = $leaguemanager->getMatches( array("league_id" => $league->id, "season" => $season['name'], "final" => '', "limit" => false) );
 		foreach ( $matches AS $match ) {
 			if ( isset($match->home_partner) && isset($match->guest_partner) ) {
 				if ( $match->home_partner == $team_id && $match->winner_id == $match->home_team )
@@ -223,7 +224,7 @@ class LeagueManagerTennis extends LeagueManager
 		$league = $leaguemanager->getCurrentLeague();
 		$season = $leaguemanager->getSeason($league);
 
-		$matches = $leaguemanager->getMatches( "`league_id` = {$league->id} AND `season` = '".$season['name']."' AND `final` = '' AND `winner_id` = -1 AND `loser_id` = -1" );
+		$matches = $leaguemanager->getMatches( array("league_id" => $league->id, "season" => $season['name'], "final" => '', "winner_id" => -1, "loser_id" => -1, "limit" => false) );
 		foreach ( $matches AS $match ) {
 			if ( isset($match->home_partner) && isset($match->guest_partner) ) {
 				if ( $match->home_partner == $team_id || $match->guest_partner == $team_id )
@@ -231,7 +232,7 @@ class LeagueManagerTennis extends LeagueManager
 					
 			}
 		}
-		return $num_won;
+		return $num_tie;
 	}
 	
 
@@ -248,7 +249,7 @@ class LeagueManagerTennis extends LeagueManager
 		$league = $leaguemanager->getCurrentLeague();
 		$season = $leaguemanager->getSeason($league);
 
-		$matches = $leaguemanager->getMatches( "`league_id` = {$league->id} AND `season` = '".$season['name']."' AND `final` = ''" );
+		$matches = $leaguemanager->getMatches( array("league_id" => $league->id, "season" => $season['name'], "final" => '', "limit" => false) );
 		foreach ( $matches AS $match ) {
 			if ( isset($match->home_partner) && isset($match->guest_partner) ) {
 				if ( $match->home_partner == $team_id && $match->winner_id == $match->away_team )
@@ -273,7 +274,7 @@ class LeagueManagerTennis extends LeagueManager
 		global $wpdb, $leaguemanager;
 
 		$team = $wpdb->get_results( "SELECT `custom` FROM {$wpdb->leaguemanager_teams} WHERE `id` = {$team_id}" );
-		$custom = maybe_unserialize($team->custom);
+		$custom = isset($team->custom) ? maybe_unserialize($team->custom) : '';
 		$custom = $this->getStandingsData($team_id, $custom);
 
 		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->leaguemanager_teams} SET `custom` = '%s' WHERE `id` = '%d'", maybe_serialize($custom), $team_id ) );
@@ -297,9 +298,10 @@ class LeagueManagerTennis extends LeagueManager
 		$league = $leaguemanager->getCurrentLeague();
 		$season = $leaguemanager->getSeason($league);
 
-		$matches = $leaguemanager->getMatches( "`league_id` = {$league->id} AND `season` = '".$season['name']."' AND `final` = ''" ); //( `home_team` = {$team_id} OR `away_team` = {$team_id} )" );
+		$matches = $leaguemanager->getMatches( array("league_id" => $league->id, "season" => $season['name'], "final" => '', "limit" => false) );
 		foreach ( $matches AS $match ) {
 			if ( $match->home_team == $team_id || $match->away_team == $team_id || ( isset($match->home_partner) && $match->home_partner == $team_id ) || ( isset($match->guest_partner) && $match->guest_partner == $team_id ) ) {
+				if (!isset($match->home_partner)) $match->home_partner = '';
 				$index = ( $team_id == $match->home_team || $team_id == $match->home_partner ) ? 'player2' : 'player1';
 
 				// First check for Split Set, else it's straight set
@@ -317,6 +319,8 @@ class LeagueManagerTennis extends LeagueManager
 						$data['games_allowed'] += 1;
 					}
 				} else {
+					if (!isset($match->home_partner)) $match->home_partner = "";
+					if (!isset($match->guest_partner)) $match->guest_partner = "";
 					if ( $match->winner_id == $team_id || ($team_id == $match->home_partner && $match->winner_id == $match->home_team) || ($team_id == $match->guest_partner && $match->winner_id == $match->away_team) ) {
 						$data['straight_set']['win'] += 1;
 						for ( $j = 1; $j <= $league->num_sets-1; $j++  ) {
@@ -380,6 +384,9 @@ class LeagueManagerTennis extends LeagueManager
 		global $leaguemanager;
 		$league = $leaguemanager->getCurrentLeague();
 
+		if (!isset($team->straight_set)) $team->straight_set = array('win' => '', 'lost' => '');
+		if (!isset($team->split_set)) $team->split_set = array('win' => '', 'lost' => '');
+		if (!isset($team->games_allowd)) $team->games_allowed = '';
 		if ( is_admin() && $rule == 'manual' )
 			echo '<td><input type="text" size="2" name="custom['.$team->id.'][straight_set][win]" value="'.$team->straight_set['win'].'" />:<input type="text" size="2" name="custom['.$team->id.'][straight_set][lost]" value="'.$team->straight_set['lost'].'" /></td><td><input type="text" size="2" name="custom['.$team->id.'][split_set][win]" value="'.$team->split_set['win'].'" />:<input type="text" size="2" name="custom['.$team->id.'][split_set][lost]" value="'.$team->split_set['lost'].'" /></td><td><input type="text" size="2" name="custom['.$team->id.'][games_allowed]" value="'.$team->games_allowed.'" /></td>';
 		else
@@ -451,6 +458,9 @@ class LeagueManagerTennis extends LeagueManager
 		$league = $leaguemanager->getCurrentLeague();
 
 		for ( $i = 1; $i <= $league->num_sets; $i++ ) {
+			if (!isset($match->sets[$i])) {
+				$match->sets[$i] = array('player1' => '', 'player2' => '');
+			}
 			echo '<td><input class="points" type="text" size="2" id="set_'.$match->id.'_'.$i.'_player1" name="custom['.$match->id.'][sets]['.$i.'][player1]" value="'.$match->sets[$i]['player1'].'" /> : <input class="points" type="text" size="2" id="set_'.$match->id.'_'.$i.'_player2" name="custom['.$match->id.'][sets]['.$i.'][player2]" value="'.$match->sets[$i]['player2'].'" /></td>';
 		}
 	}
@@ -506,6 +516,7 @@ class LeagueManagerTennis extends LeagueManager
 	 */
 	function importMatches( $custom, $line, $match_id )
 	{
+		$match_id = intval($match_id);
 		for( $x = 8; $x <= 10; $x++ ) {
 			$set = explode("-",$line[$x]);
 			$custom[$match_id]['sets'][] = array( 'player1' => $set[0], 'player2' => $set[1] );

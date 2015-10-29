@@ -4,7 +4,7 @@
  * 
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerTwoScores extends LeagueManager
 {
@@ -33,7 +33,7 @@ class LeagueManagerTwoScores extends LeagueManager
 		add_action( 'leaguemanager_standings_columns_'.$this->key, array(&$this, 'displayStandingsColumns'), 10, 2 );
 
 	}
-	function LeagueManagerSoccer()
+	function LeagueManagerTwoScores()
 	{
 		$this->__construct();
 	}
@@ -79,7 +79,7 @@ class LeagueManagerTwoScores extends LeagueManager
 	 */
 	function displayStandingsHeader()
 	{
-		echo '<th class="num">'._c( 'Scores', 'leaguemanager' ).'</th><th>'.__( 'Diff', 'leaguemanager').'</th>';
+		echo '<th class="num">'.__( 'Scores', 'leaguemanager' ).'</th><th>'.__( 'Diff', 'leaguemanager').'</th>';
 	}
 
 
@@ -120,7 +120,8 @@ class LeagueManagerTwoScores extends LeagueManager
 		
 		$goals = array( 'plus' => 0, 'minus' => 0 );
 				
-		$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `home_team` = '".$team_id."'" );
+		//$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `home_team` = '".$team_id."'" );
+		$matches = $leaguemanager->getMatches( array("home_team" => $team_id, "limit" => false) );
 		if ( $matches ) {
 			foreach ( $matches AS $match ) {
 				$custom = maybe_unserialize($match->custom);
@@ -137,7 +138,8 @@ class LeagueManagerTwoScores extends LeagueManager
 			}
 		}
 		
-		$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `away_team` = '".$team_id."'" );
+		//$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `away_team` = '".$team_id."'" );
+		$matches = $leaguemanager->getMatches( array("away_team" => $team_id, "limit" => false) );
 		if ( $matches ) {
 			foreach ( $matches AS $match ) {
 				$custom = maybe_unserialize($match->custom);

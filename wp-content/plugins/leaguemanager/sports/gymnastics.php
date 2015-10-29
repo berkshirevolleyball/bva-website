@@ -1,10 +1,10 @@
 <?php
 /**
- * Gymnastics Class 
- * 
+ * Gymnastics Class
+ *
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerGymnastics extends LeagueManager
 {
@@ -19,7 +19,7 @@ class LeagueManagerGymnastics extends LeagueManager
 	/**
 	 * load custom setings
 	 *
-	 * @param 
+	 * @param
 	 * @return void
 	 */
 	function __construct()
@@ -76,19 +76,19 @@ class LeagueManagerGymnastics extends LeagueManager
 
 
 	/**
-	 * extend header for Standings Table 
+	 * extend header for Standings Table
 	 *
 	 * @param none
 	 * @return void
 	 */
 	function displayStandingsHeader()
 	{
-		echo '<th class="num">'._c( 'AP|apparatus points', 'leaguemanager' ).'</th><th>'.__( 'Diff', 'leaguemanager').'</th>';
+		echo '<th class="num">'.__( 'AP', 'leaguemanager' ).'</th><th>'.__( 'Diff', 'leaguemanager').'</th>';
 	}
 
 
 	/**
-	 * extend columns for Standings Table 
+	 * extend columns for Standings Table
 	 *
 	 * @param object $team
 	 * @param string $rule
@@ -130,7 +130,10 @@ class LeagueManagerGymnastics extends LeagueManager
 	 */
 	function displayMatchesColumns( $match )
 	{
-		echo '<td><input class="points" type="text" size="2" id="apparatus_points_plus_'.$match->id.'" name="custom['.$match->id.'][apparatus_points][plus]" value="'.$match->apparatus_points['plus'].'" /> : <input clas="points" type="text" size="2" id="apparatus_points_minus_'.$match->id.'" name="custom['.$match->id.'][apparatus_points][minus]" value="'.$match->apparatus_points['minus'].'" /></td>';
+		if (!isset($match->apparatus_points))
+			$match->apparatus_points = array('plus' => '', 'minus' => '');
+		
+		echo '<td><input class="points" type="text" size="2" id="apparatus_points_plus_'.$match->id.'" name="custom['.$match->id.'][apparatus_points][plus]" value="'.$match->apparatus_points['plus'].'" /> : <input class="points" type="text" size="2" id="apparatus_points_minus_'.$match->id.'" name="custom['.$match->id.'][apparatus_points][minus]" value="'.$match->apparatus_points['minus'].'" /></td>';
 	}
 
 
@@ -142,7 +145,7 @@ class LeagueManagerGymnastics extends LeagueManager
 	 */
 	function exportMatchesHeader( $content )
 	{
-		$content .= "\t"._c( 'AP|apparatus points', 'leaguemanager' );
+		$content .= "\t"._x( 'AP', 'apparatus points', 'leaguemanager' );
 		return $content;
 	}
 
@@ -164,7 +167,7 @@ class LeagueManagerGymnastics extends LeagueManager
 		return $content;
 	}
 
-	
+
 	/**
 	 * import matches
 	 *
@@ -175,6 +178,7 @@ class LeagueManagerGymnastics extends LeagueManager
 	 */
 	function importMatches( $custom, $line, $match_id )
 	{
+		$match_id = intval($match_id);
 		$ap = explode("-", $line[8]);
 		$custom[$match_id]['apparatus_points'] = array( 'plus' => $ap[0], 'minus' => $ap[1] );
 
@@ -192,27 +196,30 @@ class LeagueManagerGymnastics extends LeagueManager
 	{
 		global $wpdb;
 
-		$home = $wpdb->get_results( "SELECT `custom` FROM {$wpdb->leaguemanager_matches} WHERE `home_team` = '".$team_id."'" );
-		$away = $wpdb->get_results( "SELECT `custom` FROM {$wpdb->leaguemanager_matches} WHERE `away_team` = '".$team_id."'" );
+		$home = $leaguemanager->getMatches( array("home_team" => $team_id, "limit" => false) );//$wpdb->get_results( $wpdb->prepare("SELECT `custom` FROM {$wpdb->leaguemanager_matches} WHERE `home_team` = '%d'", $team_id) );
+		$away = $leaguemanager->getMatches( array("away_team" => $team_id, "limit" => false) );//$wpdb->get_results( $wpdb->prepare("SELECT `custom` FROM {$wpdb->leaguemanager_matches} WHERE `away_team` = '%d'", $team_id) );
 
 		$points = array( 'plus' => 0, 'minus' => 0);
 		if ( count($home) > 0 ) {
 			foreach ( $home AS $match ) {
 				$custom = (array)maybe_unserialize($match->custom);
-
+				
+				if (!isset($custom['apparatus_points'])) $custom['apparatus_points'] = array('plus' => '', 'minus' => '');
 				$points['plus'] += intval($custom['apparatus_points']['plus']);
 				$points['minus'] += intval($custom['apparatus_points']['minus']);
 			}
 		}
-		
+
 		if ( count($away) > 0 ) {
 			foreach ( $away AS $match ) {
 				$custom = (array)maybe_unserialize($match->custom);
+				
+				if (!isset($custom['apparatus_points'])) $custom['apparatus_points'] = array('plus' => '', 'minus' => '');
 				$points['plus'] += intval($custom['apparatus_points']['minus']);
 				$points['minus'] += intval($custom['apparatus_points']['plus']);
 			}
 		}
-		
+
 		return $points;
 	}
 }

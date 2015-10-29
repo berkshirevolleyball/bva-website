@@ -1,12 +1,12 @@
 <?php
 if ( isset($_POST['addLeague']) && !isset($_POST['deleteit']) ) {
 	check_admin_referer('leaguemanager_add-league');
-	$this->addLeague( $_POST['league_title'] );
+	$this->addLeague( htmlspecialchars($_POST['league_title']) );
 	$this->printMessage();
 } elseif ( isset($_POST['doaction']) && $_POST['action'] == 'delete' ) {
 	check_admin_referer('leagues-bulk');
 	foreach ( $_POST['league'] AS $league_id )
-		$this->delLeague( $league_id );
+		$this->delLeague( intval($league_id) );
 }
 ?>
 <div class="wrap" style="margin-bottom: 1em;">
@@ -32,7 +32,7 @@ if ( isset($_POST['addLeague']) && !isset($_POST['deleteit']) ) {
 	<table class="widefat" summary="" title="LeagueManager">
 		<thead>
 		<tr>
-                        <th scope="col" class="check-column"><input type="checkbox" onclick="Leaguemanager.checkAll(document.getElementById('leagues-filter'));" /></th>
+			<th scope="col" class="check-column"><input type="checkbox" onclick="Leaguemanager.checkAll(document.getElementById('leagues-filter'));" /></th>
 			<th scope="col" class="num">ID</th>
 			<th scope="col"><?php _e( 'League', 'leaguemanager' ) ?></th>
 			<th scope="col" class="num"><?php _e( 'Seasons', 'leaguemanager' ) ?></th>
@@ -60,7 +60,6 @@ if ( isset($_POST['addLeague']) && !isset($_POST['deleteit']) ) {
 	</div>
 	</div><!-- /col-right -->
 
-
 	<div id="col-left">
 	<div class="col-wrap">
 
@@ -75,7 +74,7 @@ if ( isset($_POST['addLeague']) && !isset($_POST['deleteit']) ) {
 			<th scope="row"><label for="league_title"><?php _e( 'League', 'leaguemanager' ) ?></label></th><td><input type="text" name="league_title" id="league_title" value="" size="30" style="margin-bottom: 1em;" /></td>
 		</tr>
 		</table>
-		<p class="submit"><input type="submit" name="addLeague" value="<?php _e( 'Add League', 'leaguemanager' ) ?> &raquo;" class="button" /></p>
+		<p class="submit"><input type="submit" name="addLeague" value="<?php _e( 'Add League', 'leaguemanager' ) ?> &raquo;" class="button button-primary" /></p>
 	</form>
 
 	</div>

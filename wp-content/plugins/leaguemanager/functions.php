@@ -41,7 +41,7 @@ function leaguemanager_display_prev_match_box( $number, $instance ) {
  * display standings table manually
  *
  * @param int $league_id League ID
- * @param array $args assoziative array of parameters, see default values (optional)
+ * @param array $args associative array of parameters, see default values (optional)
  * @return void
  */
 function leaguemanager_standings( $league_id, $args = array() ) {
@@ -62,15 +62,24 @@ function leaguemanager_standings( $league_id, $args = array() ) {
 
 function get_latest_results($id_team, $limit = 5) {
      global $wpdb;
-     $latest_results = $wpdb->get_results("SELECT `id`, `date`, `home_points`, `away_points`, `home_team`, `away_team`
+     $latest_results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `date`, `home_points`, `away_points`, `home_team`, `away_team`, `custom`
              FROM {$wpdb->leaguemanager_matches}
-             WHERE (home_team = $id_team OR away_team = $id_team)
+             WHERE (home_team = %d OR away_team = %d)
              AND (DATEDIFF(NOW(), `date`) >= 0)
              AND (home_points IS NOT NULL OR away_points IS NOT NULL)
              ORDER BY date DESC
-             LIMIT $limit");
+             LIMIT %d", $id_team, $id_team, $limit) );
 
-             return $latest_results;
+	$i = 0;
+	foreach ( $latest_results AS $match ) {
+		$latest_results[$i]->custom = $match->custom = maybe_unserialize($match->custom);
+		$latest_results[$i]->custom = $match->custom = stripslashes_deep($match->custom);
+		$latest_results[$i] = (object)array_merge((array)$match, (array)$match->custom);
+		//	unset($matches[$i]->custom);
+
+		$i++;
+	}
+    return $latest_results;
 }
 
 /**
@@ -83,12 +92,12 @@ function get_latest_results($id_team, $limit = 5) {
 
 function get_next_match($id_team, $limit = 1) {
      global $wpdb;
-     $next_results = $wpdb->get_results("SELECT `id`, `date`, `home_team`, `away_team`
+     $next_results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `date`, `home_team`, `away_team`
              FROM {$wpdb->leaguemanager_matches}
-             WHERE (home_team = $id_team OR away_team = $id_team)
+             WHERE (home_team = %d OR away_team = %d)
              AND (DATEDIFF(NOW(), `date`) <= 0)
-             ORDER BY date DESC
-             LIMIT $limit");
+             ORDER BY date ASC
+             LIMIT %d", $id_team, $id_team, $limit) );
 
              return $next_results;
 }
@@ -98,7 +107,7 @@ function get_next_match($id_team, $limit = 1) {
  * display crosstable table manually
  *
  * @param int $league_id
- * @param array $args assoziative array of parameters, see default values (optional)
+ * @param array $args associative array of parameters, see default values (optional)
  * @return void
  */
 function leaguemanager_crosstable( $league_id, $args = array() ) {
@@ -106,7 +115,7 @@ function leaguemanager_crosstable( $league_id, $args = array() ) {
 	$defaults = array('season' => false, 'template' => '', 'mode' => '');
 	$args = array_merge($defaults, $args);
 	extract($args, EXTR_SKIP);
-	echo $lmShortcodes->showCrosstable( array('league_id' => $league_id, 'mode' => $mode, 'template' => $temaplate, 'season' => $season) );
+	echo $lmShortcodes->showCrosstable( array('league_id' => $league_id, 'mode' => $mode, 'template' => $template, 'season' => $season) );
 }
 
 
@@ -114,15 +123,15 @@ function leaguemanager_crosstable( $league_id, $args = array() ) {
  * display matches table manually
  *
  * @param int $league_id
- * @param array $args assoziative array of parameters, see default values (optional)
+ * @param array $args associative array of parameters, see default values (optional)
  * @return void
  */
 function leaguemanager_matches( $league_id, $args = array() ) {
 	global $lmShortcodes;
-	$defaults = array('season' => false, 'template' => '', 'mode' => '', 'archive' => false, 'match_day' => false, 'group' => false, 'roster' => false, 'order' => false);
+	$defaults = array('season' => false, 'template' => '', 'mode' => '', 'limit' => 'true', 'archive' => false, 'match_day' => false, 'group' => false, 'roster' => false, 'order' => false);
 	$args = array_merge($defaults, $args);
 	extract($args, EXTR_SKIP);
-	echo $lmShortcodes->showMatches( array('league_id' => $league_id, 'mode' => $mode, 'season' => $season, 'archive' => $archive, 'template' => $template, 'roster' => $roster, 'order' => $order, 'match_day' => $match_day, 'group' => $group) );
+	echo $lmShortcodes->showMatches( array('league_id' => $league_id, 'limit' => $limit, 'mode' => $mode, 'season' => $season, 'archive' => $archive, 'template' => $template, 'roster' => $roster, 'order' => $order, 'match_day' => $match_day, 'group' => $group) );
 }
 
 
@@ -130,7 +139,7 @@ function leaguemanager_matches( $league_id, $args = array() ) {
  * display one match manually
  *
  * @param int $match_id
- * @param array $args additional arguments as assoziative array (optional)
+ * @param array $args additional arguments as associative array (optional)
  * @return void
  */
 function leaguemanager_match( $match_id, $args = array() ) {
@@ -147,7 +156,7 @@ function leaguemanager_match( $match_id, $args = array() ) {
  * display team list manually
  *
  * @param int|string $league_id
- * @param array $args additional arguments as assoziative array (optional)
+ * @param array $args additional arguments as associative array (optional)
  * @return void
  */
 function leaguemanager_teams( $league_id, $args = array() ) {
@@ -164,7 +173,7 @@ function leaguemanager_teams( $league_id, $args = array() ) {
  * display one team manually
  *
  * @param int $team_id
- * @param array $args additional arguments as assoziative array (optional)
+ * @param array $args additional arguments as associative array (optional)
  * @return void
  */
 function leaguemanager_team( $team_id, $args = array() ) {
@@ -181,7 +190,7 @@ function leaguemanager_team( $team_id, $args = array() ) {
  * display championship manually
  *
  * @param int $league_id
- * @param array $args additional arguments as assoziative array (optional)
+ * @param array $args additional arguments as associative array (optional)
  * @return void
  */
 function leaguemanager_championship( $league_id, $args = array() ) {
@@ -195,7 +204,7 @@ function leaguemanager_championship( $league_id, $args = array() ) {
 
 
 /**
- * helper function to allocate matches and teams of a league to a aseason and maybe other league
+ * helper function to allocate matches and teams of a league to a season and maybe other league
  *
  * @param int $league_id ID of current league
  * @param string $season season to set
@@ -206,15 +215,17 @@ function move_league_to_season( $league_id, $season, $new_league_id = false, $ol
 	global $leaguemanager, $wpdb;
 	if ( !$new_league_id ) $new_league_id = $league_id;
 	
-	$search = "`league_id` = '".$league_id."'";
-	if ( $old_season ) $search .= " AND `season` = '".$old_season."'";
-
-	if ( $teams = $leaguemanager->getTeams($search) ) {
+	$team_args = array("league_id" => $league_id);
+	if ( $old_season ) $team_args["season"] = $old_season;
+	
+	$match_args = $team_args;
+	
+	if ( $teams = $leaguemanager->getTeams($team_args) ) {
 		foreach ( $teams AS $team ) {
 			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->leaguemanager_teams} SET `season` = '%d', `league_id` = '%d' WHERE `id` = '%d'", $season, $new_league_id, $team->id ) );
 		}
 	}
-	if ( $matches = $leaguemanager->getMatches($search) ) {
+	if ( $matches = $leaguemanager->getMatches($match_args) ) {
 		foreach ( $matches AS $match ) {
 			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->leaguemanager_matches} SET `season` = '%d', `league_id` = '%d' WHERE `id` = '%d'", $season, $new_league_id, $match->id ) );
 		}

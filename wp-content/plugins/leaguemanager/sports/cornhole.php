@@ -4,7 +4,7 @@
  * 
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerCornhole extends LeagueManager
 {
@@ -57,13 +57,13 @@ class LeagueManagerCornhole extends LeagueManager
 	{
 		global $leaguemanager;
 
-		$home = $leaguemanager->getMatches( "`home_team` = '".$team_id."'" );
+		$home = $leaguemanager->getMatches( array("home_team" => $team_id, "limit" => false) );
 		foreach ( $home AS $match ) {
 			$points['plus'] += $match->home_points;
 			$points['minus'] += $match->away_points;
 		}
 
-		$away = $leaguemanager->getMatches("`away_team` = '".$team_id."'" );
+		$away = $leaguemanager->getMatches( array("away_team" => $team_id, "limit" => false) );
 		foreach ( $away AS $match ) {
 			$points['plus'] += $match->away_points;
 			$points['minus'] += $match->home_points;

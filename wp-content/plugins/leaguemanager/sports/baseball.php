@@ -4,7 +4,7 @@
  * 
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerBaseball extends LeagueManager
 {
@@ -71,6 +71,7 @@ class LeagueManagerBaseball extends LeagueManager
 	 */
 	function rankTeams( $teams )
 	{
+		$won = $lost = array();
 		foreach ( $teams AS $key => $row ) {
 			$won[$key] = $row->won_matches;
 			$lost[$key] = $row->lost_matches;
@@ -91,7 +92,8 @@ class LeagueManagerBaseball extends LeagueManager
 	{
 		global $wpdb;
 
-		$team = $wpdb->get_results( "SELECT `custom` FROM {$wpdb->leaguemanager_teams} WHERE `id` = {$team_id}" );
+		$team_id = intval($team_id);
+		$team = $wpdb->get_results( $wpdb->prepare("SELECT `custom` FROM {$wpdb->leaguemanager_teams} WHERE `id` = '%d'", $team_id) );
 		$custom = maybe_unserialize($team->custom);
 
 		$custom['runs'] = $this->getRuns($team_id);
@@ -106,7 +108,7 @@ class LeagueManagerBaseball extends LeagueManager
 	 * get number of runs for team
 	 *
 	 * @param int $team_id
-	 * @return array number of runs for and against as assoziative array
+	 * @return array number of runs for and against as associative array
 	 */
 	function getRuns( $team_id )
 	{
@@ -114,13 +116,13 @@ class LeagueManagerBaseball extends LeagueManager
 		
 		$runs = array( 'for' => 0, 'against' => 0 );
 
-		$home = $leaguemanager->getMatches( "`home_team` = {$team_id}" );
+		$home = $leaguemanager->getMatches( array("home_team" => $team_id, "limit" => false) );
 		foreach ( $home AS $match ) {
 			$runs['for'] += $match->runs['for'];
 			$runs['against'] += $match->runs['against'];
 		}
 
-		$away = $leaguemanager->getMatches( "`away_team` = {$team_id}" );
+		$away = $leaguemanager->getMatches( array("away_team" => $team_id, "limit" => false) );
 		foreach ( $away AS $match ) {
 			$runs['for'] += $match->runs['against'];
 			$runs['against'] += $match->runs['for'];
@@ -144,7 +146,7 @@ class LeagueManagerBaseball extends LeagueManager
 		if ( $team->rank == 1 ) {
 			return 0;
 		} else {
-			$first = $wpdb->get_results( "SELECT `rank`, `won_matches`, `lost_matches` FROM {$wpdb->leaguemanager_teams} WHERE `rank` = 1 AND `league_id` = '".$team->league_id."' AND `season` = '".$team->season."'" );
+			$first = $wpdb->get_results( $wpdb->prepare("SELECT `rank`, `won_matches`, `lost_matches` FROM {$wpdb->leaguemanager_teams} WHERE `rank` = 1 AND `league_id` = '%d' AND `season` = '%s'", $team->league_id, $team->season) );
 			$gb = ( $first[0]->won_matches - $team->won_matches + $team->lost_matches - $first[0]->lost_matches ) / 2;
 			return round($gb, 3);
 		}
@@ -163,12 +165,12 @@ class LeagueManagerBaseball extends LeagueManager
 		
 		$shutouts = 0;
 
-		$home = $leaguemanager->getMatches( "`home_team` = {$team_id}" );
+		$home = $leaguemanager->getMatches( array("home_team" => $team_id) );
 		foreach ( $home AS $match ) {
 			$shutouts += $match->shutouts['home'];
 		}
 
-		$away = $leaguemanager->getMatches( "`away_team` = {$team_id}" );
+		$away = $leaguemanager->getMatches( array("away_team" => $team_id) );
 		foreach ( $away AS $match ) {
 			$shutouts += $match->shutouts['away'];
 		}
@@ -185,7 +187,7 @@ class LeagueManagerBaseball extends LeagueManager
 	 */
 	function displayStandingsHeader()
 	{
-		echo '<th class="num">'._c( 'RF|Runs For', 'leaguemanager' ).'</th><th>'._c( 'RA|Runs Against', 'leaguemanager' ).'</th><th>'._c('PCT|Percent Win', 'leaguemanager' ).'</th><th>'._c( 'GB|Games Behind', 'leaguemanager' ).'</th><th>'._c( 'SO|Shutouts', 'leaguemanager' ).'</th>';
+		echo '<th class="num">'.__( 'RF', 'leaguemanager' ).'</th><th>'.__( 'RA', 'leaguemanager' ).'</th><th>'.__('PCT', 'leaguemanager' ).'</th><th>'.__( 'GB', 'leaguemanager' ).'</th><th>'.__( 'SO', 'leaguemanager' ).'</th>';
 	}
 
 
@@ -199,6 +201,10 @@ class LeagueManagerBaseball extends LeagueManager
 	function displayStandingsColumns( $team, $rule )
 	{
 		$win_percent = ( $team->done_matches > 0 ) ? round($team->won_matches/$team->done_matches, 3) : 0;
+		if (!isset($team->runs)) $team->runs = array('for' => '', 'against' => '');
+		if (!isset($team->gb)) $team->gb = '';
+		if (!isset($team->shutouts)) $team->shutouts = '';
+		
 		if ( is_admin() && $rule == 'manual' )
 			echo '<td><input type="text" size="2" name="custom['.$team->id.'][runs][for]" value="'.$team->runs['for'].'" /></td><td><input type="text" size="2" name="custom['.$team->id.'][runs][against]" value="'.$team->runs['against'].'" /></td><td>'.$win_percent.'</td><td><input type="text" size="2" name="custom['.$team->id.'][gb]" value="'.$team->gb.'" /></td><td><input type="text" size="2" name="custom['.$team->id.'][shutouts]" value="'.$team->shutouts.'" /></td>';
 		else
@@ -226,7 +232,7 @@ class LeagueManagerBaseball extends LeagueManager
 	 */
 	function displayMatchesHeader()
 	{
-		echo '<th>'._c( 'RF|Runs For', 'leaguemanager' ).'</th><th>'._c( 'RA|Runs Against', 'leaguemanager' ).'</th><th>'._c( 'SO|Shutouts', 'leaguemanager' ).'</th>';
+		echo '<th>'.__( 'RF', 'leaguemanager' ).'</th><th>'.__( 'RA', 'leaguemanager' ).'</th><th>'.__( 'SO', 'leaguemanager' ).'</th>';
 	}
 
 
@@ -238,6 +244,9 @@ class LeagueManagerBaseball extends LeagueManager
 	 */
 	function displayMatchesColumns( $match )
 	{
+		if (!isset($match->runs)) $match->runs = array('for' => '', 'against' => '');
+		if (!isset($match->shutouts)) $match->shutouts = array('home' => '', 'away' => '');
+		
 		echo '<td><input class="points" type="text" size="2" id="runs_for_'.$match->id.'" name="custom['.$match->id.'][runs][for]" value="'.$match->runs['for'].'" /></td><td><input clas="points" type="text" size="2" id="runs_against_'.$match->id.'" name="custom['.$match->id.'][runs][against]" value="'.$match->runs['against'].'" /></td>';
 		echo '<td><input class="points" type="text" size="2" id="shutouts_home_'.$match->id.'" name="custom['.$match->id.'][shutouts][home]" value="'.$match->shutouts['home'].'" /> : <input class="points" type="text" size="2" id="shutouts_away_'.$match->id.'" name="custom['.$match->id.'][shutouts][away]" value="'.$match->shutouts['away'].'" /></td>';
 	}
@@ -251,7 +260,7 @@ class LeagueManagerBaseball extends LeagueManager
 	 */
 	function exportMatchesHeader( $content )
 	{
-		$content .= "\t"._c( 'RF|Runs for', 'leaguemanager' )."\t"._c('RA|Runs against', 'leaguemanager')."\t"._c('SO|Shutouts', 'leaguemanager');
+		$content .= "\t".__( 'RF', 'leaguemanager' )."\t".__('RA', 'leaguemanager')."\t".__('SO', 'leaguemanager');
 		return $content;
 	}
 
@@ -284,6 +293,7 @@ class LeagueManagerBaseball extends LeagueManager
 	 */
 	function importMatches( $custom, $line, $match_id )
 	{
+		$match_id = intval($match_id);
 		$shutouts = explode("-", $line[10]);
 
 		$custom[$match_id]['runs'] = array( 'for' => $line[8], 'against' => $line[9] );
@@ -301,7 +311,7 @@ class LeagueManagerBaseball extends LeagueManager
 	 */
 	function exportTeamsHeader( $content )
 	{
-		$content .= "\t"._c( 'RF|Runs for', 'leaguemanager' )."\t"._c('RA|Runs against', 'leaguemanager')."\t"._c('PCT|Percentage win')."\t"._c('GB|games behind', 'leaguemanager')."\t".__c('SO|Shutouts', 'leaguemanager');
+		$content .= "\t".__( 'RF', 'leaguemanager' )."\t".__('RA', 'leaguemanager')."\t".__('PCT')."\t"._c('GB|games behind', 'leaguemanager')."\t".__('SO', 'leaguemanager');
 		return $content;
 	}
 

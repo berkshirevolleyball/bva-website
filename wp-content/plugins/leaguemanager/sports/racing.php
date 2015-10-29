@@ -4,7 +4,7 @@
  * 
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerRacing extends LeagueManager
 {
@@ -104,6 +104,7 @@ class LeagueManagerRacing extends LeagueManager
 	 */
 	function displayMatchesColumns( $match )
 	{
+		if (!isset($match->racetype)) $match->racetype = '';
 		echo '<td>'.$match->racetype.'</td><td><a href="admin.php?page=leaguemanager&subpage='.$this->key.'&league_id='.$match->league_id.'&season='.$match->season.'&match='.$match->id.'">'.__( 'Results', 'leaguemanager' ).'</a></td>';
 	}
 
@@ -116,6 +117,7 @@ class LeagueManagerRacing extends LeagueManager
 	 */
 	function displayEditMatchesColumns( $i, $match )
 	{
+		if (!isset($match->racetype)) $match->racetype = '';
 		echo '<td><input type"text" name="custom['.$i.'][racetype]" value="'.$match->racetype.'" size="10" /></td><td></td>';
 	}
 
@@ -161,6 +163,7 @@ class LeagueManagerRacing extends LeagueManager
 	 */
 	function importMatches( $custom, $line, $match_id )
 	{
+		$match_id = intval($match_id);
 		$custom[$match_id]['racetype'] = $line[8];
 		return $custom;
 	}
@@ -182,6 +185,8 @@ class LeagueManagerRacing extends LeagueManager
 	{
 		global $lmLoader;
 		$admin = $lmLoader->getAdminPanel();
+		$edit = ($mode == 'edit') ? true : false;
+		$class = '';
 	?>
 		<form action="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league->id?>&amp;season=<?php echo $season['name'] ?>" method="post">
 			<?php wp_nonce_field( 'leaguemanager_manage-matches' ) ?>
@@ -189,7 +194,7 @@ class LeagueManagerRacing extends LeagueManager
 			<table class="widefat">
 				<thead>
 					<tr>
-						<?php if ( !$edit ) : ?>
+						<?php if ( !isset($edit) || (isset($edit) && !$edit) ) : ?>
 						<th scope="col"><?php _e( 'Add', 'leaguemanager' ) ?></th>
 						<?php endif; ?>
 						<th scope="col"><?php _e( 'Date', 'leaguemanager' ) ?></th>
@@ -202,9 +207,9 @@ class LeagueManagerRacing extends LeagueManager
 					</tr>
 				</thead>
 				<tbody id="the-list" class="form-table">
-				<?php for ( $i = 0; $i < $max_matches; $i++ ) : $class = ( 'alternate' == $class ) ? '' : 'alternate'; ?>
+				<?php for ( $i = 0; $i < $max_matches; $i++ ) : $class = ( 'alternate' == $class ) ? '' : 'alternate'; if (!isset($matches[$i]->racetype)) $matches[$i]->racetype = ''; if (!isset($matches[$i]->description)) $matches[$i]->description = ''; if (!isset($matches[$i]->title)) $matches[$i]->title = '';?>
 				<tr class="<?php echo $class; ?>">
-					<?php if ( !$edit ) : ?>
+					<?php if ( !isset($edit) || (isset($edit) && !$edit) ) : ?>
 					<td><input type="checkbox" name="add_match[<?php echo $i ?>]" id="add_match_<?php echo $i ?>" /></td>
 					<?php endif; ?>
 					<td><?php echo $admin->getDateSelection( $matches[$i]->day, $matches[$i]->month, $matches[$i]->year, $i) ?></td>
@@ -233,8 +238,8 @@ class LeagueManagerRacing extends LeagueManager
 						</select>
 					</td>
 					<td><textarea name="custom[<?php echo $i ?>][description]" id="description_<?php echo $i ?>" cols="20" rows="5"><?php echo $matches[$i]->description ?></textarea></td>
+					<input type="hidden" name="match[<?php echo $i ?>]" value="<?php echo $matches[$i]->id ?>" />
 				</tr>
-				<input type="hidden" name="match[<?php echo $i ?>]" value="<?php echo $matches[$i]->id ?>" />
 				<?php endfor; ?>
 				</tbody>
 			</table>
@@ -262,22 +267,24 @@ class LeagueManagerRacing extends LeagueManager
 
 		$league_id = (int)$_GET['league_id'];
 		$match_id = (int)$_GET['match'];
-		$season = $_GET['season'];
+		$season = htmlspecialchars($_GET['season']);
 
 		if ( isset($_POST['save_results']) ) {
-			$this->saveResults( $_POST['racer'], $_POST['racer_name'], $_POST['category'], $_POST['result'], $_POST['info'], $match_id );
+			$this->saveResults( $_POST['racer'], $_POST['racer_name'], $_POST['category'], $_POST['points'], $_POST['time'], $_POST['info'], $match_id );
 			$leaguemanager->printMessage();
 		}
 		$league = $leaguemanager->getLeague($league_id);
 		$match = $leaguemanager->getMatch($match_id);
-		$teams = $leaguemanager->getTeams("`league_id` = {$league_id} AND `season` = '".$season."'");
-		$team_id = isset($_GET['team']) ? (int)$_GET['team'] : $teams[0]->id;
+		$teams = $leaguemanager->getTeams( array("league_id" => $league_id, "season" => $season) );
+		$team_list = $teams;
+		$team_id = isset($_GET['team']) ? (int)$_GET['team'] : false;
 
-		$team = $leaguemanager->getTeam($team_id);
-
+		if ($team_id) $teams = array($leaguemanager->getTeam($team_id));
+		$class = '';
+		if (!isset($match->title)) $match->title = $leaguemanager->getMatchTitle($match_id);
 	?>
 	<div class="wrap">
-		<p class="leaguemanager_breadcrumb"><a href="admin.php?page=leaguemanager"><?php _e( 'Leaguemanager', 'leaguemanager' ) ?></a> &raquo; <a href="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league->id ?>"><?php echo $league->title ?></a> &raquo; <?php _e( 'Race Results', 'leaguemanager' ) ?></p>
+		<p class="leaguemanager_breadcrumb"><a href="admin.php?page=leaguemanager"><?php _e( 'LeagueManager', 'leaguemanager' ) ?></a> &raquo; <a href="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league->id ?>"><?php echo $league->title ?></a> &raquo; <?php _e( 'Race Results', 'leaguemanager' ) ?></p>
 		<h2><?php printf(__( 'Racing Results - %s', 'leaguemanager' ), $match->title) ?></h2>
 
 		<form action="admin.php" method="get" class="alignright">
@@ -289,45 +296,52 @@ class LeagueManagerRacing extends LeagueManager
 			
 			<label for="team"><?php _e( 'Choose Team', 'leaguemanager' ) ?></label>
 			<select size="1" name="team" id="team">
-			<?php foreach ( $teams AS $t ) : ?>
+				<option value="" <?php selected('', $team_id) ?>><?php _e('Show all Teams', 'leaguemanager') ?>
+			<?php foreach ( $team_list AS $t ) : ?>
 				<option value="<?php echo $t->id ?>"<?php selected($t->id, $team_id) ?>><?php echo $t->title ?></option>
 			<?php endforeach; ?>
 			</select>
 			<input type="submit" value="<?php _e('Filter', 'leaguemanager') ?>" class="button-secondary" />
 		</form>
 
+		<?php if ($leaguemanager->hasTeamRoster($teams)) : ?>
+		<form action="" method="post">
+		
+		<?php foreach ($teams AS $team) : ?>
 		<h3><?php echo $team->title ?></h3>
 
 		<?php if ( isset($team->teamRoster) && !empty($team->teamRoster) ) : ?>
-
-		<form action="" method="post">
 		<table class="widefat">
 		<thead>
 		<tr>
 			<th><?php _e( 'Name', 'leaguemanager' ) ?></th>
+			<th><?php _e( 'Points', 'leaguemanager' ) ?></th>
+			<th><?php _e( 'Time', 'leaguemanager' ) ?></th>
 			<th><?php _e( 'Category', 'leaguemanager' ) ?></th>
-			<th><?php _e( 'Result', 'leaguemanager' ) ?></th>
 			<th><?php _e( 'Other Info', 'leaguemanager' ) ?></th>
 		</tr>
 		</thead>
 		<tbody id="the-list" class="form-table">
 		<?php foreach ( $team->teamRoster AS $roster ) : $class = ( 'alternate' == $class ) ? '' : 'alternate'; ?>
+		<?php if (!isset($match->raceresult[$roster->id])) $match->raceresult[$roster->id] = array('category' => '', 'points' => '', 'time' => '', 'info' => ''); ?>
+		<?php if (isset($match->raceresult[$roster->id]['result'])) $match->raceresult[$roster->id]['time'] = $match->raceresult[$roster->id]['result']; ?>
 		<tr class="<?php echo $class ?>">
 			<td><input type="hidden" name="racer[<?php echo $roster->id ?>]" value="<?php echo $roster->id ?>" /><input type="hidden" name="racer_name[<?php echo $roster->id ?>]" value="<?php echo $roster->name ?>" /><?php echo $roster->name ?></td>
+			<td><input type="text" name="points[<?php echo $roster->id ?>]" id="points_<?php echo $roster->id ?>" value="<?php echo $match->raceresult[$roster->id]['points'] ?>" /></td>
+			<td><input type="text" name="time[<?php echo $roster->id ?>]" id="time_<?php echo $roster->id ?>" value="<?php echo $match->raceresult[$roster->id]['time'] ?>" /></td>
 			<td><input type="text" name="category[<?php echo $roster->id ?>]" id="category_<?php echo $roster->id ?>" value="<?php echo $match->raceresult[$roster->id]['category'] ?>" /></td>
-			<td><input type="text" name="result[<?php echo $roster->id ?>]" id="result_<?php echo $roster->id ?>" value="<?php echo $match->raceresult[$roster->id]['result'] ?>" /></td>
 			<td><input type="text" name="info[<?php echo $roster->id ?>]" id="info_<?php echo $roster->id ?>" value="<?php echo $match->raceresult[$roster->id]['info'] ?>" /></td>
 		</tr>
 		<?php endforeach; ?>
 		</tbody>
 		</table>
-
-		<input type="hidden" name="match_id" value="<?php echo $match->id ?>" />
-		<p class="submit"><input type="submit" name="save_results" value="<?php _e( 'Save Team Results', 'leaguemanager' ) ?>" /></p>
-		</form>
-
 		<?php else : ?>
-			<div class="error"><p><?php _e( 'No Team Roster found.', 'leaguemanager' ) ?></p></div>
+			<p class="error"><?php _e( 'No Team Roster found.', 'leaguemanager' ) ?></p>
+		<?php endif; ?>
+		<?php endforeach; ?>
+		<input type="hidden" name="match_id" value="<?php echo $match->id ?>" />
+		<p class="submit"><input type="submit" name="save_results" value="<?php _e( 'Save Team Results', 'leaguemanager' ) ?>" class="button button-primary" /></p>
+		</form>
 		<?php endif; ?>
 	</div>
 	<?php
@@ -340,12 +354,13 @@ class LeagueManagerRacing extends LeagueManager
 	 * @param array $racer
 	 * @param array $racer_name
 	 * @param array $category
-	 * @param array $results
+	 * @param array $points
+	 * @param array $time
 	 * @param array $info
 	 * @param int $match_id
 	 * @return true
 	 */
-	function saveResults($racer, $racer_name, $category, $results, $info, $match_id)
+	function saveResults($racer, $racer_name, $category, $points, $time, $info, $match_id)
 	{
 		global $wpdb, $leaguemanager;
 
@@ -354,10 +369,11 @@ class LeagueManagerRacing extends LeagueManager
 
 		$data = isset($custom['raceresult']) ? $custom['raceresult'] : array();
 		while ( list($id) = each($racer) ) {
-			$data[$id]['name'] = $racer_name[$id];
+			$data[$id]['name'] = htmlspecialchars($racer_name[$id]);
 			$data[$id]['category'] = $category[$id];
-			$data[$id]['result'] = $results[$id];
-			$data[$id]['info'] = $info[$id];
+			$data[$id]['time'] = htmlspecialchars($time[$id]);
+			$data[$id]['points'] = intval($points[$id]);
+			$data[$id]['info'] = htmlspecialchars($info[$id]);
 		}
 
 		$custom['raceresult'] = $data;
@@ -365,6 +381,86 @@ class LeagueManagerRacing extends LeagueManager
 		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->leaguemanager_matches} SET `custom` = '%s' WHERE `id` = '%d'", maybe_serialize($custom), $match_id ) );
 		$leaguemanager->setMessage( __( 'Race Results Saved', 'leaguemanager' ) );
 		return true;
+	}
+	
+	
+	/**
+	 * get racing results for one racer
+	 *
+	 */
+	function getRacerResults($teams)
+	{
+		global $leaguemanager; global $projectmanager;
+		
+		$team_roster = array();
+		foreach ($teams AS $team) {
+			if (isset($team->teamRoster) && is_array($team->teamRoster)) {
+				foreach ($team->teamRoster AS $racer) {
+					$team_roster[$racer->id] = array('project_id' => $team->roster['id'], 'racer_name' => $racer->name, 'team_id' => $team->id);
+				}
+			}
+		}
+
+		$url = get_permalink();
+		$r = array();
+		$keys = array();
+		$points = array();
+		$matches = $leaguemanager->getMatches( array("league_id" => $teams[0]->league_id, "season" => $teams[0]->season, "limit" => false) );
+		foreach ($matches AS $match) {
+			if (isset($match->raceresult)) {
+				foreach ($match->raceresult AS $id => $result) {
+					if (isset($team_roster[$id])) {
+						if (!isset($points[$id])) $points[$id] = 0;
+						$url = add_query_arg('show_'.$team_roster[$id]['project_id'], $id, $url);
+						
+						$r[$id]['points'] = $points[$id] + $result['points'];
+						$r[$id]['name'] = $result['name'];
+						$r[$id]['name_url'] = '<a href="'.$url.'">'.$result['name'].'</a>';
+						$r[$id]['time'][] = $result['time'];
+						$r[$id]['team_id'] = $team_roster[$id]['team_id'];
+						$r[$id]['id'] = $id;
+					
+						$points[$id] = $points[$id] + $result['points'];
+					}
+				}
+				arsort($points);
+			}
+		}
+		
+		$keys = array();
+		foreach ($points AS $id => $pts) {
+			$keys[] = $id;
+		}
+
+		$rank = 1; $class = ""; $i = 0;
+		$racerlist = array();
+		foreach ($points AS $id => $pts) {
+			$racer = $r[$id];
+			$racer['rank'] = $rank;
+			$racer['class'] = ($class == 'alternate') ? '' : 'alternate';
+			
+			$team = $leaguemanager->getTeam($racer['team_id']);
+			if ( 1 == $team->home ) $team->title = '<strong>'.$team->title.'</strong>';
+			$racer['team_logo'] = $team->logo;
+			$racer['team_logo_url'] = $leaguemanager->getThumbnailUrl($team->logo);
+			
+			if ( $team->website != '' )
+				$racer['team_name'] = '<a href="http://'.$team->website.'" target="_blank">'.$team->title.'</a>';
+            else
+    			$racer['team_name'] = $team->title;
+            
+			$racerlist[$id] = $racer;
+		
+			if ($i > 0) {
+				$key = $keys[$i-1];
+			}
+			$curr = $pts;
+			
+			$rank++;
+			$i++;
+		}
+		
+		return $racerlist;
 	}
 }
 

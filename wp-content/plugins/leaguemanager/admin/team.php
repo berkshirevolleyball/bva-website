@@ -2,47 +2,49 @@
 Leaguemanager.reInit();
 </script>
 <?php
-if ( !current_user_can( 'manage_leagues' ) ) : 
+if ( !current_user_can( 'manage_leaguemanager' ) ) :
 	echo '<p style="text-align: center;">'.__("You do not have sufficient permissions to access this page.").'</p>';
 else :
 	$edit = false;
+	$myGroup = isset($_GET['group']) ? htmlspecialchars($_GET['group']) : '';
 	if ( isset( $_GET['edit'] ) ) {
 		$edit = true;
-		$team = $leaguemanager->getTeam($_GET['edit']);
-		$league_id = (int)$team->league_id;
+		$team = $leaguemanager->getTeam(intval($_GET['edit']));
+		$league_id = intval($team->league_id);
 		$form_title = __( 'Edit Team', 'leaguemanager' );
 	} else {
 		$form_title = __( 'Add Team', 'leaguemanager' );
-		$league_id = (int)$_GET['league_id'];
+		$league_id = intval($_GET['league_id']);
 		$team = (object)array( 'title' => '', 'home' => 0, 'id' => '', 'logo' => '', 'website' => '', 'coach' => '', 'stadium' => '' );
 	}
 	$league = $leaguemanager->getLeague( $league_id );
 	$season = isset($_GET['season']) ? htmlspecialchars($_GET['season']) : '';
-	
+
 	if ( !wp_mkdir_p( $leaguemanager->getImagePath() ) )
 		echo "<div class='error'><p>".sprintf( __( 'Unable to create directory %s. Is its parent directory writable by the server?' ), $leaguemanager->getImagePath() )."</p></div>";
 	?>
 
 	<div class="wrap">
-		<p class="leaguemanager_breadcrumb"><a href="admin.php?page=leaguemanager"><?php _e( 'Leaguemanager', 'leaguemanager' ) ?></a> &raquo; <a href="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league->id ?>"><?php echo $league->title ?></a> &raquo; <?php echo $form_title ?></p>
+		<p class="leaguemanager_breadcrumb"><a href="admin.php?page=leaguemanager"><?php _e( 'LeagueManager', 'leaguemanager' ) ?></a> &raquo; <a href="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league->id ?>"><?php echo $league->title ?></a> &raquo; <?php echo $form_title ?></p>
 		<h2><?php echo $form_title ?></h2>
+
+		<form action="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league_id ?>&amp;season=<?php echo $season ?><?php if(isset($myGroup)) echo '&amp;group=' . $myGroup; ?>" method="post" enctype="multipart/form-data" name="team_edit">		
 		
-		<form action="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league_id ?>&amp;season=<?php echo $season ?>" method="post" enctype="multipart/form-data" name="team_edit">
 			<?php wp_nonce_field( 'leaguemanager_manage-teams' ) ?>
-			
+
 			<table class="form-table">
 			<tr valign="top">
-				<th scope="row"><label for="team"><?php _e( 'Team', 'leaguemanager' ) ?></label></th>
+				<th scope="row" style="width: 225px;"><label for="team"><?php _e( 'Team', 'leaguemanager' ) ?></label></th>
 				<td>
 					<input type="text" id="team" name="team" value="<?php echo $team->title ?>" />
 					<?php if ( !$edit ) : ?>
 
-					<div id="teams_db" style="display: none; overflow: auto; width: 300px; height: 80px;"><div´>
+					<div id="teams_db" style="display: none; overflow: auto; width: 300px; height: 80px;"><div>
 					<select size="1" name="team_db_select" id="team_db_select" style="display: block; margin: 0.5em auto;">
 						<option value=""><?php _e( 'Choose Team', 'leaguemanager' ) ?></option>
 						<?php $this->teamsDropdownCleaned() ?>
 					</select>
-				
+
 					<div style='text-align: center; margin-top: 1em;'><input type="button" value="<?php _e('Insert', 'leaguemanager') ?>" class="button-secondary" onClick="Leaguemanager.getTeamFromDatabase(); return false;" />&#160;<input type="button" value="<?php _e('Cancel', 'leaguemanager') ?>" class="button-secondary" onClick="tb_remove();" /></div>
 					</div></div>
 
@@ -64,7 +66,7 @@ else :
 					</div>
 
 					<input type="file" name="logo" id="logo" size="35"/>&#160;<a class="thickbox" href="#TB_inline&amp;width=350&amp;height=100&amp;inlineId=logo_library" title="<?php _e( 'Add Logo from Url', 'leaguemanager' ) ?>"><img src="<?php echo LEAGUEMANAGER_URL ?>/admin/icons/image.png" alt="<?php _e( 'Add Logo from Url', 'leaguemanager' ) ?>" title="<?php _e( 'Add Logo from Url', 'leaguemanager' ) ?>" style="vertical-align: middle;" /></a>
-					
+
 					<p><?php _e( 'Supported file types', 'leaguemanager' ) ?>: <?php echo implode( ',',$this->getSupportedImageTypes() ); ?></p>
 					
 					<?php if ( '' != $team->logo ) : ?>
@@ -83,6 +85,25 @@ else :
 			<tr valign="top">
 				<th scope="row"><label for="stadium"><?php _e( 'Stadium', 'leaguemanager' ) ?></label></th><td><input type="text" name="stadium" id="stadium" value="<?php echo $team->stadium ?>" size="50" /></td>
 			</tr>
+
+
+			<tr valign="top">
+				<th scope="row"><label for="team_default_start_time"><?php _e( 'Default Team Match Start Time', 'leaguemanager' ) ?></label></th>
+				<td>
+					<select size="1" name="team_default_start_time">
+					<?php for ( $hour = 0; $hour <= 23; $hour++ ) : ?>
+						<option value="<?php echo str_pad($hour, 2, 0, STR_PAD_LEFT) ?>"<?php selected( $hour, (isset($league->default_match_start_time['hour']) ? ($league->default_match_start_time['hour']) : '' ) ) ?>><?php echo str_pad($hour, 2, 0, STR_PAD_LEFT) ?></option>
+					<?php endfor; ?>
+					</select>
+					<select size="1" name="settings[default_match_start_time][minutes]">
+					<?php for ( $minute = 0; $minute <= 60; $minute++ ) : ?>
+						<?php if ( 0 == $minute % 5 && 60 != $minute ) : ?>
+						<option value="<?php  echo str_pad($minute, 2, 0, STR_PAD_LEFT) ?>"<?php selected( $minute, (isset($league->default_match_start_time['minutes']) ? ($league->default_match_start_time['minutes']) : '' ) ) ?>><?php echo str_pad($minute, 2, 0, STR_PAD_LEFT) ?></option>
+					<?php endif; ?>
+					<?php endfor; ?>
+					</select>
+				</td>
+			</tr>
 			<tr valign="top">
 				<th scope="row"><label for="home"><?php _e( 'Home Team', 'leaguemanager' ) ?></label></th><td><input type="checkbox" name="home" id="home"<?php if ($team->home == 1) echo ' checked="checked""' ?>/></td>
 			</tr>
@@ -92,13 +113,18 @@ else :
 				<td>
 					<select size="1" name="group" id="group">
 					<?php foreach ( (array)explode(";", $league->groups) AS $group ) : ?>
-					<option value="<?php echo $group ?>" <?php selected( $group, $team->group ) ?>><?php echo $group ?></option>
+                	<?php if ( isset( $_GET['edit'] ) ) { ?>
+						<option value="<?php echo $group ?>" <?php selected( $group, $team->group ) ?>><?php echo $group ?></option>
+                    <?php } else { ?>
+						<option value="<?php echo $group ?>" <?php if($group == $myGroup) echo ' selected="selected"' ?>><?php echo $group ?></option>
+                    <?php } ?>
 					<?php endforeach; ?>
 					</select>
 				</td>
 			</tr>
 			<?php endif; ?>
-			<?php if ( $leaguemanager->hasBridge() ) : global $projectmanager; ?>
+			<?php global $projectmanager; ?>
+			<?php if ( $leaguemanager->hasBridge() && isset($projectmanager) ) : ?>
 			<tr valign="top">
 				<th scope="row"><label for="roster"><?php _e( 'Team Roster', 'leaguemanager' ) ?></label></th>
 				<td>
@@ -119,15 +145,15 @@ else :
 			<?php endif; ?>
 
 			<?php do_action( 'team_edit_form', $team ) ?>
-			<?php do_action( 'team_edit_form_'.$league->sport, $team ) ?>
+			<?php do_action( 'team_edit_form_'.(isset($league->sport) ? ($league->sport) : '' ), $team ) ?>
 			</table>
-						
-			<input type="hidden" name="team_id" value="<?php echo $team->id ?>" />	
+
+			<input type="hidden" name="team_id" value="<?php echo $team->id ?>" />
 			<input type="hidden" name="league_id" value="<?php echo $league_id ?>" />
 			<input type="hidden" name="updateLeague" value="team" />
 			<input type="hidden" name="season" value="<?php echo $season ?>" />
-			
-			<p class="submit"><input type="submit" value="<?php echo $form_title ?> &raquo;" class="button" /></p>
+
+			<p class="submit"><input type="submit" value="<?php echo $form_title ?> &raquo;" class="button button-primary" /></p>
 		</form>
 	</div>
 <?php endif; ?>

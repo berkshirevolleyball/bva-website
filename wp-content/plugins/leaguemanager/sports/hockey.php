@@ -1,10 +1,10 @@
 <?php
 /**
- * Hockey Class 
- * 
+ * Hockey Class
+ *
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerHockey extends LeagueManager
 {
@@ -109,9 +109,10 @@ class LeagueManagerHockey extends LeagueManager
 			$points[$key] = $row->points['plus']+$row->add_points;
 			$done[$key] = $row->done_matches;
 			$diff[$key] = $row->diff;
+			$goals[$key] = $row->points2['plus'];
 		}
 
-		array_multisort( $points, SORT_DESC, $diff, SORT_DESC, $done, SORT_ASC, $teams );
+		array_multisort( $points, SORT_DESC, $diff, SORT_DESC, $done, SORT_ASC, $goals, SORT_DESC, $teams );
 		return $teams;
 	}
 
@@ -126,10 +127,11 @@ class LeagueManagerHockey extends LeagueManager
 	function calculateGoalStatistics( $team_id )
 	{
 		global $wpdb, $leaguemanager;
-		
+
 		$goals = array( 'plus' => 0, 'minus' => 0 );
-				
-		$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `home_team` = '".$team_id."'" );
+
+		//$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `home_team` = '".$team_id."'" );
+		$matches = $leaguemanager->getMatches( array("home_team" => $team_id, "limit" => false) );
 		if ( $matches ) {
 			foreach ( $matches AS $match ) {
 				$custom = maybe_unserialize($match->custom);
@@ -140,13 +142,14 @@ class LeagueManagerHockey extends LeagueManager
 					$home_goals = $match->home_points;
 					$away_goals = $match->away_points;
 				}
-				
+
 				$goals['plus'] += $home_goals;
 				$goals['minus'] += $away_goals;
 			}
 		}
-		
-		$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `away_team` = '".$team_id."'" );
+
+		//$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `away_team` = '".$team_id."'" );
+		$matches = $leaguemanager->getMatches( array("away_team" => $team_id, "limit" => false) );
 		if ( $matches ) {
 			foreach ( $matches AS $match ) {
 				$custom = maybe_unserialize($match->custom);
@@ -157,12 +160,12 @@ class LeagueManagerHockey extends LeagueManager
 					$home_goals = $match->home_points;
 					$away_goals = $match->away_points;
 				}
-				
+
 				$goals['plus'] += $away_goals;
 				$goals['minus'] += $home_goals;
 			}
 		}
-		
+
 		return $goals;
 	}
 
@@ -177,7 +180,7 @@ class LeagueManagerHockey extends LeagueManager
 	{
 		echo '<h4>'.__( 'German Icehockey League (DEL)', 'leaguemanager' ).'</h4>';
 		echo '<p>'.__( 'The DEL uses a more complicated form of the Three-Point-Rule. The winner after regular time gets three points, the loser none. The winner after overtime gets two points and the loser one. This rule was also applied at the Ice Hockey World Championship in 2008.', 'leaguemanager' ).'</p>';
-	
+
 		echo '<h4>'.__( 'National Hockey League (NHL)', 'leaguemanager' ).'</h4>';
 		echo '<p>'.__( 'The NHL uses a derivative of the Two-Point-Rule. The winner after regular time and overtime gains two points whereas the loser after overtime and penalty gets one.', 'leaguemanager' ).'</p>';
 	}
@@ -214,7 +217,7 @@ class LeagueManagerHockey extends LeagueManager
 	function getNumWonMatchesOvertime( $team_id )
 	{
 		global $wpdb;
-		$matches = $wpdb->get_results( "SELECT `custom` FROM {$wpdb->leaguemanager_matches} WHERE `winner_id` = '".$team_id."'" );
+		$matches = $wpdb->get_results( $wpdb->prepare("SELECT `custom` FROM {$wpdb->leaguemanager_matches} WHERE `winner_id` = '%d'", $team_id) );
 		$num = 0;
 		foreach ( $matches AS $match ) {
 			$custom = maybe_unserialize($match->custom);
@@ -234,7 +237,7 @@ class LeagueManagerHockey extends LeagueManager
 	function getNumLostMatchesOvertime( $team_id )
 	{
 		global $wpdb;
-		$matches = $wpdb->get_results( "SELECT `custom` FROM {$wpdb->leaguemanager_matches} WHERE `loser_id` = '".$team_id."'" );
+		$matches = $wpdb->get_results( $wpdb->prepare("SELECT `custom` FROM {$wpdb->leaguemanager_matches} WHERE `loser_id` = '%d'", $team_id) );
 		$num = 0;
 		foreach ( $matches AS $match ) {
 			$custom = maybe_unserialize($match->custom);
@@ -253,7 +256,7 @@ class LeagueManagerHockey extends LeagueManager
 	 */
 	function displayStandingsHeader()
 	{
-		echo '<th class="num">'._c( 'Goals', 'leaguemanager' ).'</th><th>'.__( 'Diff', 'leaguemanager').'</th>';
+		echo '<th class="num">'._x( 'Goals', 'leaguemanager' ).'</th><th>'.__( 'Diff', 'leaguemanager').'</th>';
 	}
 
 
@@ -270,7 +273,7 @@ class LeagueManagerHockey extends LeagueManager
 		$league = $leaguemanager->getCurrentLeague();
 
 		echo '<td class="num">';
-		if ( is_admin() && $rule == 'manual' ) 
+		if ( is_admin() && $rule == 'manual' )
 			echo '<input type="text" size="2" name="custom['.$team->id.'][points2][plus]" value="'.$team->points2_plus.'" /> : <input type="text" size="2" name="custom['.$team->id.'][points2][minus]" value="'.$team->points2_minus.'" />';
 		else
 			printf($league->point_format2, $team->points2_plus, $team->points2_minus);
@@ -300,9 +303,11 @@ class LeagueManagerHockey extends LeagueManager
 	 */
 	function displayMatchesColumns( $match )
 	{
+		if (!isset($match->thirds)) $match->thirds = array(1 => array('plus' => '', 'minus' => ''), 2 => array('plus' => '', 'minus' => ''), 3 => array('plus' => '', 'minus' => ''));
+		
 		echo '<td>';
 		for ( $i = 1; $i <= 3; $i++ )
-			echo '<input class="points" type="text" size="2" id="thirds_plus_'.$i.'_'.$match->id.'" name="custom['.$match->id.'][thirds]['.$i.'][plus]" value="'.$match->thirds[$i]['plus'].'" /> : <input clas="points" type="text" size="2" id="thirds_minus_'.$i.'_'.$match->id.'" name="custom['.$match->id.'][thirds]['.$i.'][minus]" value="'.$match->thirds[$i]['minus'].'" /><br />';
+			echo '<input class="points" type="text" size="2" id="thirds_plus_'.$i.'_'.$match->id.'" name="custom['.$match->id.'][thirds]['.$i.'][plus]" value="'.$match->thirds[$i]['plus'].'" /> : <input class="points" type="text" size="2" id="thirds_minus_'.$i.'_'.$match->id.'" name="custom['.$match->id.'][thirds]['.$i.'][minus]" value="'.$match->thirds[$i]['minus'].'" /><br />';
 		echo '</td>';
 
 		echo '<td><input class="points" type="text" size="2" id="overtime_home_'.$match->id.'" name="custom['.$match->id.'][overtime][home]" value="'.$match->overtime['home'].'" /> : <input class="points" type="text" size="2" id="overtime_away_'.$match->id.'" name="custom['.$match->id.'][overtime][away]" value="'.$match->overtime['away'].'" /></td>';
@@ -347,7 +352,7 @@ class LeagueManagerHockey extends LeagueManager
 		return $content;
 	}
 
-	
+
 	/**
 	 * import matches
 	 *
@@ -358,6 +363,8 @@ class LeagueManagerHockey extends LeagueManager
 	 */
 	function importMatches( $custom, $line, $match_id )
 	{
+		$match_id = intval($match_id);
+		
 		$thirds = array( explode("-", $line[8]), explode("-", $line[9]), explode("-", $line[10]) );
 		$overtime = explode("-", $line[11]);
 		$penalty = explode("-", $line[12]);

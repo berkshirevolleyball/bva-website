@@ -1,14 +1,13 @@
 <?php
 /**
- * Soccer Class 
- * 
+ * Soccer Class
+ *
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerSoccer extends LeagueManager
 {
-
 	/**
 	 * sports key
 	 *
@@ -18,7 +17,7 @@ class LeagueManagerSoccer extends LeagueManager
 
 
 	/**
-	 * load specifif settings
+	 * load specific settings
 	 *
 	 * @param none
 	 * @return void
@@ -68,30 +67,29 @@ class LeagueManagerSoccer extends LeagueManager
 	{
 		foreach ( $teams AS $key => $row ) {
 			$points[$key] = $row->points['plus']+$row->add_points;
-			//$done[$key] = $row->done_matches;
 			$diff[$key] = $row->diff;
 			$goals[$key] = $row->points2['plus'];
+			$done[$key] = $row->done_matches;
 		}
-		//array_multisort( $points, SORT_DESC, $done, SORT_ASC, $diff, SORT_DESC, $goals, SORT_DESC, $teams );
-		array_multisort( $points, SORT_DESC, $diff, SORT_DESC, $goals, SORT_DESC, $teams );
+		array_multisort( $points, SORT_DESC, $done, SORT_ASC, $diff, SORT_DESC, $goals, SORT_DESC, $teams );
 		return $teams;
 	}
 
 
 	/**
-	 * extend header for Standings Table 
+	 * extend header for Standings Table
 	 *
 	 * @param none
 	 * @return void
 	 */
 	function displayStandingsHeader()
 	{
-		echo '<th class="num">'._c( 'Goals', 'leaguemanager' ).'</th><th>'.__( 'Diff', 'leaguemanager').'</th>';
+		echo '<th class="num">'._x( 'Goals', 'leaguemanager' ).'</th><th style="text-align: center;">'.__( 'Diff', 'leaguemanager').'</th>';
 	}
 
 
 	/**
-	 * extend columns for Standings Table 
+	 * extend columns for Standings Table
 	 *
 	 * @param object $team
 	 * @param string $rule
@@ -121,7 +119,7 @@ class LeagueManagerSoccer extends LeagueManager
 	 */
 	function displayMatchesHeader()
 	{
-		echo '<th>'.__( 'Halftime', 'leaguemanager' ).'</th><th>'.__( 'Overtime', 'leaguemanager' ).'</th><th>'.__( 'Penalty', 'leaguemanager' ).'</th>';
+		echo '<th style="text-align: center;">'.__( 'Halftime', 'leaguemanager' ).'</th><th style="text-align: center;">'.__( 'Overtime', 'leaguemanager' ).'</th><th style="text-align: center;">'.__( 'Penalty', 'leaguemanager' ).'</th>';
 	}
 
 
@@ -133,9 +131,10 @@ class LeagueManagerSoccer extends LeagueManager
 	 */
 	function displayMatchesColumns( $match )
 	{
-		echo '<td><input class="points" type="text" size="2" id="halftime_plus_'.$match->id.'" name="custom['.$match->id.'][halftime][plus]" value="'.$match->halftime['plus'].'" /> : <input clas="points" type="text" size="2" id="halftime_minus_'.$match->id.'" name="custom['.$match->id.'][halftime][minus]" value="'.$match->halftime['minus'].'" /></td>';
-		echo '<td><input class="points" type="text" size="2" id="overtime_home_'.$match->id.'" name="custom['.$match->id.'][overtime][home]" value="'.$match->overtime['home'].'" /> : <input class="points" type="text" size="2" id="overtime_away_'.$match->id.'" name="custom['.$match->id.'][overtime][away]" value="'.$match->overtime['away'].'" /></td>';
-		echo '<td><input class="points" type="text" size="2" id="penalty_home_'.$match->id.'" name="custom['.$match->id.'][penalty][home]" value="'.$match->penalty['home'].'" /> : <input class="points" type="text" size="2" id="penalty_away_'.$match->id.'" name="custom['.$match->id.'][penalty][away]" value="'.$match->penalty['away'].'" /></td>';
+		$match_id = ( isset($match->id) ? $match->id : '' );
+		echo '<td style="text-align: center;"><input class="points" style="text-align: center;" type="text" size="2" id="halftime_plus_'.$match_id.'" name="custom['.$match_id.'][halftime][plus]" value="'. ( isset($match->halftime['plus']) ? $match->halftime['plus'] : "" ) .'" /> : <input class="points" style="text-align: center;" type="text" size="2" id="halftime_minus_'.$match_id.'" name="custom['.$match_id.'][halftime][minus]" value="'. ( isset($match->halftime['minus']) ? $match->halftime['minus'] : "" ) .'" /></td>';
+		echo '<td style="text-align: center;"><input class="points" style="text-align: center;" type="text" size="2" id="overtime_home_'.$match_id.'" name="custom['.$match_id.'][overtime][home]" value="'. ( isset($match->overtime['home']) ? $match->overtime['home'] : "" ) .'" /> : <input class="points" style="text-align: center;" type="text" size="2" id="overtime_away_'.$match_id.'" name="custom['.$match_id.'][overtime][away]" value="'. ( isset($match->overtime['away']) ? $match->overtime['away'] : "" ) .'" /></td>';
+		echo '<td style="text-align: center;"><input class="points" style="text-align: center;" type="text" size="2" id="penalty_home_'.$match_id.'" name="custom['.$match_id.'][penalty][home]" value="'. ( isset($match->penalty['home']) ? $match->penalty['home'] : "" ) .'" /> : <input class="points" style="text-align: center;" type="text" size="2" id="penalty_away_'.$match_id.'" name="custom['.$match_id.'][penalty][away]" value="'. ( isset($match->penalty['away']) ? $match->penalty['away'] : "" ) .'" /></td>';
 	}
 
 
@@ -169,7 +168,7 @@ class LeagueManagerSoccer extends LeagueManager
 		return $content;
 	}
 
-	
+
 	/**
 	 * import matches
 	 *
@@ -180,6 +179,8 @@ class LeagueManagerSoccer extends LeagueManager
 	 */
 	function importMatches( $custom, $line, $match_id )
 	{
+		$match_id = intval($match_id);
+		
 		$halftime = explode("-", $line[8]);
 		$overtime = explode("-", $line[9]);
 		$penalty = explode("-", $line[10]);
@@ -203,8 +204,9 @@ class LeagueManagerSoccer extends LeagueManager
 		global $wpdb, $leaguemanager;
 
 		$goals = array( 'plus' => 0, 'minus' => 0 );
-				
-		$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `home_team` = '".$team_id."'" );
+
+		//$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `home_team` = '".$team_id."'" );
+		$matches = $leaguemanager->getMatches( array("home_team" => $team_id, "limit" => false) );
 		if ( $matches ) {
 			foreach ( $matches AS $match ) {
 				$custom = maybe_unserialize($match->custom);
@@ -215,13 +217,14 @@ class LeagueManagerSoccer extends LeagueManager
 					$home_goals = $match->home_points;
 					$away_goals = $match->away_points;
 				}
-				
+
 				$goals['plus'] += $home_goals;
 				$goals['minus'] += $away_goals;
 			}
 		}
-		
-		$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `away_team` = '".$team_id."'" );
+
+		//$matches = $wpdb->get_results( "SELECT `home_points`, `away_points`, `custom` FROM {$wpdb->leaguemanager_matches} WHERE `away_team` = '".$team_id."'" );
+		$matches = $leaguemanager->getMatches( array("away_team" => $team_id, "limit" => false) );
 		if ( $matches ) {
 			foreach ( $matches AS $match ) {
 				$custom = maybe_unserialize($match->custom);
@@ -232,12 +235,12 @@ class LeagueManagerSoccer extends LeagueManager
 					$home_goals = $match->home_points;
 					$away_goals = $match->away_points;
 				}
-				
+
 				$goals['plus'] += $away_goals;
 				$goals['minus'] += $home_goals;
 			}
 		}
-		
+
 		return $goals;
 	}
 }

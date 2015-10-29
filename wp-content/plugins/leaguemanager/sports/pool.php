@@ -1,10 +1,10 @@
 <?php
 /**
- * Pool Class 
- * 
+ * Pool Class
+ *
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerPool extends LeagueManager
 {
@@ -91,7 +91,7 @@ class LeagueManagerPool extends LeagueManager
 	{
 		global $wpdb;
 
-		$team = $wpdb->get_results( "SELECT `custom` FROM {$wpdb->leaguemanager_teams} WHERE `id` = {$team_id}" );
+		$team = $wpdb->get_results( $wpdb->prepare("SELECT `custom` FROM {$wpdb->leaguemanager_teams} WHERE `id` = '%d'", $team_id) );
 		$custom = maybe_unserialize($team->custom);
 
 		$custom['forScore'] = $this->getScore($team_id, 'for');
@@ -110,26 +110,26 @@ class LeagueManagerPool extends LeagueManager
 	function getScore( $team_id, $index )
 	{
 		global $leaguemanager;
-		
+
 		$score = array( 'for' => 0, 'against' => 0 );
-		$home = $leaguemanager->getMatches( "`home_team` = {$team_id}" );
+		$home = $leaguemanager->getMatches( array("home_team" => $team_id, "limit" => false) );
 		foreach ( $home AS $match ) {
 			$score['for'] += $match->forScore;
 			$score['against'] += $match->againstScore;
 		}
 
-		$away = $leaguemanager->getMatches( "`away_team` = {$team_id}" );
+		$away = $leaguemanager->getMatches( array("away_team" => $team_id, "limit" => false) );
 		foreach ( $away AS $match ) {
 			$score['for'] += $match->againstScore;
 			$score['against'] += $match->forScore;
 		}
-		
+
 		return $score[$index];
 	}
-	
+
 
 	/**
-	 * extend header for Standings Table 
+	 * extend header for Standings Table
 	 *
 	 * @param none
 	 * @return void
@@ -149,6 +149,9 @@ class LeagueManagerPool extends LeagueManager
 	 */
 	function displayStandingsColumns( $team, $rule )
 	{
+		if (!isset($team->forScore)) $team->forScore = '';
+		if (!isset($team->againstScore)) $team->againstScore = '';
+		
 		if ( is_admin() && $rule == 'manual' )
 			echo '<td><input type="text" size="2" name="custom['.$team->id.'][forScore]" value="'.$team->forScore.'" /></td><td><input type="text" size="2" name="custom['.$team->id.'][againstScore]" value="'.$team->againstScore.'" /></td>';
 		else
@@ -188,7 +191,10 @@ class LeagueManagerPool extends LeagueManager
 	 */
 	function displayMatchesColumns( $match )
 	{
-		echo '<td><input class="points" type="text" size="2" id="forscore_'.$match->id.'" name="custom['.$match->id.'][forScore]" value="'.$match->forScore.'" /></td><td><input clas="points" type="text" size="2" id="againstscore_'.$match->id.'" name="custom['.$match->id.'][againstScore]" value="'.$match->againstScore.'" /></td>';
+		if (!isset($match->forScore)) $match->forScore = '';
+		if (!isset($match->againstScore)) $match->againstScore = '';
+		
+		echo '<td><input class="points" type="text" size="2" id="forscore_'.$match->id.'" name="custom['.$match->id.'][forScore]" value="'.$match->forScore.'" /></td><td><input class="points" type="text" size="2" id="againstscore_'.$match->id.'" name="custom['.$match->id.'][againstScore]" value="'.$match->againstScore.'" /></td>';
 	}
 
 
@@ -222,7 +228,7 @@ class LeagueManagerPool extends LeagueManager
 		return $content;
 	}
 
-	
+
 	/**
 	 * import matches
 	 *
@@ -233,6 +239,8 @@ class LeagueManagerPool extends LeagueManager
 	 */
 	function importMatches( $custom, $line, $match_id )
 	{
+		$match_id = intval($match_id);
+		
 		$custom[$match_id]['forScore'] = $line[8];
 		$custom[$match_id]['againstScore'] = $line[9];
 		return $custom;
@@ -269,7 +277,7 @@ class LeagueManagerPool extends LeagueManager
 		return $content;
 	}
 
-	
+
 	/**
 	 * import teams
 	 *

@@ -1,6 +1,41 @@
 /*
 * @section: Backend
 */
+#lm_admin {
+	width:92%;
+	margin-top:10px;
+}
+
+#lm_head {
+	font-family:Verdana;
+	font-size:18px;
+    position: relative;
+	top: -2px;
+}
+#lm_admin .lm_head_strong {
+	font-family:Verdana;
+	font-size:18px;
+	font-weight:bold;
+}
+
+#lm_version {
+    font-family:Verdana;
+    font-size:14px;
+    position: relative;
+	top: -20px;
+    float: right;
+}
+
+#lm_admin .lm_version_strong {
+    font-family:Verdana;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.check-column {
+	vertical-align: middle;
+}
+
 /*--- Documentation ---*/
 dl.leaguemanager {
 	}
@@ -16,7 +51,7 @@ p.match_info {
 	font-size: 0.9em;
 	margin-top: 1.5em;
 	}
-	
+
 p.leaguemanager_breadcrumb {
 	clear: both;
 	float: right;
@@ -48,8 +83,10 @@ p.table_rows {
 	padding: 0;
 	margin: 0 2em 0 0;
 	}
-	
+
 p.info { margin: 0; padding: 0; float: right; }
+
+/*table#standings tr { cursor: move; }*/
 
 span.loading { margin-left: 5px; }
 span.loading img { vertical-align: middle; }
@@ -94,6 +131,78 @@ div.leaguemanager_widget_control select {
 }
 
 
+/*
+* @section: Frontend Tables
+*/
+table.leaguemanager {
+	text-align: left;
+	border: 0;
+	border-collapse: collapse;
+	width: 100%;
+	margin: 1em auto 1.5em auto;
+}
+table.leaguemanager th {
+	padding: 2px 3px;
+	margin: 0;
+	border-bottom: 1px solid;
+	}
+table.leaguemanager td {
+	vertical-align: middle;
+	padding: 3px;
+	border: 0;
+	margin: 0;
+	}
+
+table.leaguemanager a.W { background-position:0 -150px; }
+table.leaguemanager a.D { background-position:0 -200px; }
+table.leaguemanager a.L { background-position:0 -250px; }
+table.leaguemanager a.N { background-position:0 -650px; }
+
+table.leaguemanager a.W:hover { background-position:0 -300px; }
+table.leaguemanager a.D:hover { background-position:0 -350px; }
+table.leaguemanager a.L:hover { background-position:0 -400px; }
+table.leaguemanager a.N:hover { background-position:0 -700px; }
+
+table.leaguemanager .last5Icon a { background-image: url(images/last5.png); position: relative; top: 0px; }
+
+table.leaguemanager .last5-bg { float:left; width:20px; height:17px; }
+
+table.leaguemanager .num {
+	text-align: center;
+	}
+table.leaguemanager .last5 {
+	text-align: center;
+	width: 130px;
+	}
+table.leaguemanager .logo {
+	width: 20px;
+	}
+table.leaguemanager .logo img {
+	display: block;
+	margin: 0;
+	padding: 0;
+	}
+table.leaguemanager .rank {
+	text-align: center;
+	padding: 0;
+	width: 1.2em;
+	}
+table.leaguemanager .home {
+	font-weight: bold;
+	}
+table.leaguemanager th.match {
+	text-align: center;
+	}
+table.leaguemanager .score, table.leaguemanager .ap {
+	vertical-align: bottom;
+	text-align: right;
+	}
+table.leaguemanager tr.divider {
+	/*border-bottom: 1px solid;*/
+	}
+table.leaguemanager a {
+	text-decoration: none;
+}
 
 /*--- Crosstable Popup---*/
 div#leaguemanager_crosstable div { text-align: center; padding-top: 1em;}
@@ -157,15 +266,17 @@ div.teampage .prev_match .score {
 */
 .leaguemanager_widget {
 	background-image: none;
-	width: 90%;
+	width: 100%;
 	margin-left: auto;
 	margin-right: auto;
 	}
 .leaguemanager_widget h4 {
 	position: relative;
-	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid;
 	text-align: center;
-	margin: 0.5em 0 0.3em 0;
+	margin: 0.5em 0 0.5em 0;
+	padding-bottom: 0.3em;
+	font-size: 1em;
 	}
 .leaguemanager_widget h4 .next {
 	position: absolute;
@@ -175,7 +286,7 @@ div.teampage .prev_match .score {
 	position: absolute;
 	left: 0;
 	}
-.leaguemanager_widget h4.standings {
+.leaguemanager_widget h4 .standings {
 	margin-top: 1.5em;
 	}
 .leaguemanager_widget h4 a {
@@ -215,30 +326,116 @@ div.teampage .prev_match .score {
 .leaguemanager_widget .match_box .report {
 	text-align: right;
 	}
-	
+
 /*--- Standings Table ---*/
 .leaguemanager_widget table.leaguemanager {
 	font-size: 0.9em;
-	margin: 0 auto 0 auto;
+	margin: 0;
 	padding: 0;
 	}
 .leaguemanager_widget table.leaguemanager th {
-	background-color: #ffffff;
+	background-color: transparent;
 	}
 .leaguemanager_widget table.leaguemanager th, .leaguemanager_widget table.leaguemanager td {
 	padding: 4px;
 	margin: 0;
 	border: 0;
-	border-bottom: 1px solid #dfdfdf;
+	border-bottom: 1px solid;
+	background-color: transparent;
 	}
-/*
-.leaguemanager_widget table.leaguemanager tr, .leaguemanager_widget table.leaguemanager tr.alternate {
-	background-color: #ffffff;
-	}
-*/
 
-/*--- Custom ---*/
-.form-table td input[type="text"] {
-	text-align:center;
+.leaguemanager_widget table.leaguemanager tr, .leaguemanager_widget table.leaguemanager tr.alternate {
+	background-color: transparent;
+	}
+
+
+/* Pagination */
+
+#lm_admin .pagination{
+	text-align: center
 }
 
+#lm_admin .pagination li{
+	display: inline-block;
+	*display: inline;
+	zoom: 1;
+	margin: 0 0 0 5px;
+	height: 25px
+}
+
+#lm_admin .pagination li:first-child{
+	margin: 0 0 0 0
+}
+
+#lm_admin .pagination li a{
+	display: inline-block;
+	*display: inline;
+	zoom: 1;
+	font-size: 12px;
+	/*color: #5d666c;*/
+	border: solid 1px;/* #dedede;*/
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	text-decoration: none;
+	padding: 4px 8px;
+	height: 15px
+}
+
+#lm_admin .pagination li.active a{
+	/*border-color: #5d666c*/
+}
+
+#lm_admin .pagination li a:hover{
+	text-decoration: none
+}
+
+#lm_admin .pagination li span{
+	display: inline-block;
+	*display: inline;
+	zoom: 1;
+	width: 25px;
+	text-align: center;
+	font-size: 12px;
+	/*color: #5d666c;*/
+	margin: 4px 0
+}
+
+#lm_admin .pagination li.prev_page a{
+	width: 7px;
+	height: 15px;
+	text-indent: -999999px
+}
+
+#lm_admin .pagination li.next_page a{
+	width: 7px;
+	height: 15px;
+	text-indent: -999999px
+}
+
+#lm_admin .pagination li.prev_page a em{
+	display: none
+}
+
+#lm_admin .pagination li.next_page a em{
+	display: none
+}
+#lm_admin .pagination li.first_page a{
+	width: 7px;
+	height: 15px;
+	text-indent: -999999px
+}
+
+#lm_admin .pagination li.last_page a{
+	width: 7px;
+	height: 15px;
+	text-indent: -999999px
+}
+
+#lm_admin .pagination li.first_page a em{
+	display: none
+}
+
+#lm_admin .pagination li.last_page a em{
+	display: none
+}

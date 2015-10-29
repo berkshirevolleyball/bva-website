@@ -1,5 +1,5 @@
 <?php
-if ( !current_user_can( 'manage_leagues' ) ) : 
+if ( !current_user_can( 'manage_leaguemanager' ) ) :
 	echo '<p style="text-align: center;">'.__("You do not have sufficient permissions to access this page.").'</p>';
 else :
 
@@ -7,9 +7,9 @@ global $lmStats, $lmAJAX;
 
 if ( isset($_POST['add_stats']) ) {
 	if ( empty($_POST['stats_id']) ) {
-		$lmStats->add($_POST['stat_name'], $_POST['fields'], $_POST['league_id']);
+		$lmStats->add(htmlspecialchars($_POST['stat_name']), $_POST['fields'], $_POST['league_id']);
 	} else {
-		$lmStats->edit($_POST['stat_name'], $_POST['fields'], $_POST['stats_id']);
+		$lmStats->edit(htmlspecialchars($_POST['stat_name']), $_POST['fields'], $_POST['stats_id']);
 	}
 	$leaguemanager->printMessage();
 } elseif ( isset($_POST['doaction']) ) {
@@ -35,7 +35,12 @@ if ( isset($_GET['match_id']) ) {
 	// Load ProjectManager Bridge
 	$roster = array();
 	if ( $league->hasBridge ) {
-		$lmBridge->setProjectID( $league->project_id );
+		if (isset($league->project_id))
+			$project_id = $league->project_id;
+		else
+			$project_id = false;
+		
+		$lmBridge->setProjectID( $project_id );
 
 		$home->teamRoster = $lmBridge->getTeamRoster( $home->roster );
 		$away->teamRoster = $lmBridge->getTeamRoster( $away->roster );
@@ -56,11 +61,11 @@ if ( isset($_GET['match_id']) ) {
 ?>
 
 <div class="wrap">
-	<p class="leaguemanager_breadcrumb"><a href="admin.php?page=leaguemanager"><?php _e( 'Leaguemanager', 'leaguemanager' ) ?></a> &raquo; <a href="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league->id ?>"><?php echo $league->title ?></a> &raquo; <?php _e( 'Match Statistics', 'leaguemanager' ) ?></p>
+	<p class="leaguemanager_breadcrumb"><a href="admin.php?page=leaguemanager"><?php _e( 'LeagueManager', 'leaguemanager' ) ?></a> &raquo; <a href="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league->id ?>"><?php echo $league->title ?></a> &raquo; <?php _e( 'Match Statistics', 'leaguemanager' ) ?></p>
 
 <?php if ( $match ) : ?>
 
-	<h2><?php printf(__( 'Match Statistics &#8211; %s v.s. %s', 'leaguemanager'), $home->title, $away->title) ?></h2>
+	<h2><?php printf(__( 'Match Statistics &#8211; %s vs %s', 'leaguemanager'), $home->title, $away->title) ?></h2>
 
 	<form action="" method="post">
 	<?php foreach ( $lmStats->get($league->id) AS $stat ) : ?>
@@ -77,14 +82,16 @@ if ( isset($_GET['match_id']) ) {
 		</thead>
 		<tbody id="stat_<?php echo sanitize_title($stat->name) ?>" class="form-table">
 		<?php $class = ''; ?>
-		<?php $stat->key = sanitize_title($stat->name); $data = $match->{$stat->key}; ?>
+		<?php $stat->key = sanitize_title($stat->name); $data = (isset($match->{$stat->key})) ? $match->{$stat->key} : ''; ?>
 		<?php foreach ( (array)$data AS $i => $values ) : ?>
 		<?php $class = ( 'alternate' == $class ) ? '' : 'alternate'; ?>
 		<tr id="<?php echo $stat->key ?>_<?php echo $i ?>" class="<?php echo $class ?>">
 		<?php $stat->fields = maybe_unserialize($stat->fields) ?>
+		<?php if (is_array($stat->fields)) : ?>
 		<?php foreach ( (array)$stat->fields AS $x => $field ) : ?>
+		<?php $value = isset($values[sanitize_title($field['name'])]) ? stripslashes($values[sanitize_title($field['name'])])	 : "" ?>
 		<td>
-			<input type="text" size="10" name="stats[<?php echo $stat->key ?>][<?php echo $i ?>][<?php echo sanitize_title($field['name']) ?>]" id="<?php echo $stat->key ?>_<?php echo sanitize_title($field['name']) ?>_<?php echo $i ?>" value="<?php echo $values[sanitize_title($field['name'])] ?>" />
+			<input type="text" size="10" name="stats[<?php echo $stat->key ?>][<?php echo $i ?>][<?php echo sanitize_title($field['name']) ?>]" id="<?php echo $stat->key ?>_<?php echo sanitize_title($field['name']) ?>_<?php echo $i ?>" value="<?php echo $value ?>" />
 			<?php if ( 'roster' == $field['type'] && !empty($roster) ) : ?>
 			<div id="<?php echo $stat->key ?>_roster_box_<?php echo $i ?>_<?php echo $x ?>" style="display: none; overflow: auto;" class="leaguemanager_thickbox">
 				<?php echo $lmBridge->getTeamRosterSelection($roster, $values[sanitize_title($field['name'])], $stat->key."_".sanitize_title($field['name'])."_roster_".$i); ?>
@@ -95,6 +102,7 @@ if ( isset($_GET['match_id']) ) {
 			<?php endif; ?>
 		</td>
 		<?php endforeach; ?>
+		<?php endif; ?>
 		<td style="text-align: center; width: 12px; vertical-align: middle;"><a class="image_link" href="#" onclick='return Leaguemanager.removeField("<?php echo $stat->key ?>_<?php echo $i ?>", "stat_<?php echo $stat->key ?>");'><img src="<?php echo LEAGUEMANAGER_URL ?>/admin/icons/trash.gif" alt="<?php _e( 'Delete', 'leaguemanager' ) ?>" title="<?php _e( 'Delete', 'leaguemanager' ) ?>" /></a></td>
 		</tr>
 
@@ -108,7 +116,7 @@ if ( isset($_GET['match_id']) ) {
 
 
 		<input type="hidden" name="match_id" value="<?php echo $match->id ?>" />
-		<p class="submit"><input type="submit" name="updateMatchStats" value="<?php _e( 'Save Statistics', 'leaguemanager' ) ?> &raquo;" class="button" /></p>
+		<p class="submit"><input type="submit" name="updateMatchStats" value="<?php _e( 'Save Statistics', 'leaguemanager' ) ?> &raquo;" class="button button-primary" /></p>
 
 		</form>
 <?php else : ?>
@@ -133,15 +141,16 @@ if ( isset($_GET['match_id']) ) {
 	<tr>
 		<th scope="col" class="check-column"><input type="checkbox" onclick="Leaguemanager.checkAll(document.getElementById('stats-filter'));" /></th>
 		<th scope="col"><?php _e( 'Name', 'leaguemanager' ) ?></th>
-<!--		<th class="num" scope="col"><?php _e ( 'Number of Fields', 'leaguemanager' ) ?></th>-->
+		<th scope="col"><?php _e ( 'Number of Fields', 'leaguemanager' ) ?></th>
 		<th scope="col"><?php _e( 'Actions', 'leaguemanager' ) ?></th>
 	</tr>
 	</thead>
 	<tbody id="stats-list">
-	<?php foreach ( (array)$lmStats->get($league->id) AS $stat ) : ?>
+	<?php foreach ( (array)$lmStats->get($league->id) AS $stat ) : $fields = maybe_unserialize($stat->fields); ?>
 	<tr>
 		<th scope="row" class="check-column"><input type="checkbox" value="<?php echo $stat->id ?>" name="stat_id[<?php echo $stat->id ?>]" /></th>
 		<td><?php echo $stat->name ?></td>
+		<td><?php echo count($fields) ?></td>
 		<td><a href="admin.php?page=leaguemanager&amp;subpage=matchstats&amp;league_id=<?php echo $league->id ?>&amp;edit=<?php echo $stat->id ?>"><?php _e( 'Edit', 'leaguemanager' ) ?></a></td>
 	</tr>
 	<?php endforeach; ?>
@@ -162,26 +171,28 @@ if ( isset($_GET['match_id']) ) {
 <thead>
 	<tr>
 		<th scope="row"><label for="stat_name"><?php _e( 'Name', 'leaguemanager' ) ?></label></th>
-		<td><input type="text" name="stat_name" id="stat_name" value="<?php echo $statistic->name ?>" /></td>
+		<td><input type="text" name="stat_name" id="stat_name" value="<?php if (isset($statistic->name)) echo $statistic->name; else "" ?>" /></td>
 		<td>&#160;</td>
 	</tr>
 	</thead>
 	<tbody id="stats_fields">
 	<?php if ( $statistic ) :?>
-	<?php $fields = maybe_unserialize($statistic->fields); ?>
+	<?php $fields = ((isset($statistic->fields)) ? maybe_unserialize($statistic->fields) : ''); ?>
+	<?php if (is_array($fields)) : ?>
 	<?php foreach ( (array)$fields AS $key => $field ) : ?>
-		<?php echo $lmStats->addStatsFIeld($key, $field['name'], $field['type'], false) ?>
+		<?php echo $lmStats->addStatsField($key, $field['name'], $field['type'], false) ?>
 	<?php endforeach; ?>
+	<?php endif; ?>
 	<?php endif; ?>
 	</tbody>
 	</table>
 
-	<p><a href="#" onClick="Leaguemanager.addStatsField()"><?php _e( 'Add Field', 'leaguemanager' ) ?></a></p>
+	<p><a href="#" onClick="Leaguemanager.addStatsField('<?php bloginfo( 'wpurl' ); ?>/wp-admin/admin-ajax.php')"><?php _e( 'Add Field', 'leaguemanager' ) ?></a></p>
 
 	<input type="hidden" name="add_stats" value="<?php if ( $stats_id ) echo 'add'; else echo 'edit'; ?>" />
 	<input type="hidden" name="stats_id" value="<?php echo $stats_id ?>" />
 	<input type="hidden" name="league_id" value="<?php echo $league->id ?>" />
-	<p class="submit"><input type="submit" value="<?php if ( $stats_id ) _e( 'Edit', 'leaguemanager' ); else _e( 'Add New', 'leaguemanager' ) ?>" /></p>
+	<p class="submit"><input type="submit" class="button button-primary" value="<?php if ( $stats_id ) _e( 'Edit', 'leaguemanager' ); else _e( 'Add New', 'leaguemanager' ) ?>" /></p>
 </form>
 
 </div>
@@ -189,3 +200,5 @@ if ( isset($_GET['match_id']) ) {
 <?php endif; ?>
 
 <?php endif; ?>
+
+</div>

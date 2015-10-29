@@ -1,10 +1,11 @@
 === LeagueManager ===
-Contributors: Kolja Schleich
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2329191
+Contributors: Kolja Schleich, LaMonte Forthun
+Donate link: 
 Tags: sport, widget, basketball, football, hockey, league, soccer, volleyball, gymnastics, tennis, baseball, rugby
 Requires at least: 2.7
-Tested up to: 3.5.1
-Stable tag: 3.8.9
+Tested up to: 4.3.1
+Stable tag: 3.9.6
+License: LGPLv2.1 or later
 
 Plugin to manage and present Sports Leagues
 
@@ -51,7 +52,7 @@ To install the plugin to the following steps
 == Frequently Asked Questions ==
 **I want to implement player registration. Is that possible?**
 
-Yes it is, however not with this plugin, but with my [ProjectManager](http://wordpress.org/extend/plugins/projectmanager/). It is designed to manage any recurrent datasets, such as player profiles. It is also possible to set a hook in the user profile. Any user with the capability *project_user_profile* is able to use this feature. You would also need the [Role Manager](http://www.im-web-gefunden.de/wordpress-plugins/role-manager/) for access control. Further the plugin has a template engine implemented that makes it easy to design your own templates.
+Yes it is, however not with this plugin, but with [ProjectManager](http://wordpress.org/extend/plugins/projectmanager/). It is designed to manage any recurrent datasets, such as player profiles. It is also possible to set a hook in the user profile. Any user with the capability *project_user_profile* is able to use this feature. You would also need the [Role Manager](http://www.im-web-gefunden.de/wordpress-plugins/role-manager/) for access control. Further the plugin has a template engine implemented that makes it easy to design your own templates.
 
 
 **How can I display the widget statically**
@@ -70,12 +71,170 @@ Replace *league_ID* with the ID of the league you want to display. This will dis
 4. Easy insertion of tags via TinyMCE Button
 5. Widget control panel
 6. Example of 'Last 5' (shows 'Last 3') Functionality
-
+7. Match Report
 
 == Credits ==
 The LeagueManager icon is taken from the Fugue Icons of http://www.pinvoke.com/.
 
 == Changelog ==
+
+* TO-DO - There are a few fixes left with LeagueManager's Championship mode. As the plugins documentation mentions, it was written for soccer (football) and has some limitations. It's being worked on and will be updated gradually with some new features and fixes.
+* TO-DO - The Match Day (Fixtures) filter on the admin standings page isn't currently working. I'm aware of the issue and importances to those using the Match Day filter to get around the PHP variable limit. I hope to have this resolved shortly.
+* TO-DO - Updating the translation code to remove the deprecated code has broken some translations due to a change in how WordPress handles multiple options. The translations files need some attention, so do the sport files...
+* Coming soon - Players, pagination for leagues, teams, matches, and players. New admin dashboard. New sport files.
+
+= 3.9.6 =
+* some fixes
+
+= 3.9.5 =
+* NEW: load custom sport files from stylesheet directory in subdirectory sports
+* BUGFIX: fixed problem saving match report
+
+= 3.9.4 =
+* BUGFIX: fixed an issue with saving match results
+* BUGFIX: some small fixes
+
+= 3.9.3 =
+* NEW: show multiple leagues on the same page
+* NEW: global options to set support news widget options in dashboard
+* BUGFIX: limit in matches shortcode
+* BUGFIX: get next and previous matches in widget on a scale of minutes instead of 1 day
+
+= 3.9.2 =
+* BUGFIX: fixed some poor file location calling
+* BUGFIX: fixed TinyMCE window width
+
+= 3.9.1.9 =
+* BUGFIX: fixed issue with wrong next match in last-5 standings table
+
+= 3.9.1.8 =
+* NEW: matches pagination
+* NEW: team filter for matches in admin panel
+* BUGFIX: fixed home_only argument in matches shortcode
+* BUGFIX: fixed some styling issues
+
+= 3.9.1.7 =
+* UPDATED: updated french translation
+* BUGFIX: fixed setting getting stuck on user-defined point rule
+* BUGFIX: fixed an SQL query error in getMatches()
+
+= 3.9.1.6 =
+* BUGFIX: fixed team selection in matches template
+* BUGFIX: fixed getting league by name
+
+= 3.9.1.5 =
+* SECURITY: major change in retrieving teams (getTeams() in core.php) and matches (getMatches() in core.php) to avoid sql injections
+* SECURITY: fixed multiple possible sql injection vulnerabilities
+* BUGFIX: add stripslashes
+* BUGFIX: correctly load stylesheet and javascript scripts
+* BUGFIX: limit the number of matches to add to 50 (to avoid problems with memory limit)
+* BUGFIX: fixed some possible security issues
+* BUGFIX: fixed several small issues
+* BUGFIX: fixed issues with match statistics
+* BUGFIX: fixed some small issues with undefined variable notices in different sports
+
+= 3.9.1.4 =
+* BUGFIX: ordering of teams by rank
+
+= 3.9.1.3 =
+* SECURITY: fixed security issues
+
+= 3.9.1.2 =
+
+= 3.9.1.1 =
+* NEW: load custom templates from child themes
+* BUGFIX: some fixes in championship mode
+
+= 3.9.1 =
+* NEW: new template to show individual racer standings table
+* CHANGE: changed fields for racing results (points and time)
+* BUGFIX: fixed ajax in widget to navigate through next and last matches
+* BUGFIX: fixed bridge to projectmanager for compatibility with latest version
+* BUGFIX: several small fixes for racing mode
+* BUGFIX: added missing template matches-by_matchday.php to svn repository
+
+= 3.9.0.9 =
+* BUGFIX: fixed last-5 standings table to reflect scores of matches with overtime or penalty
+* BUGFIX: some small fixes
+
+= 3.9.0.8 =
+* BUGFIX: fixed issue with zero scores not displaying in tennis sports
+* BUGFIX: several small fixes
+
+= 3.9.0.7 =
+* NEW: new match_day values in [matches] shortcode: "next" to show matches of upcoming match day, "last" for last match day, "current" or "latest" for match day closest to current date
+* NEW: new template to display matches separated by match day. Use "template=by_matchday" in the shortcode to load template matches-by_matchday.php
+* NEW: show logo in matches tables
+* NEW: show home team in standings table and home team matches in bold in admin interface
+* NEW: added paramters $match->homeScore and $match->awayScore holding the match score depending if game has been finished after regular time, overtime or penalty. This can be used in the templates loaded by the [matches] or [match] shortcodes
+* NEW: don't show match day selection if specific match day is selected. Using "next", "last", "current" or "latest" will still show match day selection dropdown
+* NEW: new shortcode options for [matches] shortcode: "show_match_day_selection" and "show_team_selection" to force showing or hiding match day or team selection dropdown menus, respectively
+* BUGFIX: fixed problem with zeros in matches with empty scores
+* BUGFIX: fixed datepicker in match adding/editing page
+
+= 3.9.0.6 =
+* BUGFIX: Manual ranking of teams
+* BUGFIX: fixed several small bugs
+* BUGFIX: AJAX in widget
+
+= 3.9.0.5 =
+* BUGFIX: small fixes
+
+= 3.9.0.4 = 
+* BUGFIX: fix colorpicker in global settings page
+* BUGFIX: fix default match day to -1 (all matches) in matches shortcode
+
+= 3.9.0.3 =
+* BUGFIX: fix match day issue in shortcode
+
+= 3.9.0.2 =
+* BUGFIX: show all matches in admin panel due to problems 
+* BUGFIX: team edit save button not showing
+
+= 3.9.0.1 =
+* UPDATE: show first matches of first match day by default
+
+= 3.9 =
+* BUGFIX: fixed TinyMCE for Wordpress >= 3.9 preserving backwards compatibility
+* BUGFIX: removed broken sortable standings table
+* UPDATE: saving standings manually using POST button
+* BUGFIX: setting point-rule
+* BUGFIX: fixed several XSS Vulnerabilities
+* BUGFIX: fixed match day match editing
+
+= 3.8.9 =
+* UPDATE: Numerous files have been worked on to remove PHP Strict Mode warnings. These warnings didn't affect LeagueManager use, but if your WordPress installation had debugging mode turned on there were many, many warnings being thrown at you. There are no doubt more that will need to be fixed, but a conservative guess is that over 100 fixes have been applied.
+* BUGFIX: Fixed the error with the Widget not changing
+* BUGFIX: Permissions error on documenation page
+* UPDATE: Added completed games to soccer ranking
+* UPDATE: Numerous areas with deprecated code
+* UPDATE: Started to get into the sport files to get a consistent look to the output, centering headings over input fields, centering input fields in the space allocated and centering the text in the input fields.
+* UPDATE: Started work on the Championship mode, fixed a few none working areas, much work left to do, let me know if you've got suggestions...
+* ADDED:  Ability to allow for matches between groups (out of group/division games)
+* BUGFIX: Fixed issue with sport files throwing error regarding a not-found function (I hope! I can't duplicate it, let me know if there are still issues)
+* UPDATE: Removed all traces of dropdowns for date, replaced with Datepicker
+* UPDATE: Fixed a number of areas to keep the user in the same group when adding or updating teams or matches. If you are working in one group and add a team the group knows where you came from and when you click submit you go back to the group you started from (your welcome!)
+
+= 3.8.8.5 =
+* BUGFIX: Fix standings numbers
+* BUGFIX: Fix widget issues after adding groups
+* ADDED:  US Football Sport file
+
+= 3.8.8.4 =
+* BUGFIX: Wrong numbers on standing positions
+
+= 3.8.8.3 =
+* BUGFIX: Permission error
+* UPDATE: Changed some internal code from 'leagues' to 'leaguemanager'
+* ADDED: Dashboard Widget
+
+= 3.8.8.2 =
+* ADDED: Code for Widget to show/hide logos and limit to group
+* BUGFIX: "Clas=" in a number of sport files, changed to "Class="
+* ADDED: JQuery tooltip for 'Last 5' to show date, score and teams of a game in the standings
+* ADDED: Ability to change color of Widget title in 'style.css'
+* ADDED: Limited code to set up out of group matches
+* Code clean up, removed extra whitespace in a number of files, replaced deprecated _c tag with _x or _e.
 
 = 3.8.8.1 =
 * TEST: Test version to add 'Last 5' function to standings. Only update to this version if you're willing to test.
@@ -86,7 +245,7 @@ use this shortcode to test:
 
 If you test and find that the icons at the end of each line in the standings are moving to a second line it means you don't have enough room on your template for five past results. You can then change to a lesser number in the template, named 'standings-last5.php' in the 'admin/templates' folder. Go to 43:
 
-	<th width="100" class="last5"><?php _e( 'Last 5', 'leaguemanager' ) ?></th>
+    <th width="100" class="last5"><?php _e( 'Last 5', 'leaguemanager' ) ?></th>
 
 change the 'Last 5' text to 'Last 3' if you're going to use three past results, or whatever you choose. Then go to line 93:
 
@@ -108,7 +267,6 @@ The final version will probably have this as a preference option.
 * BUGFIX: standings
 
 = 3.8.5 =
-
 *** IF YOU'VE DONE ANY MANUAL MODIFICATIONS, DOWNLOAD THIS AND CHECK THAT YOU AREN'T GOING TO LOSE THEM WHEN YOU UPDATE (INSTEAD OF DOING AN AUTO UPDATE). THIS UPDATE TOUCHES A NUMBER OF FILES (17). IF YOU HAVE QUESTIONS BEFORE UPDATING, LEAVE A MESSAGE ON THE SUPPORT FORUM ON WORDPRESS.ORG. A LIST OF ALL FILES UPDATED IS LISTED IN A POST THERE. ***
 
 http://wordpress.org/support/topic/leaguemanager-385-changes-info
@@ -139,7 +297,7 @@ http://wordpress.org/support/topic/leaguemanager-385-changes-info
 * BUGFIX: upgrade process
 
 = 3.6.8 =
-* BUGFIX: Language 
+* BUGFIX: Language
 * BUGFIX: Team names with ' or similar
 
 = 3.6.7 =

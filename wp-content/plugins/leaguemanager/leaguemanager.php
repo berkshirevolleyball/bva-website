@@ -3,10 +3,11 @@
 Plugin Name: LeagueManager
 Plugin URI: http://wordpress.org/extend/plugins/leaguemanager/
 Description: Manage and present sports league results.
-Version: 3.8.9
-Author: Kolja Schleich
+Version: 3.9.6
+Author: Kolja Schleich, LaMonte Forthun
 
-Copyright 2008-2009  Kolja Schleich  (email : kolja.schleich@googlemail.com)
+Copyright 2008-2015  Kolja Schleich  (email : kolja.schleich@googlemail.com)
+					 LaMonte Forthun (email : lamontef@collegefundsoftware.com, lamontef@yahoo.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,10 +26,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /**
 * Loading class for the WordPress plugin LeagueManager
-* 
-* @author 	Kolja Schleich
+*
+* @author 	Kolja Schleich, LaMonte Forthun
 * @package	LeagueManager
-* @copyright 	Copyright 2008-2009
+* @copyright Copyright 2008-2015
 */
 class LeagueManagerLoader
 {
@@ -37,25 +38,25 @@ class LeagueManagerLoader
 	 *
 	 * @var string
 	 */
-	var $version = '3.7';
-	
-	
+	var $version = '3.9.6';
+
+
 	/**
 	 * database version
 	 *
 	 * @var string
 	 */
-	var $dbversion = '3.7';
-	
-		
+	var $dbversion = '3.7.1';
+
+
 	/**
-	 * check if bridge is active
+	 * check if bridge to projectmanager is active
 	 *
 	 * @var boolean
 	 */
 	var $bridge = false;
-		
-		
+
+
 	/**
 	 * admin Panel object
 	 *
@@ -81,18 +82,28 @@ class LeagueManagerLoader
 		$this->loadLibraries();
 
 		register_activation_hook(__FILE__, array(&$this, 'activate') );
-			
+
 		if (function_exists('register_uninstall_hook'))
-			register_uninstall_hook(__FILE__, array(&$this, 'uninstall'));
+			register_uninstall_hook(__FILE__, array('LeagueManagerLoader', 'uninstall'));
 
 		add_action( 'widgets_init', array(&$this, 'registerWidget') );
+		
+		add_action('wp_enqueue_scripts', array(&$this, 'loadStyles'), 5 );
+		add_action('wp_enqueue_scripts', array(&$this, 'loadScripts') );
+		
+		// Add TinyMCE Button
+		add_action( 'init', array(&$this, 'addTinyMCEButton') );
+		add_filter( 'tiny_mce_version', array(&$this, 'changeTinyMCEVersion') );
+		// register AJAX action to show TinyMCE Window
+		add_action( 'wp_ajax_leaguemanager_tinymce_window', array(&$this, 'showTinyMCEWindow') );
+		
 		// Start this plugin once all other plugins are fully loaded
-		add_action( 'plugins_loaded', array(&$this, 'initialize') );
-		
+		//add_action( 'plugins_loaded', array(&$this, 'initialize') );
+
 		$leaguemanager = new LeagueManager( $this->bridge );
-		$championship = new LeagueManagerchampionship();
+		$championship = new LeagueManagerChampionship();
 		$lmStats = new LeagueManagerStats();
-		
+
 		if ( is_admin() )
 			$this->adminPanel = new LeagueManagerAdminPanel();
 	}
@@ -100,8 +111,8 @@ class LeagueManagerLoader
 	{
 		$this->__construct();
 	}
-	
-		
+
+
 	/**
 	 * initialize plugin
 	 *
@@ -110,15 +121,12 @@ class LeagueManagerLoader
 	 */
 	function initialize()
 	{
-		// Add the script and style files
-		add_action('wp_head', array(&$this, 'loadScripts') );
-		add_action('wp_print_styles', array(&$this, 'loadStyles') );
 		// Add TinyMCE Button
 		add_action( 'init', array(&$this, 'addTinyMCEButton') );
 		add_filter( 'tiny_mce_version', array(&$this, 'changeTinyMCEVersion') );
 	}
-		
-	
+
+
 	/**
 	 * register Widget
 	 */
@@ -136,22 +144,13 @@ class LeagueManagerLoader
 	 */
 	function defineConstants()
 	{
-		if ( !defined( 'WP_CONTENT_URL' ) )
-			define( 'WP_CONTENT_URL', get_option( 'siteurl' ) . '/wp-content' );
-		if ( !defined( 'WP_PLUGIN_URL' ) )
-			define( 'WP_PLUGIN_URL', WP_CONTENT_URL. '/plugins' );
-		if ( !defined( 'WP_CONTENT_DIR' ) )
-			define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
-		if ( !defined( 'WP_PLUGIN_DIR' ) )
-			define( 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins' );
-			
 		define( 'LEAGUEMANAGER_VERSION', $this->version );
 		define( 'LEAGUEMANAGER_DBVERSION', $this->dbversion );
-		define( 'LEAGUEMANAGER_URL', WP_PLUGIN_URL.'/leaguemanager' );
-		define( 'LEAGUEMANAGER_PATH', WP_PLUGIN_DIR.'/leaguemanager' );
+		define( 'LEAGUEMANAGER_URL', rtrim(esc_url(plugin_dir_url(__FILE__)), "/") ); // remove trailing slash as the plugin has been coded without it
+		define( 'LEAGUEMANAGER_PATH', dirname(__FILE__) );
 	}
-	
-		
+
+
 	/**
 	 * define database tables
 	 *
@@ -166,8 +165,8 @@ class LeagueManagerLoader
 		$wpdb->leaguemanager_matches = $wpdb->prefix . 'leaguemanager_matches';
 		$wpdb->leaguemanager_stats = $wpdb->prefix . 'leaguemanager_stats';
 	}
-	
-		
+
+
 	/**
 	 * load libraries
 	 *
@@ -177,7 +176,7 @@ class LeagueManagerLoader
 	function loadLibraries()
 	{
 		global $lmShortcodes, $lmAJAX;
-		
+
 		// Global libraries
 		require_once (dirname (__FILE__) . '/lib/core.php');
 		require_once (dirname (__FILE__) . '/lib/ajax.php');
@@ -186,15 +185,18 @@ class LeagueManagerLoader
 		require_once (dirname (__FILE__) . '/lib/widget.php');
 		require_once (dirname (__FILE__) . '/functions.php');
 		require_once (dirname (__FILE__) . '/lib/championship.php');
+		require_once (dirname (__FILE__) . '/lib/tiebreakers.php');
 		$this->loadSports();
 		$lmAJAX = new LeagueManagerAJAX();
 
 		if ( is_admin() ) {
 			require_once (dirname (__FILE__) . '/lib/image.php');
-			require_once (dirname (__FILE__) . '/admin/admin.php');	
+			require_once (dirname (__FILE__) . '/admin/admin.php');
 		}
-			
-		if ( file_exists(WP_PLUGIN_DIR . '/projectmanager/projectmanager.php') ) {
+
+		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		// define bridge to ProjectManager
+		if ( file_exists(WP_PLUGIN_DIR . '/projectmanager/projectmanager.php') && is_plugin_active("projectmanager/projectmanager.php") ) {
 			$p = get_option('projectmanager');
 			if (version_compare($p['version'], '2.4.7', '>=')) {
 				global $lmBridge;
@@ -203,9 +205,10 @@ class LeagueManagerLoader
 				$this->bridge = true;
 			}
 		}
+		
 		$lmShortcodes = new LeagueManagerShortcodes($this->bridge);
 	}
-		
+
 
 	/**
 	 * load sport types
@@ -215,15 +218,38 @@ class LeagueManagerLoader
 	 */
 	function loadSports()
 	{
+		$files = array();
+		
+		// First save default sport files in array indexed by filename
 		$dir = LEAGUEMANAGER_PATH."/sports";
 		if ( $handle = opendir($dir) ) {
 			while ( false !== ($file = readdir($handle)) ) {
 				$file_info = pathinfo($dir.'/'.$file);
-				$file_type = $file_info['extension'];
+				$file_type = (isset($file_info['extension'])) ? $file_info['extension'] : '';
 				if ( $file != "." && $file != ".." && !is_dir($file) && substr($file, 0,1) != "."  && $file_type == 'php' )  {
-					require_once($dir.'/'.$file);
+					//require_once($dir.'/'.$file);
+					$files[$file] = $dir.'/'.$file;
 				}
 			}
+		}
+		
+		// Save sport files in user stylesheet directory indexed by filename, thus overwriting original files with the same name
+		$dir = get_stylesheet_directory() . "/sports";
+		if ( file_exists($dir) ) {
+			if ( $handle = opendir($dir) ) {
+				while ( false !== ($file = readdir($handle)) ) {
+				$file_info = pathinfo($dir.'/'.$file);
+				$file_type = (isset($file_info['extension'])) ? $file_info['extension'] : '';
+				if ( $file != "." && $file != ".." && !is_dir($file) && substr($file, 0,1) != "."  && $file_type == 'php' )  {
+					$files[$file] = $dir.'/'.$file;
+				}
+			}
+			}
+		}
+		
+		// load files
+		foreach ( $files AS $file ) {
+			require_once($file);
 		}
 	}
 
@@ -238,8 +264,8 @@ class LeagueManagerLoader
 	{
 		$this->options = get_option('leaguemanager');
 	}
-		
-		
+
+
 	/**
 	 * get options
 	 *
@@ -250,10 +276,11 @@ class LeagueManagerLoader
 	{
 		if ( $index )
 			return $this->options[$index];
-			return $this->options;
-	}
-	
 		
+		return $this->options;
+	}
+
+
 	/**
 	 * load textdomain
 	 *
@@ -263,23 +290,23 @@ class LeagueManagerLoader
 	function loadTextdomain()
 	{
 		global $leaguemanager;
-		
+
 		$textdomain = $this->getOptions('textdomain');
 		if ( !empty($textdomain) ) {
 			$locale = get_locale();
 			$path = dirname(__FILE__) . '/languages';
 			$domain = 'leaguemanager';
 			$mofile = $path . '/'. $domain . '-' . $textdomain . '-' . $locale . '.mo';
-			
+
 			if ( file_exists($mofile) ) {
 				load_textdomain($domain, $mofile);
 				return true;
 			}
 		}
-		
+
 		load_plugin_textdomain( 'leaguemanager', false, 'leaguemanager/languages' );
 	}
-	
+
 
 	/**
 	 * load scripts
@@ -290,19 +317,31 @@ class LeagueManagerLoader
 	function loadScripts()
 	{
 		wp_register_script( 'leaguemanager', LEAGUEMANAGER_URL.'/leaguemanager.js', array('jquery', 'sack', 'thickbox'), LEAGUEMANAGER_VERSION );
-		wp_print_scripts('leaguemanager');
+		wp_enqueue_script('leaguemanager');
 		?>
 		<script type="text/javascript">
 		//<![CDATA[
 		LeagueManagerAjaxL10n = {
-			blogUrl: "<?php bloginfo( 'wpurl' ); ?>", pluginPath: "<?php echo LEAGUEMANAGER_PATH; ?>", pluginUrl: "<?php echo LEAGUEMANAGER_URL; ?>", requestUrl: "<?php echo LEAGUEMANAGER_URL ?>/ajax.php", Edit: "<?php _e("Edit"); ?>", Post: "<?php _e("Post"); ?>", Save: "<?php _e("Save"); ?>", Cancel: "<?php _e("Cancel"); ?>", pleaseWait: "<?php _e("Please wait..."); ?>", Revisions: "<?php _e("Page Revisions"); ?>", Time: "<?php _e("Insert time"); ?>", Options: "<?php _e("Options") ?>", Delete: "<?php _e('Delete') ?>"
+			blogUrl: "<?php bloginfo( 'wpurl' ); ?>",
+			//pluginPath: "<?php echo LEAGUEMANAGER_PATH; ?>",
+			pluginUrl: "<?php echo LEAGUEMANAGER_URL; ?>",
+			requestUrl: "<?php echo LEAGUEMANAGER_URL ?>/ajax.php",
+			Edit: "<?php _e("Edit"); ?>",
+			Post: "<?php _e("Post"); ?>",
+			Save: "<?php _e("Save"); ?>",
+			Cancel: "<?php _e("Cancel"); ?>",
+			pleaseWait: "<?php _e("Please wait..."); ?>",
+			Revisions: "<?php _e("Page Revisions"); ?>",
+			Time: "<?php _e("Insert time"); ?>",
+			Options: "<?php _e("Options") ?>",
+			Delete: "<?php _e('Delete') ?>"
 	 	}
 		//]]>
 		</script>
 		<?php
 	}
-		
-		
+
+
 	/**
 	 * load styles
 	 *
@@ -312,33 +351,34 @@ class LeagueManagerLoader
 	function loadStyles()
 	{
 		wp_enqueue_style('thickbox');
-		wp_enqueue_style('leaguemanager', LEAGUEMANAGER_URL . "/style.css", false, '1.0', 'screen');
-		
-		echo "\n<style type='text/css'>";
+		wp_enqueue_style('leaguemanager', LEAGUEMANAGER_URL . "/style.css", false, '1.0', 'all');
+
+		$css = "";
 		if ( !empty($this->options['colors']['headers']) )
-		echo "\n\ttable.leaguemanager th { background-color: ".$this->options['colors']['headers']." }";
+		$css .= "\ntable.leaguemanager th { background-color: ".$this->options['colors']['headers']." }";
 
 		if ( !empty($this->options['colors']['rows']['main']) )
-		echo "\n\ttable.leaguemanager tr { background-color: ".$this->options['colors']['rows']['main']." }";
+		$css .= "\ntable.leaguemanager tr { background-color: ".$this->options['colors']['rows']['main']." }";
 
 		if ( !empty($this->options['colors']['rows']['alternate']) )
-		echo "\n\ttable.leaguemanager tr.alternate { background-color: ".$this->options['colors']['rows']['alternate']." }";
+		$css .= "\ntable.leaguemanager tr.alternate { background-color: ".$this->options['colors']['rows']['alternate']." }";
 
 		if ( !empty($this->options['colors']['rows']['ascend']) )
-		echo "\n\ttable.standingstable tr.ascend, table.standingstable tr.ascend.alternate { background-color: ".$this->options['colors']['rows']['ascend']." }";
+		$css .= "\ntable.standingstable tr.ascend, table.standingstable tr.ascend.alternate { background-color: ".$this->options['colors']['rows']['ascend']." }";
 
 		if ( !empty($this->options['colors']['rows']['descend']) )
-		echo "\n\ttable.standingstable tr.descend, table.standingstable tr.descend.alternate { background-color: ".$this->options['colors']['rows']['descend']." }";
+		$css .= "\ntable.standingstable tr.descend, table.standingstable tr.descend.alternate { background-color: ".$this->options['colors']['rows']['descend']." }";
 
 		if ( !empty($this->options['colors']['rows']['relegation']) )
-		echo "\n\ttable.standingstable tr.relegation, table.standingstable tr.relegation.alternate { background-color: ".$this->options['colors']['rows']['relegation']." }";
+		$css .= "\ntable.standingstable tr.relegation, table.standingstable tr.relegation.alternate { background-color: ".$this->options['colors']['rows']['relegation']." }";
 
 		if ( !empty($this->options['colors']['rows']['alternate']) )
-		echo "\n\ttable.crosstable th, table.crosstable td { border: 1px solid ".$this->options['colors']['rows']['alternate']."; }";
-		echo "\n</style>";
+		$css .= "\ntable.crosstable th, table.crosstable td { border: 1px solid ".$this->options['colors']['rows']['alternate']."; }";
+		
+		wp_add_inline_style( 'leaguemanager', $css );
 	}
-		
-		
+
+
 	/**
 	 * add TinyMCE Button
 	 *
@@ -349,10 +389,10 @@ class LeagueManagerLoader
 	{
 		// Don't bother doing this stuff if the current user lacks permissions
 		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) return;
-		
+
 		// Check for LeagueManager capability
-		if ( !current_user_can('manage_leagues') ) return;
-		
+		if ( !current_user_can('manage_leaguemanager') ) return;
+
 		// Add only in Rich Editor mode
 		if ( get_user_option('rich_editing') == 'true') {
 			add_filter("mce_external_plugins", array(&$this, 'addTinyMCEPlugin'));
@@ -373,8 +413,17 @@ class LeagueManagerLoader
 	{
 		return ++$version;
 	}
-		
-		
+
+	/**
+	 * Display the TinyMCE Window.
+	 *
+	 */
+	function showTinyMCEWindow() {
+		require_once( LEAGUEMANAGER_PATH . '/admin/tinymce/window.php' );
+		exit;
+	}
+	
+	
 	/**
 	 * Activate plugin
 	 *
@@ -387,29 +436,35 @@ class LeagueManagerLoader
 		$options['dbversion'] = $this->dbversion;
 		$options['textdomain'] = 'default';
 		$options['colors']['headers'] = '#dddddd';
-		$options['colors']['rows'] = array( '#ffffff', '#efefef' );
-		add_option( 'leaguemanager', $options, 'Leaguemanager Options', 'yes' );
-		add_option( 'leaguemanager_widget', array(), 'Leaguemanager Widget Options', 'yes' );
+		$options['colors']['rows'] = array( 'main' => '#ffffff', 'alternate' => '#efefef', 'ascend' => '#ffffff', 'descend' => '#ffffff', 'relegate' => '#ffffff');
+		$options['dashboard_widget']['num_items'] = 4;
+		$options['dashboard_widget']['show_author'] = 1;
+		$options['dashboard_widget']['show_date'] = 1;
+		$options['dashboard_widget']['show_summary'] = 1;
+ 
+		add_option( 'leaguemanager', $options, 'LeagueManager Options', 'yes' );
+		add_option( 'leaguemanager_widget', array(), 'LeagueManager Widget Options', 'yes' );
+
 		/*
 		* Set Capabilities
 		*/
 		$role = get_role('administrator');
-		$role->add_cap('manage_leagues');
-		$role->add_cap('leagues');
-	
+		$role->add_cap('manage_leaguemanager');
+		$role->add_cap('league_manager');
+
 		$role = get_role('editor');
-		$role->add_cap('leagues');
-	
+		$role->add_cap('league_manager');
+
 		$this->install();
 	}
-		
-		
-		
+
+
+
 	function install()
 	{
 		global $wpdb;
 		include_once( ABSPATH.'/wp-admin/includes/upgrade.php' );
-		
+
 		$charset_collate = '';
 		if ( $wpdb->has_cap( 'collation' ) ) {
 			if ( ! empty($wpdb->charset) )
@@ -417,7 +472,7 @@ class LeagueManagerLoader
 			if ( ! empty($wpdb->collate) )
 				$charset_collate .= " COLLATE $wpdb->collate";
 		}
-		
+
 		$create_leagues_sql = "CREATE TABLE {$wpdb->leaguemanager} (
 						`id` int( 11 ) NOT NULL AUTO_INCREMENT,
 						`title` varchar( 100 ) NOT NULL default '',
@@ -425,7 +480,7 @@ class LeagueManagerLoader
 						`seasons` longtext NOT NULL,
 						PRIMARY KEY ( `id` )) $charset_collate;";
 		maybe_create_table( $wpdb->leaguemanager, $create_leagues_sql );
-			
+
 		$create_teams_sql = "CREATE TABLE {$wpdb->leaguemanager_teams} (
 						`id` int( 11 ) NOT NULL AUTO_INCREMENT ,
 						`status` varchar( 50 ) NOT NULL default '&#8226;',
@@ -453,7 +508,7 @@ class LeagueManagerLoader
 						`custom` longtext NOT NULL,
 						PRIMARY KEY ( `id` )) $charset_collate;";
 		maybe_create_table( $wpdb->leaguemanager_teams, $create_teams_sql );
-			
+
 		$create_matches_sql = "CREATE TABLE {$wpdb->leaguemanager_matches} (
 						`id` int( 11 ) NOT NULL AUTO_INCREMENT ,
 						`group` varchar( 30 ) NOT NULL default '',
@@ -473,6 +528,7 @@ class LeagueManagerLoader
 						`custom` longtext NOT NULL,
 						PRIMARY KEY ( `id` )) $charset_collate;";
 		maybe_create_table( $wpdb->leaguemanager_matches, $create_matches_sql );
+
 		$create_stats_sql = "CREATE TABLE {$wpdb->leaguemanager_stats} (
 						`id` int( 11 ) NOT NULL AUTO_INCREMENT,
 						`name` varchar( 30 ) NOT NULL default '',
@@ -481,24 +537,25 @@ class LeagueManagerLoader
 						PRIMARY KEY ( `id` )) $charset_collate;";
 		maybe_create_table( $wpdb->leaguemanager_stats, $create_stats_sql );
 	}
-		
-		
+
+
 	/**
 	 * Uninstall Plugin
 	 *
 	 * @param none
 	 */
-	function uninstall()
+	static function uninstall()
 	{
 		global $wpdb, $leaguemanager;
-		
+
 		$wpdb->query( "DROP TABLE {$wpdb->leaguemanager_matches}" );
 		$wpdb->query( "DROP TABLE {$wpdb->leaguemanager_teams}" );
+		$wpdb->query( "DROP TABLE {$wpdb->leaguemanager_stats}" );
 		$wpdb->query( "DROP TABLE {$wpdb->leaguemanager}" );
-		
+
 		delete_option( 'leaguemanager_widget' );
 		delete_option( 'leaguemanager' );
-		
+
 		// Delete Logos
 		$dir = $leaguemanager->getImagePath();
 		if ( $handle = opendir($dir) ) {
@@ -525,7 +582,7 @@ class LeagueManagerLoader
 }
 
 /**
- * Checks if a particular user has a role. 
+ * Checks if a particular user has a role.
  * Returns true if a match was found.
  *
  * @param string $role Role name.
@@ -535,21 +592,21 @@ class LeagueManagerLoader
  * Put together by AppThemes (http://docs.appthemes.com/tutorials/wordpress-check-user-role-function/)
  */
 /*function leaguemanager_check_user_role( $role, $user_id = null ) {
- 
+
     if ( is_numeric( $user_id ) )
 		$user = get_userdata( $user_id );
     else
         $user = wp_get_current_user();
- 
+
     if ( empty( $user ) )
 		return false;
- 
+
     return in_array( $role, (array) $user->roles );
 }*/
- 
+
 // Run the Plugin
 global $lmLoader;
 $lmLoader = new LeagueManagerLoader();
 if ( isset($_POST['leaguemanager_export']) )
-	$lmLoader->adminPanel->export((int)$_POST['league_id'], $_POST['mode']); 
+	$lmLoader->adminPanel->export((int)$_POST['league_id'], $_POST['mode']);
 ?>

@@ -4,7 +4,7 @@
  * 
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerRugby extends LeagueManager
 {
@@ -126,7 +126,7 @@ class LeagueManagerRugby extends LeagueManager
 		global $leaguemanager;
 		extract($rule);
 
-		$matches = $leaguemanager->getMatches( "(`home_team` = {$team_id} OR `away_team` = {$team_id})" );
+		$matches = $leaguemanager->getMatches( array("team_id" => $team_id, "limit" => false) );
 		foreach ( $matches AS $match ) {
 			$index = ( $match->home_team == $team_id ) ? 'home' : 'away';
 
@@ -173,7 +173,7 @@ class LeagueManagerRugby extends LeagueManager
 		$winner = $admin->getMatchResult( $score['home'], $score['away'], $home_team, $away_team, 'winner' );
 		$loser =  $admin->getMatchResult( $score['home'], $score['away'], $home_team, $away_team, 'loser' );
 
-		$wpdb->query( "UPDATE {$wpdb->leaguemanager_matches} SET `home_points` = ".$score['home'].", `away_points` = ".$score['away'].", `winner_id` = ".intval($winner).", `loser_id` = ".intval($loser)." WHERE `id` = {$match_id}" );
+		$wpdb->query( $wpdb->prepare("UPDATE {$wpdb->leaguemanager_matches} SET `home_points` = '%d', `away_points` = '%d', `winner_id` = '%d', `loser_id` = '%d' WHERE `id` = '%d'", $score['home'], $score['away'], $winner, $loser, $match_id) );
 	}
 
 
@@ -187,7 +187,7 @@ class LeagueManagerRugby extends LeagueManager
 	{
 		global $wpdb, $leaguemanager;
 
-		$team = $wpdb->get_results( "SELECT `custom` FROM {$wpdb->leaguemanager_teams} WHERE `id` = {$team_id}" );
+		$team = $wpdb->get_results( $wpdb->prepare("SELECT `custom` FROM {$wpdb->leaguemanager_teams} WHERE `id` = '%d'", $team_id) );
 		$custom = maybe_unserialize($team->custom);
 		$custom = $this->getStandingsData($team_id, $custom);
 
@@ -208,7 +208,7 @@ class LeagueManagerRugby extends LeagueManager
 		
 		$data['gamepoints'] = array( 'plus' => 0, 'minus' => 0 );
 
-		$matches = $leaguemanager->getMatches( "(`home_team` = {$team_id} OR `away_team` = {$team_id})" );
+		$matches = $leaguemanager->getMatches( array("team_id" => $team_id, "limit" => false) );
 		foreach ( $matches AS $match ) {
 			// Home Match
 			if ( $team_id == $match->home_team ) {
@@ -248,6 +248,8 @@ class LeagueManagerRugby extends LeagueManager
 		global $leaguemanager;
 		$league = $leaguemanager->getCurrentLeague();
 
+		if (!isset($team->gamepoints)) $team->gamepoints = array('plus' => '', 'minus' => '');
+		
 		if ( is_admin() && $rule == 'manual' )
 			echo '<td><input type="text" size="2" name="custom['.$team->id.'][gamepoints][plus]" value="'.$team->gamepoints['plus'].'" />:<input type="text" size="2" name="custom['.$team->id.'][gamepoints][minus]" value="'.$team->gamepoints['minus'].'" /></td>';
 		else
@@ -263,6 +265,7 @@ class LeagueManagerRugby extends LeagueManager
 	 */
 	function editTeam( $team )
 	{
+		if (!isset($team->gamepoints)) $team->gamepoints = array('plus' => '', 'minus' => '');
 		echo '<input type="hidden" name="custom[gamepoints][plus]" value="'.$team->gamepoints['plus'].'" /><input type="hidden" name="custom[gamepoints][minus]" value="'.$team->gamepoints['minus'].'" />';
 	}
 
@@ -287,6 +290,10 @@ class LeagueManagerRugby extends LeagueManager
 	 */
 	function displayMatchesColumns( $match )
 	{
+		if (!isset($match->tries)) $match->tries = array('home' => '', 'away' => '');
+		if (!isset($match->conversions)) $match->conversions = array('home' => '', 'away' => '');
+		if (!isset($match->penaltykicks)) $match->penaltykicks = array('home' => '', 'away' => '');
+		
 		echo '<td><input class="points" type="text" size="2" id="tries_'.$match->id.'_home" name="custom['.$match->id.'][tries][home]" value="'.$match->tries['home'].'" /> : <input class="points" type="text" size="2" id="tries_'.$match->id.'_away" name="custom['.$match->id.'][tries][away]" value="'.$match->tries['away'].'" /></td>';
 		echo '<td><input class="points" type="text" size="2" id="conversions_'.$match->id.'_home" name="custom['.$match->id.'][conversions][home]" value="'.$match->conversions['home'].'" /> : <input class="points" type="text" size="2" id="conversions_'.$match->id.'_away" name="custom['.$match->id.'][conversions][away]" value="'.$match->conversions['away'].'" /></td>';
 		echo '<td><input class="points" type="text" size="2" id="penaltykicks_'.$match->id.'_home" name="custom['.$match->id.'][penaltykicks][home]" value="'.$match->penaltykicks['home'].'" /> : <input class="points" type="text" size="2" id="penaltykicks_'.$match->id.'_away" name="custom['.$match->id.'][penaltykicks][away]" value="'.$match->penaltykicks['away'].'" /></td>';
@@ -335,6 +342,8 @@ class LeagueManagerRugby extends LeagueManager
 	 */
 	function importMatches( $custom, $line, $match_id )
 	{
+		$match_id = intval($match_id);
+		
 		$tries = explode(":",$line[8]);
 		$conversions = explode(":",$line[9]);
 		$penalties = explode(":",$line[10]);

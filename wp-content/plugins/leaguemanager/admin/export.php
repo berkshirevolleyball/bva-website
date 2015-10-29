@@ -1,5 +1,5 @@
 <?php
-if ( !current_user_can( 'manage_leagues' ) ) : 
+if ( !current_user_can( 'manage_leaguemanager' ) ) :
      echo '<p style="text-align: center;">'.__("You do not have sufficient permissions to access this page.").'</p>';
 else :
 ?>
@@ -33,7 +33,7 @@ else :
 			</td>
 		</tr>
 		</table>
-		<p class="submit"><input type="submit" name="leaguemanager_export" value="<?php _e('Download File'); ?>" class="button" /></p>
+		<p class="submit"><input type="submit" name="leaguemanager_export" value="<?php _e('Download File'); ?>" class="button button-primary" /></p>
 	</form>
 </div>
 

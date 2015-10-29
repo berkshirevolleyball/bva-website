@@ -4,7 +4,7 @@
  * 
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerTabletennis extends LeagueManager
 {
@@ -70,7 +70,7 @@ class LeagueManagerTabletennis extends LeagueManager
 	 */
 	function getPointRules( $rules )
 	{
-		$rules['tabletennis'] = array( 'forwin' => 0, 'fordraw' => 0, 'forloss' => 0 );
+		$rules['tabletennis'] = array( 'forwin' => 1, 'fordraw' => 0, 'forloss' => 0 );
 
 		return $rules;
 	}
@@ -88,13 +88,13 @@ class LeagueManagerTabletennis extends LeagueManager
 		global $leaguemanager;
 
 		$points = array( 'plus' => 0, 'minus' => 0 );
-		$home = $leaguemanager->getMatches( "`home_team` = '".$team_id."'" );
+		$home = $leaguemanager->getMatches( array("home_team" => $team_id, "limit" => false) );
 		foreach ( $home AS $match ) {
 			$points['plus'] += $match->home_points;
 			$points['minus'] += $match->away_points;
 		}
 
-		$away = $leaguemanager->getMatches("`away_team` = '".$team_id."'" );
+		$away = $leaguemanager->getMatches( array("away_team" => $team_id, "limit" => false) );
 		foreach ( $away AS $match ) {
 			$points['plus'] += $match->away_points;
 			$points['minus'] += $match->home_points;

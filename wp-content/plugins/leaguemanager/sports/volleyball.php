@@ -4,7 +4,7 @@
  * 
  * @author 	Kolja Schleich
  * @package	LeagueManager
- * @copyright 	Copyright 2008-2009
+ * @copyright Copyright 2008
 */
 class LeagueManagerVolleyball extends LeagueManager
 {
@@ -27,6 +27,7 @@ class LeagueManagerVolleyball extends LeagueManager
 	{
 		add_filter( 'leaguemanager_sports', array(&$this, 'sports') );
 		add_filter( 'rank_teams_'.$this->key, array(&$this, 'rankTeams') );
+
 		add_filter( 'leaguemanager_export_matches_header_'.$this->key, array(&$this, 'exportMatchesHeader') );
 		add_filter( 'leaguemanager_export_matches_data_'.$this->key, array(&$this, 'exportMatchesData'), 10, 2 );
 		add_filter( 'leaguemanager_import_matches_'.$this->key, array(&$this, 'importMatches'), 10, 3 );
@@ -42,7 +43,6 @@ class LeagueManagerVolleyball extends LeagueManager
 
 		add_action( 'leaguemanager_save_standings_'.$this->key, array(&$this, 'saveStandings') );
 	}
-
 	function LeagueManagerSoccer()
 	{
 		$this->__construct();
@@ -93,7 +93,7 @@ class LeagueManagerVolleyball extends LeagueManager
 	{
 		global $wpdb, $leaguemanager;
 
-		$team = $wpdb->get_results( "SELECT `custom` FROM {$wpdb->leaguemanager_teams} WHERE `id` = {$team_id}" );
+		$team = $wpdb->get_results( $wpdb->prepare("SELECT `custom` FROM {$wpdb->leaguemanager_teams} WHERE `id` = '%d'", $team_id) );
 		$custom = maybe_unserialize($team->custom);
 		$custom = $this->getStandingsData($team_id, $custom);
 
@@ -115,27 +115,24 @@ class LeagueManagerVolleyball extends LeagueManager
 		$data['sets'] = array( "won" => 0, "lost" => 0 );
 		$data['ballpoints'] = array( 'plus' => 0, 'minus' => 0 );
 
-		$matches = $leaguemanager->getMatches( "(`home_team` = {$team_id} OR `away_team` = {$team_id})" );
+		$matches = $leaguemanager->getMatches( array("team_id" => $team_id, "limit" => false) );
 		foreach ( $matches AS $match ) {
 			// Home Match
 			if ( $team_id == $match->home_team ) {
 				$data['sets']['won'] += $match->home_points;
 				$data['sets']['lost'] += $match->away_points;
 	
-				if ($match->sets !== NULL) {
-					foreach ( $match->sets AS $s => $set ) {
-						$data['ballpoints']['plus'] += $set['home'];
-						$data['ballpoints']['minus'] += $set['away'];
-					}
+				foreach ( $match->sets AS $s => $set ) {
+					$data['ballpoints']['plus'] += $set['home'];
+					$data['ballpoints']['minus'] += $set['away'];
 				}
 			} else {
 				$data['sets']['won'] += $match->away_points;
 				$data['sets']['lost'] += $match->home_points;
-				if ($match->sets !== NULL) {
-					foreach ( $match->sets AS $set ) {
-						$data['ballpoints']['plus'] += $set['away'];
-						$data['ballpoints']['minus'] += $set['home'];
-					}
+	
+				foreach ( $match->sets AS $s => $set ) {
+					$data['ballpoints']['plus'] += $set['away'];
+					$data['ballpoints']['minus'] += $set['home'];
 				}
 			}
 		}
@@ -152,7 +149,7 @@ class LeagueManagerVolleyball extends LeagueManager
 	 */
 	function displayStandingsHeader()
 	{
-		echo '<th class="num" align="center">'.__( 'Sets', 'leaguemanager' ).'</th><th class="num" align="center">'.__( 'Ball Points', 'leaguemanager' ).'</th>';
+		echo '<th class="num">'.__( 'Sets', 'leaguemanager' ).'</th><th class="num">'.__( 'Ballpoints', 'leaguemanager' ).'</th>';
 	}
 
 
@@ -168,11 +165,13 @@ class LeagueManagerVolleyball extends LeagueManager
 		global $leaguemanager;
 		$league = $leaguemanager->getCurrentLeague();
 
+		if (!isset($team->sets)) $team->sets = array('won' => '', 'lost' => '');
+		if (!isset($team->ballpoints)) $team->ballpoints = array('plus' => '', 'minus' => '');
+		
 		if ( is_admin() && $rule == 'manual' )
 			echo '<td><input type="text" size="2" name="custom['.$team->id.'][sets][won]" value="'.$team->sets['won'].'" />:<input type="text" size="2" name="custom['.$team->id.'][sets][lost]" value="'.$team->sets['lost'].'" /></td><td><input type="text" size="2" name="custom['.$team->id.'][ballpoints][plus]" value="'.$team->ballpoints['plus'].'" />:<input type="text" size="2" name="custom['.$team->id.'][ballpoints][minus]" value="'.$team->ballpoints['minus'].'" /></td>';
 		else
-			echo '<td class="num" align="center">' . $team->sets['won'] . " : " . $team->sets['lost'].'</td>';
-			echo '<td class="num" align="center">' . $team->ballpoints['plus'] . " : " . $team->ballpoints['minus'].'</td>';
+			echo '<td class="num">'.sprintf($league->point_format2, $team->sets['won'], $team->sets['lost']).'</td><td class="num">'.sprintf($league->point_format2, $team->ballpoints['plus'], $team->ballpoints['minus']).'</td>';
 	}
 
 
@@ -184,6 +183,9 @@ class LeagueManagerVolleyball extends LeagueManager
 	 */
 	function editTeam( $team )
 	{
+		if (!isset($team->sets)) $team->sets = array('won' => '', 'lost' => '');
+		if (!isset($team->ballpoints)) $team->ballpoints = array('plus' => '', 'minus' => '');
+		
 		echo '<input type="hidden" name="custom[sets][won]" value="'.$team->sets['won'].'" /><input type="hidden" name="custom[sets][lost]" value="'.$team->sets['lost'].'" /><input type="hidden" name="custom[ballpoints][plus]" value="'.$team->ballpoints['plus'].'" /><input type="hidden" name="custom[ballpoints][minus]" value="'.$team->ballpoints['minus'].'" />';
 	}
 
@@ -196,7 +198,7 @@ class LeagueManagerVolleyball extends LeagueManager
 	 */
 	function displayMatchesHeader()
 	{
-		echo '<th colspan="3" align="center">'.__( 'Sets', 'leaguemanager' ).'</th>';
+		echo '<th colspan="5" style="text-align: center;">'.__( 'Sets', 'leaguemanager' ).'</th>';
 	}
 
 
@@ -208,7 +210,14 @@ class LeagueManagerVolleyball extends LeagueManager
 	 */
 	function displayMatchesColumns( $match )
 	{
-		for ( $i = 1; $i <= 3; $i++ ) {
+		if (!isset($match->sets)) {
+			$match->sets = array();
+		}
+		
+		for ( $i = 1; $i <= 5; $i++ ) {
+			if (!isset($match->sets[$i]['home'])) $match->sets[$i]['home'] = '';
+			if (!isset($match->sets[$i]['away'])) $match->sets[$i]['away'] = '';
+			
 			echo '<td><input class="points" type="text" size="2" id="set_'.$match->id.'_'.$i.'_home" name="custom['.$match->id.'][sets]['.$i.'][home]" value="'.$match->sets[$i]['home'].'" /> : <input class="points" type="text" size="2" id="set_'.$match->id.'_'.$i.'_away" name="custom['.$match->id.'][sets]['.$i.'][away]" value="'.$match->sets[$i]['away'].'" /></td>';
 		}
 	}
@@ -222,7 +231,7 @@ class LeagueManagerVolleyball extends LeagueManager
 	 */
 	function exportMatchesHeader( $content )
 	{
-		$content .= "\t"._c( 'Sets', 'leaguemanager' )."\t\t\t\t";
+		$content .= "\t".__( 'Sets', 'leaguemanager' )."\t\t\t\t";
 		return $content;
 	}
 
@@ -258,6 +267,7 @@ class LeagueManagerVolleyball extends LeagueManager
 	 */
 	function importMatches( $custom, $line, $match_id )
 	{
+		$match_id = intval($match_id);
 		for( $x = 8; $x <= 12; $x++ ) {
 			$set = explode(":",$line[$x]);
 			$custom[$match_id]['sets'][] = array( 'home' => $set[0], 'away' => $set[1] );

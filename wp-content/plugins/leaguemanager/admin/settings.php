@@ -1,10 +1,11 @@
 <?php
-if ( !current_user_can( 'manage_leagues' ) ) : 
+if ( !current_user_can( 'manage_leaguemanager' ) ) :
 	echo '<p style="text-align: center;">'.__("You do not have sufficient permissions to access this page.").'</p>';
-	
+
 else :
 	$options = get_option('leaguemanager');
-	$league = $leaguemanager->getCurrentLeague();
+	//$league = $leaguemanager->getCurrentLeague();
+	$league = $leaguemanager->getLeague( intval($_GET['league_id']) );
 	if ( isset($_POST['updateSettings']) ) {
 		check_admin_referer('leaguemanager_manage-league-options');
 
@@ -13,17 +14,17 @@ else :
 		// Set textdomain
 		$options['textdomain'] = (string)$settings['sport'];
 		update_option('leaguemanager', $options);
-		
-		if ( isset($_POST['forwin']) )
-			$settings['point_rule'] = array( 'forwin' => $_POST['forwin'], 'fordraw' => $_POST['fordraw'], 'forloss' => $_POST['forloss'], 'forwin_overtime' => $_POST['forwin_overtime'], 'forloss_overtime' => $_POST['forloss_overtime'] );
 
-		$this->editLeague( $_POST['league_title'], $settings, $_POST['league_id'] );
+		if ( $settings['point_rule'] == 'user' && isset($_POST['forwin']) && is_numeric($_POST['forwin']) )
+			$settings['point_rule'] = array( 'forwin' => intval($_POST['forwin']), 'fordraw' => intval($_POST['fordraw']), 'forloss' => intval($_POST['forloss']), 'forwin_overtime' => intval($_POST['forwin_overtime']), 'forloss_overtime' => intval($_POST['forloss_overtime']) );
+
+		$this->editLeague( htmlspecialchars($_POST['league_title']), $settings, intval($_POST['league_id']) );
 		$this->printMessage();
+		
+		$options = get_option('leaguemanager');
+		$league = $leaguemanager->getLeague( intval($_GET['league_id']) );
 	}
 	
-	$options = get_option('leaguemanager');
-	$league = $leaguemanager->getLeague( $_GET['league_id'] );
-
 	$forwin = $fordraw = $forloss = $forwin_overtime = $forloss_overtime = 0;
 	// Manual point rule
 	if ( is_array($league->point_rule) ) {
@@ -38,11 +39,11 @@ else :
 
 <div class="wrap">
 	<p class="leaguemanager_breadcrumb"><a href="admin.php?page=leaguemanager"><?php _e( 'Leaguemanager', 'leaguemanager' ) ?></a> &raquo; <a href="admin.php?page=leaguemanager&amp;subpage=show-league&amp;league_id=<?php echo $league->id ?>"><?php echo $league->title ?></a> &raquo; <?php _e( 'League Preferences', 'leaguemanager' ) ?></p>
-			
+
 	<h2><?php _e( 'League Preferences', 'leaguemanager' ) ?></h2>
 	<form action="" method="post">
 		<?php wp_nonce_field( 'leaguemanager_manage-league-options' ) ?>
-			
+
 		<table class="form-table">
 			<tr valign="top">
 				<th scope="row"><label for="league_title"><?php _e( 'Title', 'leaguemanager' ) ?></label></th><td><input type="text" name="league_title" id="league_title" value="<?php echo $league->title ?>" size="30" /></td>
@@ -52,7 +53,7 @@ else :
 				<td>
 					<select size="1" name="settings[sport]" id="sport">
 						<?php foreach ( $leaguemanager->getLeagueTypes() AS $id => $title ) : ?>
-							<option value="<?php echo $id ?>"<?php if ( $id == $league->sport ) echo ' selected="selected"' ?>><?php echo $title ?></option>
+							<option value="<?php echo $id ?>"<?php selected( $id, $league->sport ) ?>><?php echo $title ?></option>
 						<?php endforeach; ?>
 					</select>
 					<span class="setting-description"><?php printf( __( "Check the <a href='%s'>Documentation</a> for details", 'leaguemanager'), admin_url() . 'admin.php?page=leaguemanager-doc' ) ?></span>
@@ -63,7 +64,7 @@ else :
 				<td>
 					<select size="1" name="settings[point_rule]" id="point_rule" onchange="Leaguemanager.checkPointRule(<?php echo $forwin ?>, <?php echo $forwin_overtime ?>, <?php echo $fordraw ?>, <?php echo $forloss ?>, <?php echo $forloss_overtime ?>)">
 					<?php foreach ( $this->getPointRules() AS $id => $point_rule ) : ?>
-					<option value="<?php echo $id ?>"<?php if ( $id == $league->point_rule ) echo ' selected="selected"'; ?>><?php echo $point_rule ?></option>
+					<option value="<?php echo $id ?>"<?php selected( $id, $league->point_rule ) ?>><?php echo $point_rule ?></option>
 					<?php endforeach; ?>
 					</select>
 					<span class="setting-description"><?php printf( __("For details on point rules see the <a href='%s'>Documentation</a>", 'leaguemanager'), admin_url() . 'admin.php?page=leaguemanager-doc' ) ?></span>
@@ -101,10 +102,10 @@ else :
 				<th scope="row"><label for="team_ranking"><?php _e( 'Team Ranking', 'leaguemanager' ) ?></label></th>
 				<td>
 					<select size="1" name="settings[team_ranking]" id="team_ranking" >
-						<option value="auto"<?php if ( 'auto' == $league->team_ranking  ) echo ' selected="selected"'; ?>><?php _e( 'Automatic', 'leaguemanager' ) ?></option>
-						<option value="manual"<?php if ( 'manual' == $league->team_ranking  ) echo ' selected="selected"'; ?>><?php _e( 'Manual', 'leaguemanager' ) ?></option>
+						<option value="auto"<?php selected( 'auto', $league->team_ranking  ) ?>><?php _e( 'Automatic', 'leaguemanager' ) ?></option>
+						<option value="manual"<?php selected( 'manual', $league->team_ranking  ) ?>><?php _e( 'Manual', 'leaguemanager' ) ?></option>
 					</select>
-					&#160;<span class="setting-description"><?php _e( 'Team Ranking via Drag & Drop probably will only work in Firefox', 'leaguemanager' ) ?></span>
+					<!--&#160;<span class="setting-description"><?php _e( 'Team Ranking via Drag & Drop probably will only work in Firefox', 'leaguemanager' ) ?></span>-->
 				</td>
 			</tr>
 			<tr valign="top">
@@ -112,7 +113,7 @@ else :
 				<td>
 					<select size="1" name="settings[mode]" id="mode">
 					<?php foreach ( $this->getModes() AS $id => $mode ) : ?>
-						<option value="<?php echo $id ?>"<?php if ( $id == $league->mode ) echo ' selected="selected"' ?>><?php echo $mode ?></option>
+						<option value="<?php echo $id ?>"<?php selected( $id, $league->mode ) ?>><?php echo $mode ?></option>
 					<?php endforeach; ?>
 					</select>
 				</td>
@@ -149,27 +150,29 @@ else :
 			</tr>
 			<tr valign="top">
 				<th scope="row"><label for="teams_ascend"><?php _e( 'Teams Ascend', 'leaguemanager' ) ?></label></th>
-				<td><input type="text" name="settings[num_ascend]" id="teams_ascend" value="<?php echo $league->num_ascend ?>" size="2" />&#160;<span class="setting-description"><?php _e( 'Number of Teams that ascend into higher league', 'leaguemanager' ) ?></span></td>
+				<td><input type="number" step="1" min="0" class="small-text" name="settings[num_ascend]" id="teams_ascend" value="<?php echo $league->num_ascend ?>" size="2" />&#160;<span class="setting-description"><?php _e( 'Number of Teams that ascend into higher league', 'leaguemanager' ) ?></span></td>
 			</tr>
 			<tr valign="top">
 				<th scope="row"><label for="teams_descend"><?php _e( 'Teams Descend', 'leaguemanager' ) ?></label></th>
-				<td><input type="text" name="settings[num_descend]" id="teams_descend" value="<?php echo $league->num_descend ?>" size="2" />&#160;<span class="setting-description"><?php _e( 'Number of Teams that descend into lower league', 'leaguemanager' ) ?></span></td>
+				<td><input type="number" step="1" min="0" class="small-text" name="settings[num_descend]" id="teams_descend" value="<?php echo $league->num_descend ?>" size="2" />&#160;<span class="setting-description"><?php _e( 'Number of Teams that descend into lower league', 'leaguemanager' ) ?></span></td>
 			</tr>
 			<tr valign="top">
 				<th scope="row"><label for="teams_relegation"><?php _e( 'Teams Relegation', 'leaguemanager' ) ?></label></th>
-				<td><input type="text" name="settings[num_relegation]" id="teams_relegation" value="<?php echo $league->num_relegation ?>" size="2" />&#160;<span class="setting-description"><?php _e( 'Number of Teams that need to go into relegation', 'leaguemanager' ) ?></span></td>
+				<td><input type="number" step="1" min="0" class="small-text" name="settings[num_relegation]" id="teams_relegation" value="<?php echo $league->num_relegation ?>" size="2" />&#160;<span class="setting-description"><?php _e( 'Number of Teams that need to go into relegation', 'leaguemanager' ) ?></span></td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label for="num_matches_per_page"><?php _e( 'Matches per page', 'leaguemanager' ) ?></label></th>
+				<td><input type="number" step="1" min="0" class="small-text" name="settings[num_matches_per_page]" id="num_matches_per_page" value="<?php echo $league->num_matches_per_page ?>" size="2" />&#160;<span class="setting-description"><?php _e( 'Number of matches to show per page', 'leaguemanager' ) ?></span></td>
 			</tr>
 
-			<?php do_action( 'league_settings_'.$league->sport, $league ); ?> 
-			<?php do_action( 'league_settings_'.$league->mode, $league ); ?> 
-			<?php do_action( 'league_settings', $league ); ?> 
+			<?php do_action( 'league_settings_'.$league->sport, $league ); ?>
+			<?php do_action( 'league_settings_'.$league->mode, $league ); ?>
+			<?php do_action( 'league_settings', $league ); ?>
 		</table>
-		
+
 		<input type="hidden" name="league_id" value="<?php echo $league->id ?>" />
-		<p class="submit"><input type="submit" name="updateSettings" value="<?php _e( 'Save Preferences', 'leaguemanager' ) ?> &raquo;" class="button" /></p>
+		<p class="submit"><input type="submit" name="updateSettings" value="<?php _e( 'Save Preferences', 'leaguemanager' ) ?> &raquo;" class="button button-primary" /></p>
 	</form>
 </div>
-
-
 
 <?php endif; ?>

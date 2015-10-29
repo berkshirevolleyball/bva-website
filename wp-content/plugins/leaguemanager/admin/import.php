@@ -1,11 +1,11 @@
 <?php
-     if ( !current_user_can( 'manage_leagues' ) ) : 
+if ( !current_user_can( 'manage_leaguemanager' ) ) :
      echo '<p style="text-align: center;">'.__("You do not have sufficient permissions to access this page.").'</p>';
 else :
 
 if ( isset($_POST['import']) ) {
 	check_admin_referer('leaguemanager_import-datasets');
-	$this->import( $_POST['league_id'], $_FILES['leaguemanager_import'], $_POST['delimiter'], $_POST['mode'] );
+	$this->import( intval($_POST['league_id']), $_FILES['leaguemanager_import'], htmlspecialchars($_POST['delimiter']), htmlspecialchars($_POST['mode']) );
      	$this->printMessage();
 }
 ?>
@@ -48,7 +48,7 @@ if ( isset($_POST['import']) ) {
 	</tr>
 	</table>
 
-	<p class="submit"><input type="submit" name="import" value="<?php _e( 'Upload file and import' ); ?>" class="button" /></p>
+	<p class="submit"><input type="submit" name="import" value="<?php _e( 'Upload file and import' ); ?>" class="button button-primary" /></p>
 	</form>
 </div>
 <?php endif; ?>
