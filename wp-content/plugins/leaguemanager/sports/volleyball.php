@@ -74,11 +74,12 @@ class LeagueManagerVolleyball extends LeagueManager
 			$points[$key] = $row->points['plus']+$row->add_points;
 			$set_diff[$key] = $row->sets['plus']-$row->sets['minus'];
 			$won_sets[$key] = $row->sets['plus'];
+			$lost_sets[$key] = $row->sets['minus'];
 			$ballpoints_diff[$key] = $row->ballpoints['plus']-$row->ballpoints['minus'];
 			$ballpoints[$key] = $row->ballpoints['plus'];
 		}
 
-		array_multisort( $points, SORT_DESC, $set_diff, SORT_DESC, $won_sets, SORT_DESC, $ballpoints_diff, SORT_DESC, $ballpoints, SORT_DESC, $teams );
+		array_multisort( $points, SORT_DESC, $lost_sets, SORT_ASC, $won_sets, SORT_DESC, $teams );
 		return $teams;
 	}
 
